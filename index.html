@@ -3,339 +3,567 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>StrategyMind — AI pro příležitosti, reality a money management</title>
+  <title>StrategyMind — AI pro příležitosti, trhy, reality & money management</title>
 
+  <!-- Ikony / OG -->
   <link rel="icon" type="image/png" href="logo.png" />
-  <meta property="og:title" content="StrategyMind — AI pro příležitosti, reality a money management" />
+  <meta property="og:title" content="StrategyMind — AI pro příležitosti, trhy, reality & money management" />
   <meta property="og:image" content="logo.png" />
   <meta name="twitter:card" content="summary_large_image" />
 
+  <!-- Tailwind CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
-    tailwind.config = { theme: { extend: {
-      colors: { brand:'#0A2342', mint:'#2bd4a9', ink:'#0f172a' },
-      boxShadow: { soft:'0 20px 60px -20px rgba(2,6,23,.12)' },
-      borderRadius: { xl2:'1.25rem' }
-    }}};</script>
-  <style>html{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}</style>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: { brand:'#0A2342', mint:'#2bd4a9', ink:'#0f172a', bear:'#ef4444', bull:'#10b981' },
+          boxShadow: { soft:'0 20px 60px -20px rgba(2,6,23,.12)' },
+          borderRadius: { xl2:'1.25rem' }
+        }
+      }
+    }
+  </script>
 
-  <!-- Stripe.js -->
-  <script src="https://js.stripe.com/v3/"></script>
-  <!-- jsPDF pro PDF export -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <!-- Chart.js pro grafy -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+  <style>html{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}</style>
 </head>
 <body class="bg-gradient-to-b from-slate-50 via-white to-slate-50 text-slate-900">
 
-<header class="sticky top-0 z-50 border-b border-slate-200 bg-white/80 backdrop-blur">
-  <div class="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-    <a class="flex items-center gap-3">
-      <img src="logo.png" class="h-10 w-10 rounded-2xl" alt="StrategyMind" fetchpriority="high" loading="eager">
-      <span class="text-xl font-semibold">StrategyMind</span>
-    </a>
-    <nav class="hidden gap-8 text-sm md:flex">
-      <a href="#opps">Opportunity Finder</a>
-      <a href="#locations">Lokace & Reality</a>
-      <a href="#money">Money</a>
-      <a href="#pricing">Ceník</a>
-      <a href="#faq">FAQ</a>
-    </nav>
-    <div class="hidden md:block"><a href="#cta" class="rounded-xl bg-brand px-4 py-2 text-white shadow-soft">Vyzkoušet zdarma</a></div>
-    <button id="menuBtn" class="md:hidden h-10 w-10 rounded-xl border">☰</button>
-  </div>
-  <div id="menuSheet" class="hidden border-t md:hidden">
-    <div class="mx-auto max-w-7xl px-6 py-4 text-sm"><a href="#opps" onclick="closeMenu()">Opportunity Finder</a> · <a href="#locations" onclick="closeMenu()">Lokace</a> · <a href="#money" onclick="closeMenu()">Money</a> · <a href="#pricing" onclick="closeMenu()">Ceník</a> · <a href="#faq" onclick="closeMenu()">FAQ</a></div>
-  </div>
-</header>
-
-<main class="mx-auto grid max-w-7xl grid-cols-1 items-center gap-10 px-6 pb-16 pt-10 md:grid-cols-2">
-  <div>
-    <span class="inline-block rounded-full border bg-white/70 px-3 py-1 text-xs text-slate-600 shadow">★ MVP pro podnikatele & investory</span>
-    <h1 class="mt-4 text-4xl font-extrabold sm:text-5xl">Najdi příležitost, vyber lokaci a <span class="bg-gradient-to-r from-emerald-600 to-teal-400 bg-clip-text text-transparent">akceleruj s AI</span></h1>
-    <p class="mt-4 max-w-xl text-slate-600">Plány, lokace i money management – všechno v jednom. Exportuj výstupy do PDF/MD.</p>
-    <div class="mt-6 flex gap-3">
-      <a href="#opps" class="rounded-xl bg-brand px-4 py-2 text-white shadow-soft">Spustit Opportunity Finder</a>
-      <a href="#locations" class="rounded-xl border px-4 py-2">Analýza lokací</a>
+  <!-- NAV -->
+  <header class="sticky top-0 z-50 border-b border-slate-200 bg-white/80 backdrop-blur">
+    <div class="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
+      <a href="#" class="flex items-center gap-3 select-none">
+        <img src="logo.png" alt="StrategyMind logo" class="h-10 w-10 rounded-2xl" loading="eager" decoding="sync">
+        <span class="text-xl font-semibold tracking-tight">StrategyMind</span>
+      </a>
+      <nav class="hidden items-center gap-8 text-sm md:flex">
+        <a class="hover:text-slate-700" href="#market">Market & News</a>
+        <a class="hover:text-slate-700" href="#re">Real-Estate</a>
+        <a class="hover:text-slate-700" href="#academy">Academy</a>
+        <a class="hover:text-slate-700" href="#money">Money Mgmt</a>
+        <a class="hover:text-slate-700" href="#pricing">Ceník</a>
+      </nav>
+      <div class="hidden md:block">
+        <button id="checkoutPro" class="rounded-xl bg-brand px-4 py-2 text-white shadow-soft transition hover:-translate-y-0.5">
+          Vyzkoušet Pro
+        </button>
+      </div>
+      <button id="menuBtn" class="md:hidden inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200">☰</button>
     </div>
-  </div>
-  <div class="relative">
-    <div class="absolute -inset-6 -z-10 rounded-[2rem] bg-gradient-to-tr from-emerald-500/20 via-teal-400/10 to-transparent blur-2xl"></div>
-    <div class="relative mx-auto max-w-sm rounded-[2rem] border bg-white p-8 shadow-2xl"><img src="logo.png" class="mx-auto h-40 w-40" alt="logo" loading="eager"></div>
-  </div>
-</main>
-
-<section id="opps" class="border-t bg-white/60 py-16">
-  <div class="mx-auto max-w-7xl px-6">
-    <div class="flex items-center justify-between gap-4">
-      <h2 class="text-3xl font-bold">Opportunity Finder (AI)</h2>
-      <div class="flex items-center gap-2">
-        <button id="downloadReportBtn" class="rounded-xl border px-3 py-2 text-sm">⬇️ Stáhnout report</button>
+    <div id="menuSheet" class="hidden border-t border-slate-200 md:hidden">
+      <div class="mx-auto flex max-w-7xl flex-col gap-4 px-6 py-4 text-sm">
+        <a href="#market" onclick="closeMenu()">Market & News</a>
+        <a href="#re" onclick="closeMenu()">Real-Estate</a>
+        <a href="#academy" onclick="closeMenu()">Academy</a>
+        <a href="#money" onclick="closeMenu()">Money Mgmt</a>
+        <a href="#pricing" onclick="closeMenu()">Ceník</a>
       </div>
     </div>
-    <p class="mt-2 max-w-3xl text-slate-600">Popiš nápad, přidej Search API, a stáhni si výstup jako report.</p>
+  </header>
 
-    <!-- Form -->
-    <form id="oppsForm" class="mt-6 grid gap-4 rounded-2xl border bg-white p-4 shadow-sm sm:grid-cols-2 lg:grid-cols-3">
-      <label class="text-sm">Cíl / nápad
-        <input id="idea" required class="mt-1 w-full rounded-xl border px-3 py-2 text-sm" placeholder="např. Mikro-SaaS pro účetní">
-      </label>
-      <label class="text-sm">Rozpočet (Kč)
-        <input id="budget" type="number" min="0" step="1000" class="mt-1 w-full rounded-xl border px-3 py-2 text-sm" placeholder="100000">
-      </label>
-      <label class="text-sm">Horizont (měsíce)
-        <input id="horizon" type="number" min="1" max="36" value="12" class="mt-1 w-full rounded-xl border px-3 py-2 text-sm">
-      </label>
-      <label class="text-sm">Segment
-        <select id="segment" class="mt-1 w-full rounded-xl border px-3 py-2 text-sm">
-          <option value="smb">SMB</option><option value="ecommerce">E-commerce</option><option value="content">Obsah</option><option value="realestate">Reality</option><option value="crypto">Krypto</option>
-        </select>
-      </label>
-      <label class="text-sm">Zdroj dat
-        <select id="provider" class="mt-1 w-full rounded-xl border px-3 py-2 text-sm">
-          <option value="tavily" selected>Tavily (research)</option>
-          <option value="serp">SerpAPI (Google)</option>
-        </select>
-      </label>
-      <div class="lg:col-span-1 sm:col-span-2 flex items-end justify-end">
-        <label class="mr-auto inline-flex items-center gap-2 text-sm"><input id="useSearch" type="checkbox" class="h-4 w-4 rounded border-slate-300"> Připojit Search API</label>
-        <button class="rounded-xl bg-brand px-4 py-2 text-sm font-semibold text-white shadow-soft" type="submit">Najít příležitosti</button>
-      </div>
-    </form>
+  <!-- HERO -->
+  <main class="mx-auto grid max-w-7xl grid-cols-1 items-center gap-10 px-6 pb-16 pt-10 md:grid-cols-2">
+    <div>
+      <span class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white/70 px-3 py-1 text-xs text-slate-600 shadow">
+        ★ AI toolkit pro podnikatele, investory i města
+      </span>
+      <h1 class="mt-4 text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl">
+        Jedna platforma pro <span class="bg-gradient-to-r from-emerald-600 to-teal-400 bg-clip-text text-transparent">trhy, reality a rozhodnutí</span>
+      </h1>
+      <p class="mt-5 max-w-xl text-base leading-relaxed text-slate-600">
+        Market & news analýza (intraday i long-term), predikce s pravděpodobností, globální real-estate s katastrem,
+        a praktická Academy + Money Management zvyky. Bezpečné API přes tvůj Worker.
+      </p>
 
-    <!-- Results -->
-    <div id="oppsOut" class="mt-6 grid gap-4 md:grid-cols-2"></div>
-  </div>
-</section>
-
-<section id="locations" class="border-t bg-white/60 py-16">
-  <div class="mx-auto max-w-7xl px-6">
-    <h2 class="text-3xl font-bold">Lokace & Reality (AI Location Scanner)</h2>
-    <form id="locForm" class="mt-6 grid gap-4 rounded-2xl border bg-white p-4 shadow-sm md:grid-cols-4">
-      <input id="loc" class="rounded-xl border px-3 py-2 text-sm" placeholder="Region / město (např. Praha)">
-      <select id="asset" class="rounded-xl border px-3 py-2 text-sm"><option value="apartment">Byt</option><option value="house">Dům</option><option value="land">Pozemek</option><option value="commercial">Komerční</option></select>
-      <input id="cap" type="number" class="rounded-xl border px-3 py-2 text-sm" placeholder="Rozpočet (Kč)">
-      <button class="rounded-xl bg-brand px-4 py-2 text-sm font-semibold text-white shadow-soft">Analyzovat</button>
-    </form>
-    <div id="locOut" class="mt-6 grid gap-4 md:grid-cols-3"></div>
-  </div>
-</section>
-
-<section id="pricing" class="border-y bg-white/60 py-16">
-  <div class="mx-auto max-w-7xl px-6">
-    <h2 class="text-3xl font-bold">Jednoduchý ceník</h2>
-    <div class="mt-8 grid gap-6 md:grid-cols-3">
-      <div class="rounded-2xl border bg-white p-6 shadow-sm">
-        <h3 class="text-lg font-semibold">Starter</h3>
-        <div class="mt-2 text-3xl font-extrabold">0</div>
-        <a href="#cta" class="mt-6 inline-block rounded-xl border px-4 py-2 text-sm font-semibold">Začít zdarma</a>
-      </div>
-      <div class="rounded-2xl border-2 border-brand bg-white p-6 shadow-sm">
-        <h3 class="text-lg font-semibold">Pro</h3>
-        <div class="mt-2 text-3xl font-extrabold">290 Kč<span class="text-base font-semibold text-slate-600">/měs</span></div>
-        <button id="buyProBtn" class="mt-6 inline-block rounded-xl bg-brand px-4 py-2 text-sm font-semibold text-white shadow-sm">Vybrat Pro</button>
-      </div>
-      <div class="rounded-2xl border bg-white p-6 shadow-sm">
-        <h3 class="text-lg font-semibold">Enterprise</h3>
-        <div class="mt-2 text-3xl font-extrabold">Na dotaz</div>
-        <a href="#cta" class="mt-6 inline-block rounded-xl border px-4 py-2 text-sm font-semibold">Kontakt</a>
+      <div class="mt-8 flex flex-col items-start gap-3 sm:flex-row sm:items-center">
+        <a href="#market" class="group inline-flex items-center justify-center rounded-2xl bg-brand px-5 py-3 font-medium text-white shadow-soft transition hover:-translate-y-0.5">
+          Spustit Market & News
+          <svg class="ml-2 h-5 w-5 transition group-hover:translate-x-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+        </a>
+        <a href="#re" class="inline-flex items-center justify-center rounded-2xl border border-slate-300 bg-white px-5 py-3 text-sm shadow-sm">Zobrazit Reality + Katastr</a>
       </div>
     </div>
-  </div>
-</section>
 
-<section id="faq" class="mx-auto max-w-7xl px-6 py-16">
-  <h2 class="text-3xl font-bold">Časté dotazy</h2>
-  <details class="mt-4 rounded-2xl border bg-white p-5"><summary class="font-semibold">Jak funguje platba?</summary><p class="mt-2 text-sm text-slate-600">Stripe Payment Request (Apple/Google Pay). Platba probíhá bezpečně přes Stripe.</p></details>
-</section>
-
-<footer class="mx-auto max-w-7xl px-6 pb-10">
-  <div class="rounded-2xl border bg-white/70 p-5 text-xs text-slate-500 shadow-sm">© <span id="y"></span> StrategyMind</div>
-</footer>
-
-<!-- ===== Checkout Modal ===== -->
-<div id="checkoutModal" class="fixed inset-0 z-[999] hidden items-center justify-center bg-black/40 p-4">
-  <div class="w-full max-w-md rounded-2xl border bg-white p-6 shadow-2xl">
-    <div class="flex items-start justify-between">
-      <div>
-        <h3 class="text-lg font-semibold">Košík — StrategyMind Pro</h3>
-        <p class="text-sm text-slate-600">Měsíční předplatné</p>
+    <div class="relative">
+      <div class="pointer-events-none absolute -inset-6 -z-10 rounded-[2rem] bg-gradient-to-tr from-emerald-500/20 via-teal-400/10 to-transparent blur-2xl"></div>
+      <div class="relative mx-auto max-w-sm rounded-[2rem] border border-slate-200 bg-white p-8 shadow-2xl">
+        <img src="logo.png" alt="StrategyMind" class="mx-auto h-40 w-40" loading="eager" decoding="sync">
       </div>
-      <button id="closeCheckout" class="rounded-lg border px-2 py-1 text-sm">✕</button>
     </div>
-    <div class="mt-4 flex items-center justify-between">
-      <div class="text-sm text-slate-700">Cena</div>
-      <div class="text-right"><div class="text-xl font-bold">290 Kč</div><div class="text-xs text-slate-500">vč. DPH</div></div>
+  </main>
+
+  <!-- ========== MARKET & NEWS ========== -->
+  <section id="market" class="border-t border-slate-200 bg-white/60 py-16">
+    <div class="mx-auto max-w-7xl px-6">
+      <div class="flex items-center justify-between gap-4">
+        <h2 class="text-3xl font-bold tracking-tight">Market & News (AI)</h2>
+        <span class="text-xs text-slate-500">Intraday i dlouhodobě · predikce s pravděpodobností</span>
+      </div>
+      <p class="mt-2 max-w-3xl text-slate-600">Zadej symbol (např. <b>AAPL</b>, <b>MSFT</b>, <b>TSLA</b>, <b>^GSPC</b>), vyber horizont a spusť analýzu. Zdroje: tvé finance API (Worker proxy) + zpravodajství přes Search API.</p>
+
+      <form id="marketForm" class="mt-6 grid gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm md:grid-cols-5">
+        <label class="text-sm md:col-span-2">Ticker / Index
+          <input id="ticker" placeholder="např. AAPL, ^GSPC" class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm" />
+        </label>
+        <label class="text-sm">
+          Horizont
+          <select id="horizon" class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm">
+            <option value="1d">Intraday (1D)</option>
+            <option value="1mo" selected>1 měsíc</option>
+            <option value="6mo">6 měsíců</option>
+            <option value="1y">1 rok</option>
+          </select>
+        </label>
+        <label class="text-sm">
+          Interval
+          <select id="interval" class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm">
+            <option value="5m">5 min</option>
+            <option value="15m" selected>15 min</option>
+            <option value="1d">1 den</option>
+          </select>
+        </label>
+        <div class="flex items-end">
+          <button class="w-full rounded-xl bg-brand px-4 py-2 text-sm font-semibold text-white shadow-soft" type="submit">Analyzovat</button>
+        </div>
+      </form>
+
+      <div class="mt-6 grid gap-4 md:grid-cols-3">
+        <!-- Price & prediction -->
+        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm md:col-span-2">
+          <div class="flex items-center justify-between">
+            <div>
+              <div id="mktTitle" class="text-base font-semibold">Symbol</div>
+              <div id="mktPrice" class="mt-1 text-3xl font-extrabold">—</div>
+              <div class="mt-2 text-xs text-slate-500" id="mktMeta">—</div>
+            </div>
+            <div id="predBox" class="text-right">
+              <div class="text-xs text-slate-500">Predikce (7–30 dní)</div>
+              <div id="predValue" class="mt-1 text-2xl font-extrabold">—</div>
+              <div id="predProb" class="text-xs"></div>
+            </div>
+          </div>
+          <div class="mt-5">
+            <canvas id="mktChart" height="120"></canvas>
+          </div>
+        </div>
+
+        <!-- News -->
+        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <div class="flex items-center justify-between">
+            <div class="text-base font-semibold">Zprávy & Sentiment</div>
+            <button id="refreshNews" class="rounded-lg border border-slate-300 px-2 py-1 text-xs">Obnovit</button>
+          </div>
+          <div id="newsList" class="mt-3 space-y-3 text-sm"></div>
+        </div>
+      </div>
+
+      <p class="mt-4 text-xs text-slate-500">Upozornění: Predikce je pouze edukativní. Nejedná se o investiční doporučení.</p>
     </div>
+  </section>
 
-    <div class="mt-6">
-      <div id="paymentRequestButton" class="w-full"></div>
-      <div id="payInfo" class="mt-3 text-xs text-slate-500">Podporujeme Apple Pay / Google Pay (dle zařízení).</div>
-      <div id="payError" class="mt-3 hidden rounded-lg border border-rose-200 bg-rose-50 p-2 text-xs text-rose-700"></div>
-      <div id="paySuccess" class="mt-3 hidden rounded-lg border border-emerald-200 bg-emerald-50 p-2 text-xs text-emerald-700"></div>
+  <!-- ========== REAL-ESTATE + KATASTR ========== -->
+  <section id="re" class="border-t border-slate-200 bg-white/60 py-16">
+    <div class="mx-auto max-w-7xl px-6">
+      <h2 class="text-3xl font-bold tracking-tight">Real-Estate (globálně) + Katastr</h2>
+      <p class="mt-2 max-w-3xl text-slate-600">Vyhledej region / město a typ aktiva. Zobrazíme tipy + přímý odkaz na katastr/parcelu (dle země), případně obecný geoweb.</p>
+
+      <form id="reForm" class="mt-6 grid gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm md:grid-cols-4">
+        <label class="text-sm md:col-span-2">Region / Město
+          <input id="reLoc" placeholder="např. Praha, Brno, Berlin, Austin" class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm">
+        </label>
+        <label class="text-sm">
+          Aktivum
+          <select id="reAsset" class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm">
+            <option value="apartment">Byt</option>
+            <option value="house">Dům</option>
+            <option value="land">Pozemek</option>
+            <option value="commercial">Komerční</option>
+          </select>
+        </label>
+        <div class="flex items-end">
+          <button class="w-full rounded-xl bg-brand px-4 py-2 text-sm font-semibold text-white shadow-soft" type="submit">Najít příležitosti</button>
+        </div>
+      </form>
+
+      <div id="reOut" class="mt-6 grid gap-4 md:grid-cols-3"></div>
     </div>
-  </div>
-</div>
+  </section>
 
-<script>
-/* === Konfigurace endpoints & klíčů === */
-const AI_PROXY_URL   = "https://tight-field-436e.matejmelichr.workers.dev/api/chat";
-const SEARCH_API_URL = "https://tight-field-436e.matejmelichr.workers.dev/api/search";
-const PAY_INTENT_URL = "https://tight-field-436e.matejmelichr.workers.dev/api/create-payment-intent";
-const STRIPE_PUBLISHABLE_KEY = "pk_live_51Rn2ya013WiSlBdJ5BY7CgSGxigc1449mNZ4WGkIPrxEEqBnm4fytHXYhBjEuh0gA0bOuJqzBl3r0FHp31uWD4ox00lF8OL2nD"; // ✅ tvůj live publishable key
+  <!-- ========== ACADEMY ========== -->
+  <section id="academy" class="border-t border-slate-200 bg-white/60 py-16">
+    <div class="mx-auto max-w-7xl px-6">
+      <h2 class="text-3xl font-bold tracking-tight">Academy</h2>
+      <div class="mt-4 grid gap-6 md:grid-cols-2">
+        <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <h3 class="text-lg font-semibold">Trading (základy → praxe)</h3>
+          <ul class="mt-3 list-disc pl-5 text-sm text-slate-700 space-y-2">
+            <li>Riziko / pozice / deník obchodů</li>
+            <li>Signály: trend (EMA), moment, breakout vs. mean reversion</li>
+            <li>Intraday vs. swing: plán, cíle, řízení ztrát</li>
+            <li>Checklist před vstupem + de-brief</li>
+          </ul>
+        </div>
+        <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <h3 class="text-lg font-semibold">Business (nápad → tržby)</h3>
+          <ul class="mt-3 list-disc pl-5 text-sm text-slate-700 space-y-2">
+            <li>Discovery (rozhovory), MVP, pricing</li>
+            <li>Nábor prvních zákazníků (SEO, partnerství, paid)</li>
+            <li>Unit economics, metriky (North Star, LTV/CAC)</li>
+            <li>Lean roadmap + prioritizace</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
 
-/* === Menu / UI === */
-const menuBtn=document.getElementById('menuBtn'), menuSheet=document.getElementById('menuSheet');
-function closeMenu(){ menuSheet.classList.add('hidden'); }
-menuBtn?.addEventListener('click',()=>menuSheet.classList.toggle('hidden'));
-document.getElementById('y').textContent = new Date().getFullYear();
+  <!-- ========== MONEY MANAGEMENT ========== -->
+  <section id="money" class="border-t border-slate-200 bg-white/60 py-16">
+    <div class="mx-auto max-w-7xl px-6">
+      <h2 class="text-3xl font-bold tracking-tight">Money Management (pro „outsidery“)</h2>
+      <div class="mt-6 grid gap-6 md:grid-cols-3">
+        <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <h3 class="text-lg font-semibold">1) Cashflow Basics</h3>
+          <ul class="mt-3 list-disc pl-5 text-sm text-slate-700 space-y-1">
+            <li>Pravidlo 50 / 30 / 20</li>
+            <li>První krok: odkládej 10–20 % hned po příjmu</li>
+            <li>Emergency fond na 3–6 měsíců</li>
+          </ul>
+        </div>
+        <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <h3 class="text-lg font-semibold">2) Dluhy & rizika</h3>
+          <ul class="mt-3 list-disc pl-5 text-sm text-slate-700 space-y-1">
+            <li>Splať drahé dluhy (priorita)</li>
+            <li>Pojistky: zdraví/příjem/odpovědnost</li>
+            <li>Diverzifikace a návyky</li>
+          </ul>
+        </div>
+        <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <h3 class="text-lg font-semibold">3) Investiční plán</h3>
+          <ul class="mt-3 list-disc pl-5 text-sm text-slate-700 space-y-1">
+            <li>Horizont, riziko, cíle</li>
+            <li>Automatizace investic</li>
+            <li>Revize kvartálně (řiď se daty)</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
 
-/* === Helpers === */
-const el=(t,c,h)=>{ const n=document.createElement(t); if(c) n.className=c; if(h!==undefined) n.innerHTML=h; return n; }
-const safeFetch=async(u,o)=>{ try{ const r=await fetch(u,o); if(!r.ok) throw new Error(await r.text()); return r.json(); }catch(e){ console.warn(e); return null; } }
+  <!-- ========== PRICING ========== -->
+  <section id="pricing" class="border-y border-slate-200 bg-white/60 py-16">
+    <div class="mx-auto max-w-7xl px-6">
+      <h2 class="text-3xl font-bold tracking-tight">Ceník</h2>
+      <div class="mt-8 grid gap-6 md:grid-cols-3">
+        <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <h3 class="text-lg font-semibold">Starter</h3>
+          <div class="mt-2 text-3xl font-extrabold">0</div>
+          <ul class="mt-4 space-y-2 text-sm text-slate-600">
+            <li>1 aktivní projekt</li>
+            <li>AI doporučení (základ)</li>
+            <li>Money mgmt lekce</li>
+          </ul>
+        </div>
+        <div class="rounded-2xl border-2 border-brand bg-white p-6 shadow-sm">
+          <h3 class="text-lg font-semibold">Pro</h3>
+          <div class="mt-2 text-3xl font-extrabold">499 Kč<span class="text-base font-semibold text-slate-600">/měs</span></div>
+          <ul class="mt-4 space-y-2 text-sm text-slate-600">
+            <li>Market & News (živé API)</li>
+            <li>Predikce + exporty</li>
+            <li>Real-Estate s katastrem</li>
+          </ul>
+          <button id="checkoutPro2" class="mt-6 inline-block rounded-xl bg-brand px-4 py-2 text-sm font-semibold text-white shadow-sm">Vybrat Pro</button>
+        </div>
+        <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <h3 class="text-lg font-semibold">Enterprise</h3>
+          <div class="mt-2 text-3xl font-extrabold">Na dotaz</div>
+          <ul class="mt-4 space-y-2 text-sm text-slate-600">
+            <li>SSO, on-prem</li>
+            <li>Vazba na interní systémy</li>
+            <li>Specifické modely & compliance</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
 
-/* === AI === */
-async function askAI({ system, user, model='gpt-4o-mini' }) {
-  const res = await safeFetch(AI_PROXY_URL, {
-    method:'POST', headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({ model, messages:[{role:'system',content:system},{role:'user',content:user}] })
-  });
-  return res?.choices?.[0]?.message || res?.message || { content:'(bez odpovědi)' };
-}
+  <footer class="mx-auto max-w-7xl px-6 pb-10">
+    <div class="rounded-2xl border border-slate-200 bg-white/70 p-5 text-xs text-slate-500 shadow-sm">© <span id="y"></span> StrategyMind</div>
+  </footer>
 
-/* === Search === */
-async function runSearch(query, segment) {
-  const provider = document.getElementById('provider')?.value || 'tavily';
-  const u = new URL(SEARCH_API_URL);
-  u.searchParams.set('q',query);
-  if (segment) u.searchParams.set('segment',segment);
-  u.searchParams.set('provider', provider); // tavily | serp
-  const data = await safeFetch(u.toString());
-  return Array.isArray(data) ? data : [];
-}
+  <!-- ======================= JS ======================= -->
+  <script>
+    // ====== Konfigurace endpointů ======
+    const AI_PROXY_URL   = "/api/chat";            // Worker chat proxy (OpenAI)
+    const SEARCH_API_URL = "/api/search";          // Worker search proxy (SerpAPI/Tavily)
+    const MARKET_API_URL = "/api/market";          // Worker finance proxy (Finnhub/Polygon/AlphaVantage)
+    const NEWS_API_URL   = "/api/news";            // Volitelné – fallback na SEARCH_API_URL
 
-/* === Opportunity Finder === */
-const oppsForm = document.getElementById('oppsForm'), oppsOut=document.getElementById('oppsOut');
-oppsForm.addEventListener('submit', async (e)=>{
-  e.preventDefault(); oppsOut.innerHTML='';
-  const idea=document.getElementById('idea').value.trim();
-  const budget=document.getElementById('budget').value.trim();
-  const horizon=document.getElementById('horizon').value.trim();
-  const segment=document.getElementById('segment').value;
-  const useSearch=document.getElementById('useSearch').checked;
+    // ====== UI drobnosti ======
+    const menuBtn=document.getElementById('menuBtn');
+    const menuSheet=document.getElementById('menuSheet');
+    function closeMenu(){ menuSheet.classList.add('hidden'); }
+    menuBtn?.addEventListener('click',()=> menuSheet.classList.toggle('hidden'));
+    document.getElementById('y').textContent = new Date().getFullYear();
 
-  const loading=el('div','rounded-2xl border bg-white p-6 text-sm shadow-sm','⏳ Zpracovávám…'); oppsOut.appendChild(loading);
-  let search=[]; if(useSearch) search=await runSearch(idea,segment);
+    // ====== Helpers ======
+    async function safeFetch(url, opts){
+      try{
+        const r = await fetch(url, opts);
+        if(!r.ok) throw new Error(await r.text());
+        const ct = r.headers.get("content-type")||"";
+        if(ct.includes("application/json")) return await r.json();
+        return await r.text();
+      }catch(e){
+        console.warn('fetch failed', url, e);
+        return null;
+      }
+    }
+    function fmt(n, d=2){
+      if(n==null || isNaN(n)) return "—";
+      return Number(n).toLocaleString('cs-CZ',{minimumFractionDigits:d, maximumFractionDigits:d});
+    }
 
-  const system='Jsi strategický AI poradce pro podnikatele a investory. Piš česky, bodově, jasné priority, stručné kroky.';
-  const user=`Nápad: "${idea}"\nSegment: ${segment}\nRozpočet: ${budget||'neuveden'}\nHorizont: ${horizon} měs.\nSearch:\n${search.map((r,i)=>`#${i+1} ${(r.title||'')} — ${(r.snippet||'')}`).join('\n')}\nVrať: 3–5 příležitostí, akční plán (MVP→akvizice→monetizace), metriky.`;
-  const ai=await askAI({ system, user });
-  loading.remove();
+    // ====== Stripe checkout ======
+    async function goCheckout(){
+      const res = await safeFetch('/api/checkout?plan=pro-month',{method:'POST'});
+      if(res?.url) location.href = res.url;
+      else alert('Checkout není dostupný. Zkontroluj Worker /api/checkout a STRIPE_* env.');
+    }
+    document.getElementById('checkoutPro')?.addEventListener('click', goCheckout);
+    document.getElementById('checkoutPro2')?.addEventListener('click', goCheckout);
 
-  if(search.length){
-    const wrap=el('div','rounded-2xl border bg-white p-4 shadow-sm md:col-span-2');
-    wrap.appendChild(el('div','text-sm font-semibold','🔎 Shrnutí z Search API'));
-    const list=el('div','mt-3 grid gap-3 md:grid-cols-3');
-    search.forEach(r=>{ const c=el('a','block rounded-xl border p-4 hover:shadow-soft transition',`<div class="text-sm font-semibold">${r.title}</div><div class="text-xs text-slate-500">${(r.score!=null)?'Skóre: '+Math.round(r.score*100)+'%':''}</div><p class="mt-2 text-sm text-slate-600">${r.snippet||''}</p>`); c.href=r.url||'#'; c.target='_blank'; list.appendChild(c); });
-    wrap.appendChild(list); oppsOut.appendChild(wrap);
-  }
+    // ====== Market & News ======
+    const marketForm = document.getElementById('marketForm');
+    const newsList   = document.getElementById('newsList');
+    const refreshBtn = document.getElementById('refreshNews');
+    let mktChart;
 
-  oppsOut.appendChild(el('div','rounded-2xl border bg-white p-6 shadow-sm whitespace-pre-wrap text-sm', ai.content || JSON.stringify(ai)));
-});
+    marketForm.addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      const symbol   = document.getElementById('ticker').value.trim().toUpperCase() || 'AAPL';
+      const horizon  = document.getElementById('horizon').value;
+      const interval = document.getElementById('interval').value;
 
-/* === Location Scanner === */
-const locForm=document.getElementById('locForm'), locOut=document.getElementById('locOut');
-locForm.addEventListener('submit', async (e)=>{
-  e.preventDefault(); locOut.innerHTML='';
-  const loc=document.getElementById('loc').value.trim()||'ČR';
-  const asset=document.getElementById('asset').value;
-  const cap=document.getElementById('cap').value.trim()||'neuvedeno';
-  const loading=el('div','rounded-2xl border bg-white p-6 text-sm shadow-sm','⏳ Analýza…'); locOut.appendChild(loading);
-  const ai=await askAI({ system:'Jsi AI analytik pro reality. Piš česky, bodově.', user:`Region: ${loc}\nAktivum: ${asset}\nRozpočet: ${cap}\nVrať 3 karty: název, proč teď, oček. výnos, rizika, první krok.` });
-  loading.remove();
-  (ai.content||'').split(/\n\s*\n/).slice(0,3).forEach(block=> locOut.appendChild(el('div','rounded-2xl border bg-white p-6 shadow-sm text-sm', block.replace(/\n/g,'<br>'))));
-});
-
-/* === Report Download (MD + PDF) === */
-document.getElementById('downloadReportBtn').addEventListener('click', ()=>{
-  const idea=document.getElementById('idea').value||'(neuvedeno)';
-  const seg=document.getElementById('segment').value||'(neuvedeno)';
-  const opps=Array.from(document.querySelectorAll('#oppsOut > div')).map(d=>d.innerText.trim()).join('\n\n---\n\n') || '(zatím žádné výsledky)';
-  const locs=Array.from(document.querySelectorAll('#locOut > div')).map(d=>d.innerText.trim()).join('\n\n---\n\n') || '(zatím žádné výsledky)';
-
-  const md = `# StrategyMind – Report\n\n## Vstup\n- Nápad: ${idea}\n- Segment: ${seg}\n\n## Opportunity Finder\n${opps}\n\n## Location Scanner\n${locs}\n\n_Generováno: ${new Date().toLocaleString()}_`;
-  // Markdown
-  const blob=new Blob([md],{type:'text/markdown;charset=utf-8'}); const a=document.createElement('a');
-  a.href=URL.createObjectURL(blob); a.download=`StrategyMind_report_${Date.now()}.md`; a.click();
-
-  // PDF
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF({ unit:'pt', format:'a4' });
-  const margin=40, maxWidth=515;
-  doc.setFont('helvetica','normal'); doc.setFontSize(14);
-  doc.text('StrategyMind – Report', margin, 60);
-  doc.setFontSize(10);
-  const lines = doc.splitTextToSize(md, maxWidth);
-  doc.text(lines, margin, 90);
-  doc.save(`StrategyMind_report_${Date.now()}.pdf`);
-});
-
-/* === Checkout (Stripe Payment Request: Apple/Google Pay) === */
-const checkoutModal=document.getElementById('checkoutModal');
-const buyProBtn=document.getElementById('buyProBtn');
-const closeCheckout=document.getElementById('closeCheckout');
-let stripe, paymentRequest, clientSecret;
-
-buyProBtn.addEventListener('click', async ()=>{
-  checkoutModal.classList.remove('hidden','opacity-0');
-  await initStripePaymentRequest();
-});
-closeCheckout.addEventListener('click', ()=> checkoutModal.classList.add('hidden'));
-
-async function initStripePaymentRequest(){
-  try{
-    stripe = stripe || Stripe(STRIPE_PUBLISHABLE_KEY);
-
-    // 1) Vytvoř PaymentIntent (CZK 290 = 29000 hal.)
-    const intent = await safeFetch(PAY_INTENT_URL, {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ amount: 29000, currency:'czk', plan:'pro' })
+      // 1) Data (finance API přes Worker) – pokud endpoint není, spadne do fallbacku
+      const data = await fetchMarket(symbol, horizon, interval);
+      // 2) Predikce
+      const pred = calcPrediction(data?.prices || []);
+      // 3) Render
+      renderMarket(symbol, data, pred);
+      // 4) News
+      await renderNews(symbol);
     });
-    if(!intent?.client_secret){ showPayError('Nepodařilo se vytvořit PaymentIntent.'); return; }
-    clientSecret = intent.client_secret;
 
-    // 2) Apple/Google Pay
-    paymentRequest = stripe.paymentRequest({
-      country: 'CZ',
-      currency: 'czk',
-      total: { label: 'StrategyMind Pro (měsíc)', amount: 29000 },
-      requestPayerName: true,
-      requestPayerEmail: true
+    refreshBtn?.addEventListener('click', async ()=>{
+      const symbol = document.getElementById('ticker').value.trim().toUpperCase() || 'AAPL';
+      await renderNews(symbol);
     });
 
-    const result = await paymentRequest.canMakePayment();
-    if (result) {
-      const elements = stripe.elements();
-      const prEl = elements.create('paymentRequestButton', { paymentRequest });
-      prEl.mount('#paymentRequestButton');
+    async function fetchMarket(symbol, range='1mo', interval='1d'){
+      // Zkus Worker
+      if(MARKET_API_URL){
+        const u = new URL(MARKET_API_URL, location.origin);
+        u.searchParams.set('symbol', symbol);
+        u.searchParams.set('range', range);
+        u.searchParams.set('interval', interval);
+        const res = await safeFetch(u.toString());
+        if(res?.prices?.length) return res;
+      }
+      // Fallback demo (syntetická křivka)
+      const now = Date.now(); const step = interval==='1d'?864e5: 9e5; // 15m default
+      let base=100+Math.random()*20, arr=[];
+      for(let i=120;i>0;i--){
+        base += (Math.random()-0.5)*1.2;
+        arr.push({t:new Date(now-i*step), c: Math.max(10, base)});
+      }
+      return { symbol, prices: arr, last: arr.at(-1)?.c || null, currency:'USD', provider:'demo' };
+    }
 
-      paymentRequest.on('paymentmethod', async (ev) => {
-        const { error } = await stripe.confirmCardPayment(clientSecret, { payment_method: ev.paymentMethod.id }, { handleActions: false });
-        if (error) {
-          ev.complete('fail'); showPayError(error.message || 'Platba selhala.');
-        } else {
-          ev.complete('success');
-          const { error: actErr } = await stripe.confirmCardPayment(clientSecret);
-          if (actErr) showPayError(actErr.message || 'Dvoufázové ověření selhalo.');
-          else showPaySuccess('Platba proběhla úspěšně. Děkujeme! ✅');
+    function calcPrediction(series){
+      // Jednoduché: lineární trend + volatilita -> odhad cíle + pseudo-probability
+      if(!series.length) return { target:null, prob:null, dir:null };
+
+      const ys = series.map(p => p.c);
+      const xs = series.map((_,i)=>i);
+      const {a, b, r2} = linearRegression(xs, ys);     // y = a + b*x
+      const n = xs.length;
+      const forecastSteps = Math.round(Math.max(5, Math.min(30, n*0.25)));
+      const target = a + b*(n+forecastSteps);
+      const last = ys.at(-1);
+      const dir = (target > last) ? 'up' : 'down';
+      const prob = Math.max(0.55, Math.min(0.95, Math.sqrt(Math.abs(r2)))); // 55–95 %
+
+      return { target, prob, dir };
+    }
+    function linearRegression(xs, ys){
+      const n=xs.length;
+      const mx = xs.reduce((a,b)=>a+b,0)/n;
+      const my = ys.reduce((a,b)=>a+b,0)/n;
+      let num=0, den=0, deny=0;
+      for(let i=0;i<n;i++){ const dx=xs[i]-mx, dy=ys[i]-my; num+=dx*dy; den+=dx*dx; deny+=dy*dy; }
+      const b = num/den;
+      const a = my - b*mx;
+      // R^2
+      const ssTot = deny;
+      const ssRes = ys.reduce((s, y, i)=> s + Math.pow(y - (a+b*xs[i]),2), 0);
+      const r2 = 1 - ssRes/ssTot;
+      return {a,b,r2};
+    }
+
+    function renderMarket(symbol, data, pred){
+      const title = document.getElementById('mktTitle');
+      const price = document.getElementById('mktPrice');
+      const meta  = document.getElementById('mktMeta');
+      const pb    = document.getElementById('predBox');
+      const pv    = document.getElementById('predValue');
+      const pp    = document.getElementById('predProb');
+
+      title.textContent = `${symbol} · ${data?.provider||'API'}`;
+      price.textContent = data?.last ? fmt(data.last, 2) : '—';
+      meta.textContent  = data?.currency ? `Měna: ${data.currency}` : '';
+
+      if(pred?.target){
+        const arrow = pred.dir==='up' ? '↑' : '↓';
+        pv.innerHTML = `<span class="${pred.dir==='up'?'text-bull':'text-bear'}">${arrow} ${fmt(pred.target,2)}</span>`;
+        pp.innerHTML = `<span class="inline-block rounded-lg border px-2 py-1 ${pred.dir==='up'?'border-emerald-200 text-emerald-700':'border-rose-200 text-rose-700'} text-xs">P≈${Math.round((pred.prob||0)*100)}%</span>`;
+      }else{
+        pv.textContent = '—';
+        pp.textContent = '';
+      }
+
+      const labels = (data?.prices||[]).map(p=> new Date(p.t).toLocaleString('cs-CZ'));
+      const values = (data?.prices||[]).map(p=> p.c);
+      if(mktChart) mktChart.destroy();
+      const ctx = document.getElementById('mktChart');
+      mktChart = new Chart(ctx, {
+        type:'line',
+        data:{ labels, datasets:[{ label:symbol, data:values, tension:0.2, borderWidth:2 }]},
+        options:{
+          plugins:{ legend:{display:false}},
+          scales:{ x:{ ticks:{ maxTicksLimit:6 }}, y:{ beginAtZero:false }}
         }
       });
-    } else {
-      document.getElementById('paymentRequestButton').innerHTML = '<div class="rounded-lg border bg-slate-50 p-3 text-sm text-slate-600">Apple/Google Pay není na tomto zařízení k dispozici.</div>';
     }
-  }catch(e){ showPayError(e?.message || 'Neočekávaná chyba.'); }
-}
-function showPayError(msg){ const el=document.getElementById('payError'); el.textContent=msg; el.classList.remove('hidden'); document.getElementById('paySuccess').classList.add('hidden'); }
-function showPaySuccess(msg){ const el=document.getElementById('paySuccess'); el.textContent=msg; el.classList.remove('hidden'); document.getElementById('payError').classList.add('hidden'); }
-</script>
+
+    async function renderNews(query){
+      newsList.innerHTML = `<div class="text-xs text-slate-500">Načítám zprávy…</div>`;
+      let items = [];
+      if(NEWS_API_URL){
+        const u = new URL(NEWS_API_URL, location.origin);
+        u.searchParams.set('q', query);
+        const j = await safeFetch(u.toString());
+        if(Array.isArray(j)) items = j;
+      }
+      // fallback přes /api/search
+      if(!items.length && SEARCH_API_URL){
+        const u2 = new URL(SEARCH_API_URL, location.origin);
+        u2.searchParams.set('q', query + ' market news');
+        const j2 = await safeFetch(u2.toString());
+        if(Array.isArray(j2)) items = j2;
+      }
+      if(!items.length){
+        items = [
+          { title:`${query}: tržní přehled`, url:'#', score:0.74, snippet:'Fallback ukázka. Přidej /api/news ve Workeru pro živé zpravodajství.'},
+        ];
+      }
+      newsList.innerHTML = '';
+      items.slice(0,6).forEach(r=>{
+        const a = document.createElement('a');
+        a.className = "block rounded-xl border border-slate-200 p-3 hover:shadow-soft transition";
+        a.href = r.url || '#'; a.target='_blank'; a.rel='noopener';
+        a.innerHTML = `
+          <div class="text-sm font-semibold text-slate-800">${r.title||'Bez názvu'}</div>
+          <div class="mt-1 text-xs text-slate-500">${r.score!=null?`Skóre: ${(r.score*100|0)}% · `:''}${r.source||''}</div>
+          <p class="mt-2 text-sm text-slate-600">${r.snippet||''}</p>
+        `;
+        newsList.appendChild(a);
+      });
+    }
+
+    // ====== Real-Estate ======
+    const reForm = document.getElementById('reForm');
+    const reOut  = document.getElementById('reOut');
+
+    reForm.addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      const loc   = document.getElementById('reLoc').value.trim() || 'Praha';
+      const asset = document.getElementById('reAsset').value;
+
+      // Tipy přes AI (přes chat proxy) – krátké body
+      const sys = `Jsi AI poradce pro reality. V bodech navrhni 3 lokality / čtvrti v regionu podle typu aktiva a napiš "proč teď", oček. výnos (hrubý), rizika a první krok due diligence. Stručně česky.`;
+      const user = `Region: ${loc}\nAktivum: ${asset}\nFormát: 3 oddělené karty, krátké odrážky.`;
+      let ideas = [];
+      const ai = await safeFetch(AI_PROXY_URL, { method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ model:'gpt-4o-mini', messages:[{role:'system',content:sys},{role:'user',content:user}] })
+      });
+      const text = (ai?.choices?.[0]?.message?.content) || (ai?.message?.content) || '';
+
+      // Jednoduché parsování na 3 bloky
+      const parts = text.split(/\n\s*\n/).filter(Boolean).slice(0,3);
+      ideas = parts.length?parts:[
+        `1) Centrum · poptávka po nájmech, vhodné pro byt/office · riziko: regulace\n2) Okraj města · nižší cena za m² · riziko: doprava\n3) Rozvojové území · růst v čase · riziko: povolení`
+      ];
+
+      // Katastr link dle země (heuristika)
+      const cat = buildCadastreLinks(loc);
+
+      reOut.innerHTML = '';
+      ideas.forEach(md=>{
+        const card = document.createElement('div');
+        card.className = 'rounded-2xl border border-slate-200 bg-white p-6 shadow-sm text-sm';
+        card.innerHTML = md.replace(/\n/g,'<br>');
+        reOut.appendChild(card);
+      });
+
+      // Katastr karta
+      const k = document.createElement('div');
+      k.className = 'rounded-2xl border border-emerald-200 bg-emerald-50 p-6 shadow-sm text-sm md:col-span-3';
+      k.innerHTML = `
+        <div class="text-sm font-semibold mb-1">Katastr / parcelní registry (podle země):</div>
+        <ul class="list-disc pl-4 space-y-1">
+          ${cat.map(c=>`<li><a class="text-brand underline" target="_blank" rel="noopener" href="${c.url}">${c.name}</a></li>`).join('')}
+        </ul>
+      `;
+      reOut.appendChild(k);
+    });
+
+    function buildCadastreLinks(loc){
+      const s = loc.toLowerCase();
+      const links = [];
+
+      // Heuristika na základní regiony (přidat další dle potřeby)
+      if(s.includes('praha') || s.includes('čes') || s.includes('cr') || s.includes('czech')){
+        links.push({name:'ČÚZK (ČR) — Nahlížení do KN', url:'https://nahlizenidokn.cuzk.cz/'});
+      }
+      if(s.includes('slov') || s.includes('bratis')){
+        links.push({name:'Slovensko — Kataster', url:'https://www.katasterportal.sk/'});
+      }
+      if(s.includes('german') || s.includes('berlin') || s.includes('deutsch')){
+        links.push({name:'Německo (portály dle spolkových zemí) – Geoportal', url:'https://www.geoportal.de/'});
+      }
+      if(s.includes('pol') || s.includes('wars') || s.includes('krak')){
+        links.push({name:'Polsko — Geoportal', url:'https://mapy.geoportal.gov.pl/imap/Imgp_2.html'});
+      }
+      if(s.includes('austr') || s.includes('vienna') || s.includes('wien')){
+        links.push({name:'Rakousko — Kataster (BEV)', url:'https://www.bev.gv.at/'});
+      }
+      if(s.includes('usa') || s.includes('new york') || s.includes('austin') || s.includes('california')){
+        links.push({name:'USA — County GIS / Parcel (příklad: Travis County – Austin)', url:'https://www.traviscad.org/property-search/'});
+      }
+      // generický
+      links.push({name:'OpenStreetMap · parcely (katastrální vrstvy dle regionu)', url:'https://www.openstreetmap.org/'});
+      links.push({name:'Google: vyhledat „kataster '+encodeURIComponent(loc)+'“', url:'https://www.google.com/search?q=kataster+'+encodeURIComponent(loc)});
+      return links;
+    }
+
+    // ====== Inicializace: výchozí tick + news ======
+    (async ()=>{
+      document.getElementById('ticker').value = 'AAPL';
+      marketForm.dispatchEvent(new Event('submit'));
+    })();
+  </script>
 </body>
 </html>
-
