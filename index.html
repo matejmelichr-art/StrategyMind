@@ -104,7 +104,7 @@
       </p>
 
       <!-- Form -->
-      <form id="oppsForm" class="mt-6 grid gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:grid-cols-2">
+      <form id="oppsForm" class="mt-6 grid gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:grid-cols-2 lg:grid-cols-3">
         <label class="text-sm">Cíl / nápad
           <input id="idea" required placeholder="např. Mikro-SaaS pro účetní, affiliate pro cestování…"
                  class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm">
@@ -126,12 +126,24 @@
             <option value="crypto">Krypto / fintech</option>
           </select>
         </label>
-        <div class="sm:col-span-2 flex items-center justify-between">
+
+        <!-- NOVĚ: přepínač zdroje dat -->
+        <label class="text-sm">Zdroj dat
+          <select id="provider" class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm">
+            <option value="tavily" selected>Tavily (rychlé shrnutí)</option>
+            <option value="serp">SerpAPI (Google SERP)</option>
+          </select>
+        </label>
+
+        <div class="lg:col-span-1 sm:col-span-2 flex items-end justify-end">
+          <button class="rounded-xl bg-brand px-4 py-2 text-sm font-semibold text-white shadow-soft" type="submit">Najít příležitosti</button>
+        </div>
+
+        <div class="sm:col-span-2 lg:col-span-3 -mt-2">
           <label class="inline-flex items-center gap-2 text-sm">
-            <input id="useSearch" type="checkbox" class="h-4 w-4 rounded border-slate-300">
+            <input id="useSearch" type="checkbox" class="h-4 w-4 rounded border-slate-300" checked>
             <span>Připojit Search API (konkurence, trendy)</span>
           </label>
-          <button class="rounded-xl bg-brand px-4 py-2 text-sm font-semibold text-white shadow-soft" type="submit">Najít příležitosti</button>
         </div>
       </form>
 
@@ -204,7 +216,7 @@
       </div>
 
       <div class="mt-6 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-900">
-        Tip: V appce půjde udělat **osobní plán** + připomenutí a checklist zvyku na 30 dní.
+        Tip: V appce půjde udělat <b>osobní plán</b> + připomenutí a checklist zvyku na 30 dní.
       </div>
     </div>
   </section>
@@ -227,7 +239,7 @@
     <h2 class="text-3xl font-bold tracking-tight">Časté dotazy</h2>
     <div class="mt-6 grid gap-4 md:grid-cols-2">
       <details class="rounded-2xl border border-slate-200 bg-white p-5 open:shadow-sm"><summary class="cursor-pointer select-none text-sm font-semibold">Bude AI hledat i lokální příležitosti?</summary><p class="mt-2 text-sm text-slate-600">Ano, přes Search API + geodata filtry (region, město, typ aktiva).</p></details>
-      <details class="rounded-2xl border border-slate-200 bg-white p-5 open:shadow-sm"><summary class="cursor-pointer select-none text-sm font-semibold">Je potřeba vlastní OpenAI klíč?</summary><p class="mt-2 text-sm text-slate-600">V produkci přes tvou **AI proxy** (serverless). Klíč se v prohlížeči neukládá.</p></details>
+      <details class="rounded-2xl border border-slate-200 bg-white p-5 open:shadow-sm"><summary class="cursor-pointer select-none textsm font-semibold">Je potřeba vlastní OpenAI klíč?</summary><p class="mt-2 text-sm text-slate-600">V produkci přes tvou <b>AI proxy</b> (serverless). Klíč se v prohlížeči neukládá.</p></details>
       <details class="rounded-2xl border border-slate-200 bg-white p-5 open:shadow-sm"><summary class="cursor-pointer select-none text-sm font-semibold">Mohu exportovat plány?</summary><p class="mt-2 text-sm text-slate-600">Ano, CSV/Markdown/PDF v placených plánech.</p></details>
       <details class="rounded-2xl border border-slate-200 bg-white p-5 open:shadow-sm"><summary class="cursor-pointer select-none text-sm font-semibold">Co mobilní aplikace?</summary><p class="mt-2 text-sm text-slate-600">Web je připravený jako PWA, případně obalíme přes Capacitor.</p></details>
     </div>
@@ -239,12 +251,9 @@
 
   <!-- ========== JS: MENU + AI/SEARCH TEMPLATES + RENDERERS ========== -->
   <script>
-    // ====== Konfigurace ENDPOINTŮ (DOPLŇ SVOJE) ======
-    // AI proxy (serverless) – bezpečný endpoint, který volá OpenAI na backendu.
-    // POST { model, messages:[{role, content}] } -> { message: { role, content } }
-    const AI_PROXY_URL   = ""; // např. '/api/chat' na Vercelu/Netlify
-    // Tvoje Search API – konkurenční analýza / trendy; GET ?q=...&segment=... -> [{ title, url, score, snippet }]
-    const SEARCH_API_URL = ""; // např. 'https://your-domain.com/api/search'
+    // ====== Konfigurace ENDPOINTŮ ======
+    const AI_PROXY_URL   = "https://tight-field-436e.matejmelichr.workers.dev/api/chat";   // ✅ Worker Chat endpoint
+    const SEARCH_API_URL = "https://tight-field-436e.matejmelichr.workers.dev/api/search"; // ✅ Worker Search endpoint
 
     // ====== UI drobnosti ======
     const menuBtn=document.getElementById('menuBtn');
@@ -257,24 +266,8 @@
     function el(tag, cls, html){ const n=document.createElement(tag); if(cls) n.className=cls; if(html!==undefined) n.innerHTML=html; return n; }
     async function safeFetch(url, opts){ try { const r=await fetch(url, opts); if(!r.ok) throw new Error(await r.text()); return r.json(); } catch(e){ console.warn('fetch failed', e); return null; } }
 
-    // ====== AI volání (šablona) ======
+    // ====== AI volání ======
     async function askAI({ system, user, model = 'gpt-4o-mini' }) {
-      if (!AI_PROXY_URL) {
-        // MOCK odpověď – aby sis to hned proklikal
-        return {
-          role: 'assistant',
-          content:
-`🔧 MOCK: AI shrnutí
-• Segment: ${document.getElementById('segment').value}
-• Rozpočet: ${document.getElementById('budget').value || 'n/a'}
-• Horizont: ${document.getElementById('horizon').value} měs.
-
-Doporučení:
-1) Ověř velikost trhu a CAC.
-2) Proveď 5 expertních rozhovorů (discovery).
-3) MVP landing + 2 akviziční kanály (SEO, partnerství).`
-        };
-      }
       const body = JSON.stringify({
         model,
         messages: [
@@ -287,22 +280,16 @@ Doporučení:
         headers:{ 'Content-Type':'application/json' },
         body
       });
-      return res?.message || { role:'assistant', content:'(bez odpovědi)' };
+      return res?.choices?.[0]?.message || res?.message || { role:'assistant', content:'(bez odpovědi)' };
     }
 
-    // ====== Search API (šablona) ======
+    // ====== Search API (s přepínačem zdroje) ======
     async function runSearch(query, segment) {
-      if (!SEARCH_API_URL) {
-        // MOCK data
-        return [
-          { title:'Trend report — SMB SaaS', url:'#', score:0.82, snippet:'Roste poptávka po autom. fakturaci a reportingu.' },
-          { title:'Competitor: Xfolio', url:'#', score:0.66, snippet:'Silný v PPC, slabší organika; vysoký churn.' },
-          { title:'Marketplaces overview', url:'#', score:0.58, snippet:'Vstupní náklady nízké, ale marže tlakem klesají.' }
-        ];
-      }
-      const u = new URL(SEARCH_API_URL, location.origin);
+      const provider = document.getElementById('provider')?.value || 'tavily'; // "tavily" | "serp"
+      const u = new URL(SEARCH_API_URL);
       u.searchParams.set('q', query);
       if (segment) u.searchParams.set('segment', segment);
+      u.searchParams.set('provider', provider);
       const data = await safeFetch(u.toString());
       return Array.isArray(data) ? data : [];
     }
@@ -328,7 +315,7 @@ Doporučení:
         searchResults = await runSearch(idea, segment);
       }
 
-      // 2) AI prompt (vzor)
+      // 2) AI prompt
       const system = `Jsi strategický AI poradce pro podnikatele a začínající investory. Tvým cílem je proměnit nápad na akční plán s ohledem na český a EU trh. Odpovědi piš česky, stručně, bodově, s prioritami a odhadem dopadu.`;
       const userPrompt =
 `Nápad: "${idea}"
@@ -367,11 +354,12 @@ Vrať:
       }
 
       // AI výstup
-      const aiCard = el('div','rounded-2xl border border-slate-200 bg-white p-6 shadow-sm whitespace-pre-wrap text-sm', ai.content);
+      const content = ai.content || (typeof ai === 'string' ? ai : JSON.stringify(ai));
+      const aiCard = el('div','rounded-2xl border border-slate-200 bg-white p-6 shadow-sm whitespace-pre-wrap text-sm', content);
       oppsOut.appendChild(aiCard);
     });
 
-    // ====== LOCATION SCANNER – Handler (vzor s AI) ======
+    // ====== LOCATION SCANNER – Handler ======
     const locForm = document.getElementById('locForm');
     const locOut  = document.getElementById('locOut');
     locForm.addEventListener('submit', async (e)=>{
@@ -389,18 +377,16 @@ Vrať:
 
       const ai = await askAI({ system, user });
 
-      // Render – jednoduchý split na 3 návrhy (heuristika, v produkci můžeš parsovat JSON)
       loading.remove();
-      const parts = ai.content.split(/\n\s*\n/).filter(Boolean).slice(0,3);
+      const text = ai.content || '';
+      const parts = text.split(/\n\s*\n/).filter(Boolean).slice(0,3);
       parts.forEach(md=>{
         const card = el('div','rounded-2xl border border-slate-200 bg-white p-6 shadow-sm text-sm');
-        card.innerHTML = md
-          .replace(/^###\s+/gm,'<div class="text-base font-semibold mb-1">')
-          .replace(/\n/g,'<br>')
-          .replace(/<\/div><br>/,'</div>');
+        card.innerHTML = md.replace(/\n/g,'<br>');
         locOut.appendChild(card);
       });
     });
   </script>
 </body>
 </html>
+
