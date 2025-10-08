@@ -5,388 +5,337 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>StrategyMind — AI pro příležitosti, reality a money management</title>
 
-  <!-- OG / ikony -->
   <link rel="icon" type="image/png" href="logo.png" />
   <meta property="og:title" content="StrategyMind — AI pro příležitosti, reality a money management" />
   <meta property="og:image" content="logo.png" />
   <meta name="twitter:card" content="summary_large_image" />
 
-  <!-- Tailwind (CDN) -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: { brand:'#0A2342', mint:'#2bd4a9', ink:'#0f172a' },
-          boxShadow: { soft:'0 20px 60px -20px rgba(2,6,23,.12)' },
-          borderRadius: { xl2:'1.25rem' }
-        }
-      }
-    }
-  </script>
-  <style>html{ -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }</style>
+    tailwind.config = { theme: { extend: {
+      colors: { brand:'#0A2342', mint:'#2bd4a9', ink:'#0f172a' },
+      boxShadow: { soft:'0 20px 60px -20px rgba(2,6,23,.12)' },
+      borderRadius: { xl2:'1.25rem' }
+    }}};</script>
+  <style>html{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}</style>
+
+  <!-- Stripe.js -->
+  <script src="https://js.stripe.com/v3/"></script>
+  <!-- jsPDF pro PDF export -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </head>
 <body class="bg-gradient-to-b from-slate-50 via-white to-slate-50 text-slate-900">
 
-  <!-- NAV -->
-  <header class="sticky top-0 z-50 border-b border-slate-200 bg-white/80 backdrop-blur">
-    <div class="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-      <a href="#" class="flex items-center gap-3">
-        <img src="logo.png" alt="StrategyMind logo" class="h-10 w-10 rounded-2xl"
-             fetchpriority="high" loading="eager" decoding="sync">
-        <span class="text-xl font-semibold tracking-tight">StrategyMind</span>
-      </a>
-      <nav class="hidden items-center gap-8 text-sm md:flex">
-        <a class="hover:text-slate-700" href="#opps">Opportunity Finder</a>
-        <a class="hover:text-slate-700" href="#locations">Lokace & Reality</a>
-        <a class="hover:text-slate-700" href="#money">Money Management</a>
-        <a class="hover:text-slate-700" href="#pricing">Ceník</a>
-        <a class="hover:text-slate-700" href="#faq">FAQ</a>
-      </nav>
-      <div class="hidden md:block">
-        <a href="#cta" class="rounded-xl bg-brand px-4 py-2 text-white shadow-soft transition hover:-translate-y-0.5">
-          Vyzkoušet zdarma
-        </a>
-      </div>
-      <button id="menuBtn"
-              class="md:hidden inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200">☰</button>
-    </div>
-    <div id="menuSheet" class="hidden border-t border-slate-200 md:hidden">
-      <div class="mx-auto flex max-w-7xl flex-col gap-4 px-6 py-4 text-sm">
-        <a href="#opps" onclick="closeMenu()">Opportunity Finder</a>
-        <a href="#locations" onclick="closeMenu()">Lokace & Reality</a>
-        <a href="#money" onclick="closeMenu()">Money Management</a>
-        <a href="#pricing" onclick="closeMenu()">Ceník</a>
-        <a href="#faq" onclick="closeMenu()">FAQ</a>
-      </div>
-    </div>
-  </header>
+<header class="sticky top-0 z-50 border-b border-slate-200 bg-white/80 backdrop-blur">
+  <div class="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
+    <a class="flex items-center gap-3">
+      <img src="logo.png" class="h-10 w-10 rounded-2xl" alt="StrategyMind" fetchpriority="high" loading="eager">
+      <span class="text-xl font-semibold">StrategyMind</span>
+    </a>
+    <nav class="hidden gap-8 text-sm md:flex">
+      <a href="#opps">Opportunity Finder</a>
+      <a href="#locations">Lokace & Reality</a>
+      <a href="#money">Money</a>
+      <a href="#pricing">Ceník</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+    <div class="hidden md:block"><a href="#cta" class="rounded-xl bg-brand px-4 py-2 text-white shadow-soft">Vyzkoušet zdarma</a></div>
+    <button id="menuBtn" class="md:hidden h-10 w-10 rounded-xl border">☰</button>
+  </div>
+  <div id="menuSheet" class="hidden border-t md:hidden">
+    <div class="mx-auto max-w-7xl px-6 py-4 text-sm"><a href="#opps" onclick="closeMenu()">Opportunity Finder</a> · <a href="#locations" onclick="closeMenu()">Lokace</a> · <a href="#money" onclick="closeMenu()">Money</a> · <a href="#pricing" onclick="closeMenu()">Ceník</a> · <a href="#faq" onclick="closeMenu()">FAQ</a></div>
+  </div>
+</header>
 
-  <!-- HERO -->
-  <main class="mx-auto grid max-w-7xl grid-cols-1 items-center gap-10 px-6 pb-16 pt-10 md:grid-cols-2">
-    <div>
-      <span class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white/70 px-3 py-1 text-xs text-slate-600 shadow">
-        ★ MVP pro podnikatele a investory
-      </span>
-      <h1 class="mt-4 text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl">
-        Najdi příležitosti, vyber lokaci a <span class="bg-gradient-to-r from-emerald-600 to-teal-400 bg-clip-text text-transparent">získej náskok s AI</span>
-      </h1>
-      <p class="mt-5 max-w-xl text-base leading-relaxed text-slate-600">
-        StrategyMind pomáhá lidem i státům: lepší rozhodnutí, více příjmů, lepší money management. Od nápadu k akci – s podporou AI.
-      </p>
+<main class="mx-auto grid max-w-7xl grid-cols-1 items-center gap-10 px-6 pb-16 pt-10 md:grid-cols-2">
+  <div>
+    <span class="inline-block rounded-full border bg-white/70 px-3 py-1 text-xs text-slate-600 shadow">★ MVP pro podnikatele & investory</span>
+    <h1 class="mt-4 text-4xl font-extrabold sm:text-5xl">Najdi příležitost, vyber lokaci a <span class="bg-gradient-to-r from-emerald-600 to-teal-400 bg-clip-text text-transparent">akceleruj s AI</span></h1>
+    <p class="mt-4 max-w-xl text-slate-600">Plány, lokace i money management – všechno v jednom. Exportuj výstupy do PDF/MD.</p>
+    <div class="mt-6 flex gap-3">
+      <a href="#opps" class="rounded-xl bg-brand px-4 py-2 text-white shadow-soft">Spustit Opportunity Finder</a>
+      <a href="#locations" class="rounded-xl border px-4 py-2">Analýza lokací</a>
+    </div>
+  </div>
+  <div class="relative">
+    <div class="absolute -inset-6 -z-10 rounded-[2rem] bg-gradient-to-tr from-emerald-500/20 via-teal-400/10 to-transparent blur-2xl"></div>
+    <div class="relative mx-auto max-w-sm rounded-[2rem] border bg-white p-8 shadow-2xl"><img src="logo.png" class="mx-auto h-40 w-40" alt="logo" loading="eager"></div>
+  </div>
+</main>
 
-      <div id="cta" class="mt-8 flex flex-col items-start gap-3 sm:flex-row sm:items-center">
-        <a href="#opps" class="group inline-flex items-center justify-center rounded-2xl bg-brand px-5 py-3 font-medium text-white shadow-soft transition hover:-translate-y-0.5">
-          Spustit Opportunity Finder
-          <svg class="ml-2 h-5 w-5 transition group-hover:translate-x-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
-        </a>
-        <a href="#locations" class="inline-flex items-center justify-center rounded-2xl border border-slate-300 bg-white px-5 py-3 text-sm shadow-sm">Najít investiční lokaci</a>
+<section id="opps" class="border-t bg-white/60 py-16">
+  <div class="mx-auto max-w-7xl px-6">
+    <div class="flex items-center justify-between gap-4">
+      <h2 class="text-3xl font-bold">Opportunity Finder (AI)</h2>
+      <div class="flex items-center gap-2">
+        <button id="downloadReportBtn" class="rounded-xl border px-3 py-2 text-sm">⬇️ Stáhnout report</button>
       </div>
     </div>
+    <p class="mt-2 max-w-3xl text-slate-600">Popiš nápad, přidej Search API, a stáhni si výstup jako report.</p>
 
-    <div class="relative">
-      <div class="pointer-events-none absolute -inset-6 -z-10 rounded-[2rem] bg-gradient-to-tr from-emerald-500/20 via-teal-400/10 to-transparent blur-2xl"></div>
-      <div class="relative mx-auto max-w-sm rounded-[2rem] border border-slate-200 bg-white p-8 shadow-2xl">
-        <img src="logo.png" alt="StrategyMind" class="mx-auto h-40 w-40" fetchpriority="high" loading="eager" decoding="sync">
+    <!-- Form -->
+    <form id="oppsForm" class="mt-6 grid gap-4 rounded-2xl border bg-white p-4 shadow-sm sm:grid-cols-2 lg:grid-cols-3">
+      <label class="text-sm">Cíl / nápad
+        <input id="idea" required class="mt-1 w-full rounded-xl border px-3 py-2 text-sm" placeholder="např. Mikro-SaaS pro účetní">
+      </label>
+      <label class="text-sm">Rozpočet (Kč)
+        <input id="budget" type="number" min="0" step="1000" class="mt-1 w-full rounded-xl border px-3 py-2 text-sm" placeholder="100000">
+      </label>
+      <label class="text-sm">Horizont (měsíce)
+        <input id="horizon" type="number" min="1" max="36" value="12" class="mt-1 w-full rounded-xl border px-3 py-2 text-sm">
+      </label>
+      <label class="text-sm">Segment
+        <select id="segment" class="mt-1 w-full rounded-xl border px-3 py-2 text-sm">
+          <option value="smb">SMB</option><option value="ecommerce">E-commerce</option><option value="content">Obsah</option><option value="realestate">Reality</option><option value="crypto">Krypto</option>
+        </select>
+      </label>
+      <label class="text-sm">Zdroj dat
+        <select id="provider" class="mt-1 w-full rounded-xl border px-3 py-2 text-sm">
+          <option value="tavily" selected>Tavily (research)</option>
+          <option value="serp">SerpAPI (Google)</option>
+        </select>
+      </label>
+      <div class="lg:col-span-1 sm:col-span-2 flex items-end justify-end">
+        <label class="mr-auto inline-flex items-center gap-2 text-sm"><input id="useSearch" type="checkbox" class="h-4 w-4 rounded border-slate-300"> Připojit Search API</label>
+        <button class="rounded-xl bg-brand px-4 py-2 text-sm font-semibold text-white shadow-soft" type="submit">Najít příležitosti</button>
+      </div>
+    </form>
+
+    <!-- Results -->
+    <div id="oppsOut" class="mt-6 grid gap-4 md:grid-cols-2"></div>
+  </div>
+</section>
+
+<section id="locations" class="border-t bg-white/60 py-16">
+  <div class="mx-auto max-w-7xl px-6">
+    <h2 class="text-3xl font-bold">Lokace & Reality (AI Location Scanner)</h2>
+    <form id="locForm" class="mt-6 grid gap-4 rounded-2xl border bg-white p-4 shadow-sm md:grid-cols-4">
+      <input id="loc" class="rounded-xl border px-3 py-2 text-sm" placeholder="Region / město (např. Praha)">
+      <select id="asset" class="rounded-xl border px-3 py-2 text-sm"><option value="apartment">Byt</option><option value="house">Dům</option><option value="land">Pozemek</option><option value="commercial">Komerční</option></select>
+      <input id="cap" type="number" class="rounded-xl border px-3 py-2 text-sm" placeholder="Rozpočet (Kč)">
+      <button class="rounded-xl bg-brand px-4 py-2 text-sm font-semibold text-white shadow-soft">Analyzovat</button>
+    </form>
+    <div id="locOut" class="mt-6 grid gap-4 md:grid-cols-3"></div>
+  </div>
+</section>
+
+<section id="pricing" class="border-y bg-white/60 py-16">
+  <div class="mx-auto max-w-7xl px-6">
+    <h2 class="text-3xl font-bold">Jednoduchý ceník</h2>
+    <div class="mt-8 grid gap-6 md:grid-cols-3">
+      <div class="rounded-2xl border bg-white p-6 shadow-sm">
+        <h3 class="text-lg font-semibold">Starter</h3>
+        <div class="mt-2 text-3xl font-extrabold">0</div>
+        <a href="#cta" class="mt-6 inline-block rounded-xl border px-4 py-2 text-sm font-semibold">Začít zdarma</a>
+      </div>
+      <div class="rounded-2xl border-2 border-brand bg-white p-6 shadow-sm">
+        <h3 class="text-lg font-semibold">Pro</h3>
+        <div class="mt-2 text-3xl font-extrabold">290 Kč<span class="text-base font-semibold text-slate-600">/měs</span></div>
+        <button id="buyProBtn" class="mt-6 inline-block rounded-xl bg-brand px-4 py-2 text-sm font-semibold text-white shadow-sm">Vybrat Pro</button>
+      </div>
+      <div class="rounded-2xl border bg-white p-6 shadow-sm">
+        <h3 class="text-lg font-semibold">Enterprise</h3>
+        <div class="mt-2 text-3xl font-extrabold">Na dotaz</div>
+        <a href="#cta" class="mt-6 inline-block rounded-xl border px-4 py-2 text-sm font-semibold">Kontakt</a>
       </div>
     </div>
-  </main>
+  </div>
+</section>
 
-  <!-- OPPORTUNITY FINDER -->
-  <section id="opps" class="border-t border-slate-200 bg-white/60 py-16">
-    <div class="mx-auto max-w-7xl px-6">
-      <div class="flex items-center justify-between gap-4">
-        <h2 class="text-3xl font-bold tracking-tight">Opportunity Finder (AI)</h2>
-        <span class="text-xs text-slate-500">Vzor integrace — připrav na napojení tvých API</span>
+<section id="faq" class="mx-auto max-w-7xl px-6 py-16">
+  <h2 class="text-3xl font-bold">Časté dotazy</h2>
+  <details class="mt-4 rounded-2xl border bg-white p-5"><summary class="font-semibold">Jak funguje platba?</summary><p class="mt-2 text-sm text-slate-600">Stripe Payment Request (Apple/Google Pay). Platba probíhá bezpečně přes Stripe.</p></details>
+</section>
+
+<footer class="mx-auto max-w-7xl px-6 pb-10">
+  <div class="rounded-2xl border bg-white/70 p-5 text-xs text-slate-500 shadow-sm">© <span id="y"></span> StrategyMind</div>
+</footer>
+
+<!-- ===== Checkout Modal ===== -->
+<div id="checkoutModal" class="fixed inset-0 z-[999] hidden items-center justify-center bg-black/40 p-4">
+  <div class="w-full max-w-md rounded-2xl border bg-white p-6 shadow-2xl">
+    <div class="flex items-start justify-between">
+      <div>
+        <h3 class="text-lg font-semibold">Košík — StrategyMind Pro</h3>
+        <p class="text-sm text-slate-600">Měsíční předplatné</p>
       </div>
-      <p class="mt-2 max-w-3xl text-slate-600">
-        Popiš svůj nápad nebo cíl. AI přetaví vstup + výsledky ze Search API na zřetelný plán (trhy, kanály, monetizaci).
-      </p>
-
-      <!-- Form -->
-      <form id="oppsForm" class="mt-6 grid gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:grid-cols-2 lg:grid-cols-3">
-        <label class="text-sm">Cíl / nápad
-          <input id="idea" required placeholder="např. Mikro-SaaS pro účetní, affiliate pro cestování…"
-                 class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm">
-        </label>
-        <label class="text-sm">Rozpočet (Kč)
-          <input id="budget" type="number" min="0" step="1000" placeholder="např. 100000"
-                 class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm">
-        </label>
-        <label class="text-sm">Horizont (měsíce)
-          <input id="horizon" type="number" min="1" max="36" value="12"
-                 class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm">
-        </label>
-        <label class="text-sm">Segment
-          <select id="segment" class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm">
-            <option value="smb">SMB / služby</option>
-            <option value="ecommerce">E-commerce</option>
-            <option value="content">Obsah / média</option>
-            <option value="realestate">Reality</option>
-            <option value="crypto">Krypto / fintech</option>
-          </select>
-        </label>
-
-        <!-- NOVĚ: přepínač zdroje dat -->
-        <label class="text-sm">Zdroj dat
-          <select id="provider" class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm">
-            <option value="tavily" selected>Tavily (rychlé shrnutí)</option>
-            <option value="serp">SerpAPI (Google SERP)</option>
-          </select>
-        </label>
-
-        <div class="lg:col-span-1 sm:col-span-2 flex items-end justify-end">
-          <button class="rounded-xl bg-brand px-4 py-2 text-sm font-semibold text-white shadow-soft" type="submit">Najít příležitosti</button>
-        </div>
-
-        <div class="sm:col-span-2 lg:col-span-3 -mt-2">
-          <label class="inline-flex items-center gap-2 text-sm">
-            <input id="useSearch" type="checkbox" class="h-4 w-4 rounded border-slate-300" checked>
-            <span>Připojit Search API (konkurence, trendy)</span>
-          </label>
-        </div>
-      </form>
-
-      <!-- Results -->
-      <div id="oppsOut" class="mt-6 grid gap-4 md:grid-cols-2"></div>
+      <button id="closeCheckout" class="rounded-lg border px-2 py-1 text-sm">✕</button>
     </div>
-  </section>
-
-  <!-- LOCATION SCANNER / REAL ESTATE -->
-  <section id="locations" class="border-t border-slate-200 bg-white/60 py-16">
-    <div class="mx-auto max-w-7xl px-6">
-      <h2 class="text-3xl font-bold tracking-tight">Lokace & Reality (AI Location Scanner)</h2>
-      <p class="mt-2 max-w-3xl text-slate-600">Zadej lokalitu / region, typ aktiva a rozpočet. AI navrhne top 3 lokality + očekávaný výnos.</p>
-
-      <form id="locForm" class="mt-6 grid gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm md:grid-cols-4">
-        <label class="text-sm">Region / Město
-          <input id="loc" placeholder="např. Praha, Brno, Ostrava, EU, Asie…" class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm">
-        </label>
-        <label class="text-sm">Aktivum
-          <select id="asset" class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm">
-            <option value="apartment">Byt</option>
-            <option value="house">Dům</option>
-            <option value="land">Pozemek</option>
-            <option value="commercial">Komerční</option>
-          </select>
-        </label>
-        <label class="text-sm">Rozpočet (Kč)
-          <input id="cap" type="number" min="0" step="100000" placeholder="např. 3000000" class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm">
-        </label>
-        <div class="flex items-end">
-          <button class="w-full rounded-xl bg-brand px-4 py-2 text-sm font-semibold text-white shadow-soft" type="submit">Analyzovat lokace</button>
-        </div>
-      </form>
-
-      <div id="locOut" class="mt-6 grid gap-4 md:grid-cols-3"></div>
+    <div class="mt-4 flex items-center justify-between">
+      <div class="text-sm text-slate-700">Cena</div>
+      <div class="text-right"><div class="text-xl font-bold">290 Kč</div><div class="text-xs text-slate-500">vč. DPH</div></div>
     </div>
-  </section>
 
-  <!-- MONEY MANAGEMENT -->
-  <section id="money" class="border-t border-slate-200 bg-white/60 py-16">
-    <div class="mx-auto max-w-7xl px-6">
-      <h2 class="text-3xl font-bold tracking-tight">Money Management Academy</h2>
-      <p class="mt-2 max-w-3xl text-slate-600">Krátké lekce a checklisty, které naučí pracovat s penězi. Cíl: více zdravých rozpočtů, více daní pro stát, méně zbytečných výdajů.</p>
-
-      <div class="mt-8 grid gap-6 md:grid-cols-3">
-        <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-          <h3 class="text-lg font-semibold">1) Cashflow Basics</h3>
-          <ul class="mt-3 list-disc pl-5 text-sm text-slate-700">
-            <li>50/30/20 pravidlo (fixní/volný/investice)</li>
-            <li>Návyky: odložit 10–20 % hned po výplatě</li>
-            <li>Fond na 3–6 měsíců</li>
-          </ul>
-        </div>
-        <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-          <h3 class="text-lg font-semibold">2) Dluhy & rizika</h3>
-          <ul class="mt-3 list-disc pl-5 text-sm text-slate-700">
-            <li>Priorita: drahé dluhy → co nejdřív splatit</li>
-            <li>Pojistky: zdraví/příjem/odpovědnost</li>
-            <li>Emergency & diverzifikace</li>
-          </ul>
-        </div>
-        <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-          <h3 class="text-lg font-semibold">3) Investiční plán</h3>
-          <ul class="mt-3 list-disc pl-5 text-sm text-slate-700">
-            <li>Horizont, riziko, cíle</li>
-            <li>Automatizace investic</li>
-            <li>Průběžná revize (čtvrtletně)</li>
-          </ul>
-        </div>
-      </div>
-
-      <div class="mt-6 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-900">
-        Tip: V appce půjde udělat <b>osobní plán</b> + připomenutí a checklist zvyku na 30 dní.
-      </div>
+    <div class="mt-6">
+      <div id="paymentRequestButton" class="w-full"></div>
+      <div id="payInfo" class="mt-3 text-xs text-slate-500">Podporujeme Apple Pay / Google Pay (dle zařízení).</div>
+      <div id="payError" class="mt-3 hidden rounded-lg border border-rose-200 bg-rose-50 p-2 text-xs text-rose-700"></div>
+      <div id="paySuccess" class="mt-3 hidden rounded-lg border border-emerald-200 bg-emerald-50 p-2 text-xs text-emerald-700"></div>
     </div>
-  </section>
+  </div>
+</div>
 
-  <!-- PRICING -->
-  <section id="pricing" class="border-y border-slate-200 bg-white/60 py-16">
-    <div class="mx-auto max-w-7xl px-6">
-      <h2 class="text-3xl font-bold tracking-tight">Jednoduchý ceník</h2>
-      <p class="mt-2 max-w-2xl text-slate-600">Začni zdarma a kdykoli přejdi výš.</p>
-      <div class="mt-8 grid gap-6 md:grid-cols-3">
-        <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"><h3 class="text-lg font-semibold">Starter</h3><div class="mt-2 text-3xl font-extrabold">0</div><ul class="mt-4 space-y-2 text-sm text-slate-600"><li>1 aktivní projekt</li><li>AI doporučení (základ)</li><li>Money management lekce</li></ul><a href="#cta" class="mt-6 inline-block rounded-xl border border-slate-300 px-4 py-2 text-sm font-semibold">Začít zdarma</a></div>
-        <div class="rounded-2xl border-2 border-brand bg-white p-6 shadow-sm"><h3 class="text-lg font-semibold">Pro</h3><div class="mt-2 text-3xl font-extrabold">290 Kč<span class="text-base font-semibold text-slate-600">/měs</span></div><ul class="mt-4 space-y-2 text-sm text-slate-600"><li>Neomezené projekty</li><li>AI Opportunity Finder + Location Scanner</li><li>Export, sdílení, tým</li></ul><a href="#cta" class="mt-6 inline-block rounded-xl bg-brand px-4 py-2 text-sm font-semibold text-white shadow-sm">Vybrat Pro</a></div>
-        <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"><h3 class="text-lg font-semibold">Enterprise</h3><div class="mt-2 text-3xl font-extrabold">Na dotaz</div><ul class="mt-4 space-y-2 text-sm text-slate-600"><li>SSO, on-prem</li><li>Datové napojení na vaše systémy</li><li>Specifické modely & compliance</li></ul><a href="#cta" class="mt-6 inline-block rounded-xl border border-slate-300 px-4 py-2 text-sm font-semibold">Kontakt</a></div>
-      </div>
-    </div>
-  </section>
+<script>
+/* === Konfigurace endpoints & klíčů === */
+const AI_PROXY_URL   = "https://tight-field-436e.matejmelichr.workers.dev/api/chat";
+const SEARCH_API_URL = "https://tight-field-436e.matejmelichr.workers.dev/api/search";
+const PAY_INTENT_URL = "https://tight-field-436e.matejmelichr.workers.dev/api/create-payment-intent";
+const STRIPE_PUBLISHABLE_KEY = "pk_live_51Rn2ya013WiSlBdJ5BY7CgSGxigc1449mNZ4WGkIPrxEEqBnm4fytHXYhBjEuh0gA0bOuJqzBl3r0FHp31uWD4ox00lF8OL2nD"; // ✅ tvůj live publishable key
 
-  <!-- FAQ / FOOTER -->
-  <section id="faq" class="mx-auto max-w-7xl px-6 py-16">
-    <h2 class="text-3xl font-bold tracking-tight">Časté dotazy</h2>
-    <div class="mt-6 grid gap-4 md:grid-cols-2">
-      <details class="rounded-2xl border border-slate-200 bg-white p-5 open:shadow-sm"><summary class="cursor-pointer select-none text-sm font-semibold">Bude AI hledat i lokální příležitosti?</summary><p class="mt-2 text-sm text-slate-600">Ano, přes Search API + geodata filtry (region, město, typ aktiva).</p></details>
-      <details class="rounded-2xl border border-slate-200 bg-white p-5 open:shadow-sm"><summary class="cursor-pointer select-none textsm font-semibold">Je potřeba vlastní OpenAI klíč?</summary><p class="mt-2 text-sm text-slate-600">V produkci přes tvou <b>AI proxy</b> (serverless). Klíč se v prohlížeči neukládá.</p></details>
-      <details class="rounded-2xl border border-slate-200 bg-white p-5 open:shadow-sm"><summary class="cursor-pointer select-none text-sm font-semibold">Mohu exportovat plány?</summary><p class="mt-2 text-sm text-slate-600">Ano, CSV/Markdown/PDF v placených plánech.</p></details>
-      <details class="rounded-2xl border border-slate-200 bg-white p-5 open:shadow-sm"><summary class="cursor-pointer select-none text-sm font-semibold">Co mobilní aplikace?</summary><p class="mt-2 text-sm text-slate-600">Web je připravený jako PWA, případně obalíme přes Capacitor.</p></details>
-    </div>
-  </section>
+/* === Menu / UI === */
+const menuBtn=document.getElementById('menuBtn'), menuSheet=document.getElementById('menuSheet');
+function closeMenu(){ menuSheet.classList.add('hidden'); }
+menuBtn?.addEventListener('click',()=>menuSheet.classList.toggle('hidden'));
+document.getElementById('y').textContent = new Date().getFullYear();
 
-  <footer class="mx-auto max-w-7xl px-6 pb-10">
-    <div class="rounded-2xl border border-slate-200 bg-white/70 p-5 text-xs text-slate-500 shadow-sm">© <span id="y"></span> StrategyMind</div>
-  </footer>
+/* === Helpers === */
+const el=(t,c,h)=>{ const n=document.createElement(t); if(c) n.className=c; if(h!==undefined) n.innerHTML=h; return n; }
+const safeFetch=async(u,o)=>{ try{ const r=await fetch(u,o); if(!r.ok) throw new Error(await r.text()); return r.json(); }catch(e){ console.warn(e); return null; } }
 
-  <!-- ========== JS: MENU + AI/SEARCH TEMPLATES + RENDERERS ========== -->
-  <script>
-    // ====== Konfigurace ENDPOINTŮ ======
-    const AI_PROXY_URL   = "https://tight-field-436e.matejmelichr.workers.dev/api/chat";   // ✅ Worker Chat endpoint
-    const SEARCH_API_URL = "https://tight-field-436e.matejmelichr.workers.dev/api/search"; // ✅ Worker Search endpoint
+/* === AI === */
+async function askAI({ system, user, model='gpt-4o-mini' }) {
+  const res = await safeFetch(AI_PROXY_URL, {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ model, messages:[{role:'system',content:system},{role:'user',content:user}] })
+  });
+  return res?.choices?.[0]?.message || res?.message || { content:'(bez odpovědi)' };
+}
 
-    // ====== UI drobnosti ======
-    const menuBtn=document.getElementById('menuBtn');
-    const menuSheet=document.getElementById('menuSheet');
-    function closeMenu(){ menuSheet.classList.add('hidden'); }
-    menuBtn?.addEventListener('click',()=> menuSheet.classList.toggle('hidden'));
-    document.getElementById('y').textContent = new Date().getFullYear();
+/* === Search === */
+async function runSearch(query, segment) {
+  const provider = document.getElementById('provider')?.value || 'tavily';
+  const u = new URL(SEARCH_API_URL);
+  u.searchParams.set('q',query);
+  if (segment) u.searchParams.set('segment',segment);
+  u.searchParams.set('provider', provider); // tavily | serp
+  const data = await safeFetch(u.toString());
+  return Array.isArray(data) ? data : [];
+}
 
-    // ====== Helpery ======
-    function el(tag, cls, html){ const n=document.createElement(tag); if(cls) n.className=cls; if(html!==undefined) n.innerHTML=html; return n; }
-    async function safeFetch(url, opts){ try { const r=await fetch(url, opts); if(!r.ok) throw new Error(await r.text()); return r.json(); } catch(e){ console.warn('fetch failed', e); return null; } }
+/* === Opportunity Finder === */
+const oppsForm = document.getElementById('oppsForm'), oppsOut=document.getElementById('oppsOut');
+oppsForm.addEventListener('submit', async (e)=>{
+  e.preventDefault(); oppsOut.innerHTML='';
+  const idea=document.getElementById('idea').value.trim();
+  const budget=document.getElementById('budget').value.trim();
+  const horizon=document.getElementById('horizon').value.trim();
+  const segment=document.getElementById('segment').value;
+  const useSearch=document.getElementById('useSearch').checked;
 
-    // ====== AI volání ======
-    async function askAI({ system, user, model = 'gpt-4o-mini' }) {
-      const body = JSON.stringify({
-        model,
-        messages: [
-          { role: 'system', content: system },
-          { role: 'user',   content: user }
-        ]
-      });
-      const res = await safeFetch(AI_PROXY_URL, {
-        method:'POST',
-        headers:{ 'Content-Type':'application/json' },
-        body
-      });
-      return res?.choices?.[0]?.message || res?.message || { role:'assistant', content:'(bez odpovědi)' };
-    }
+  const loading=el('div','rounded-2xl border bg-white p-6 text-sm shadow-sm','⏳ Zpracovávám…'); oppsOut.appendChild(loading);
+  let search=[]; if(useSearch) search=await runSearch(idea,segment);
 
-    // ====== Search API (s přepínačem zdroje) ======
-    async function runSearch(query, segment) {
-      const provider = document.getElementById('provider')?.value || 'tavily'; // "tavily" | "serp"
-      const u = new URL(SEARCH_API_URL);
-      u.searchParams.set('q', query);
-      if (segment) u.searchParams.set('segment', segment);
-      u.searchParams.set('provider', provider);
-      const data = await safeFetch(u.toString());
-      return Array.isArray(data) ? data : [];
-    }
+  const system='Jsi strategický AI poradce pro podnikatele a investory. Piš česky, bodově, jasné priority, stručné kroky.';
+  const user=`Nápad: "${idea}"\nSegment: ${segment}\nRozpočet: ${budget||'neuveden'}\nHorizont: ${horizon} měs.\nSearch:\n${search.map((r,i)=>`#${i+1} ${(r.title||'')} — ${(r.snippet||'')}`).join('\n')}\nVrať: 3–5 příležitostí, akční plán (MVP→akvizice→monetizace), metriky.`;
+  const ai=await askAI({ system, user });
+  loading.remove();
 
-    // ====== OPPORTUNITY FINDER – Handler ======
-    const oppsForm = document.getElementById('oppsForm');
-    const oppsOut  = document.getElementById('oppsOut');
-    oppsForm.addEventListener('submit', async (e)=>{
-      e.preventDefault();
-      oppsOut.innerHTML = '';
-      const idea    = document.getElementById('idea').value.trim();
-      const budget  = document.getElementById('budget').value.trim();
-      const horizon = document.getElementById('horizon').value.trim();
-      const segment = document.getElementById('segment').value;
-      const useSearch = document.getElementById('useSearch').checked;
+  if(search.length){
+    const wrap=el('div','rounded-2xl border bg-white p-4 shadow-sm md:col-span-2');
+    wrap.appendChild(el('div','text-sm font-semibold','🔎 Shrnutí z Search API'));
+    const list=el('div','mt-3 grid gap-3 md:grid-cols-3');
+    search.forEach(r=>{ const c=el('a','block rounded-xl border p-4 hover:shadow-soft transition',`<div class="text-sm font-semibold">${r.title}</div><div class="text-xs text-slate-500">${(r.score!=null)?'Skóre: '+Math.round(r.score*100)+'%':''}</div><p class="mt-2 text-sm text-slate-600">${r.snippet||''}</p>`); c.href=r.url||'#'; c.target='_blank'; list.appendChild(c); });
+    wrap.appendChild(list); oppsOut.appendChild(wrap);
+  }
 
-      const loading = el('div','rounded-2xl border border-slate-200 bg-white p-6 text-sm shadow-sm','⏳ Zpracovávám…');
-      oppsOut.appendChild(loading);
+  oppsOut.appendChild(el('div','rounded-2xl border bg-white p-6 shadow-sm whitespace-pre-wrap text-sm', ai.content || JSON.stringify(ai)));
+});
 
-      // 1) (volitelně) search API
-      let searchResults = [];
-      if (useSearch) {
-        searchResults = await runSearch(idea, segment);
-      }
+/* === Location Scanner === */
+const locForm=document.getElementById('locForm'), locOut=document.getElementById('locOut');
+locForm.addEventListener('submit', async (e)=>{
+  e.preventDefault(); locOut.innerHTML='';
+  const loc=document.getElementById('loc').value.trim()||'ČR';
+  const asset=document.getElementById('asset').value;
+  const cap=document.getElementById('cap').value.trim()||'neuvedeno';
+  const loading=el('div','rounded-2xl border bg-white p-6 text-sm shadow-sm','⏳ Analýza…'); locOut.appendChild(loading);
+  const ai=await askAI({ system:'Jsi AI analytik pro reality. Piš česky, bodově.', user:`Region: ${loc}\nAktivum: ${asset}\nRozpočet: ${cap}\nVrať 3 karty: název, proč teď, oček. výnos, rizika, první krok.` });
+  loading.remove();
+  (ai.content||'').split(/\n\s*\n/).slice(0,3).forEach(block=> locOut.appendChild(el('div','rounded-2xl border bg-white p-6 shadow-sm text-sm', block.replace(/\n/g,'<br>'))));
+});
 
-      // 2) AI prompt
-      const system = `Jsi strategický AI poradce pro podnikatele a začínající investory. Tvým cílem je proměnit nápad na akční plán s ohledem na český a EU trh. Odpovědi piš česky, stručně, bodově, s prioritami a odhadem dopadu.`;
-      const userPrompt =
-`Nápad: "${idea}"
-Segment: ${segment}
-Rozpočet: ${budget || 'neuveden'}
-Horizont: ${horizon} měsíců
-Search data (shrnutí):
-${searchResults.map((r,i)=>`#${i+1} [${Math.round((r.score||0)*100)}%] ${r.title} — ${r.snippet}`).join('\n')}
+/* === Report Download (MD + PDF) === */
+document.getElementById('downloadReportBtn').addEventListener('click', ()=>{
+  const idea=document.getElementById('idea').value||'(neuvedeno)';
+  const seg=document.getElementById('segment').value||'(neuvedeno)';
+  const opps=Array.from(document.querySelectorAll('#oppsOut > div')).map(d=>d.innerText.trim()).join('\n\n---\n\n') || '(zatím žádné výsledky)';
+  const locs=Array.from(document.querySelectorAll('#locOut > div')).map(d=>d.innerText.trim()).join('\n\n---\n\n') || '(zatím žádné výsledky)';
 
-Vrať:
-1) 3–5 nejlepších příležitostí (název, proč teď, rizika),
-2) akční plán (MVP → akvizice → monetizace),
-3) metriky (north star + 3 leading).`;
+  const md = `# StrategyMind – Report\n\n## Vstup\n- Nápad: ${idea}\n- Segment: ${seg}\n\n## Opportunity Finder\n${opps}\n\n## Location Scanner\n${locs}\n\n_Generováno: ${new Date().toLocaleString()}_`;
+  // Markdown
+  const blob=new Blob([md],{type:'text/markdown;charset=utf-8'}); const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob); a.download=`StrategyMind_report_${Date.now()}.md`; a.click();
 
-      const ai = await askAI({ system, user: userPrompt });
+  // PDF
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit:'pt', format:'a4' });
+  const margin=40, maxWidth=515;
+  doc.setFont('helvetica','normal'); doc.setFontSize(14);
+  doc.text('StrategyMind – Report', margin, 60);
+  doc.setFontSize(10);
+  const lines = doc.splitTextToSize(md, maxWidth);
+  doc.text(lines, margin, 90);
+  doc.save(`StrategyMind_report_${Date.now()}.pdf`);
+});
 
-      // 3) Render
-      oppsOut.innerHTML = '';
+/* === Checkout (Stripe Payment Request: Apple/Google Pay) === */
+const checkoutModal=document.getElementById('checkoutModal');
+const buyProBtn=document.getElementById('buyProBtn');
+const closeCheckout=document.getElementById('closeCheckout');
+let stripe, paymentRequest, clientSecret;
 
-      // Search karty
-      if (searchResults.length) {
-        const wrap = el('div','rounded-2xl border border-slate-200 bg-white p-4 shadow-sm md:col-span-2');
-        wrap.appendChild(el('div','text-sm font-semibold text-slate-700','🔎 Shrnutí z Search API'));
-        const list = el('div','mt-3 grid gap-3 md:grid-cols-3');
-        searchResults.forEach(r=>{
-          const card = el('a','block rounded-xl border border-slate-200 p-4 hover:shadow-soft transition',`
-            <div class="text-sm font-semibold text-slate-800">${r.title}</div>
-            <div class="mt-1 text-xs text-slate-500">${(r.score!==undefined)? `Skóre: ${(r.score*100|0)}%` : ''}</div>
-            <p class="mt-2 text-sm text-slate-600">${r.snippet||''}</p>
-          `);
-          card.href = r.url || '#'; card.target = '_blank'; card.rel='noopener';
-          list.appendChild(card);
-        });
-        wrap.appendChild(list);
-        oppsOut.appendChild(wrap);
-      }
+buyProBtn.addEventListener('click', async ()=>{
+  checkoutModal.classList.remove('hidden','opacity-0');
+  await initStripePaymentRequest();
+});
+closeCheckout.addEventListener('click', ()=> checkoutModal.classList.add('hidden'));
 
-      // AI výstup
-      const content = ai.content || (typeof ai === 'string' ? ai : JSON.stringify(ai));
-      const aiCard = el('div','rounded-2xl border border-slate-200 bg-white p-6 shadow-sm whitespace-pre-wrap text-sm', content);
-      oppsOut.appendChild(aiCard);
+async function initStripePaymentRequest(){
+  try{
+    stripe = stripe || Stripe(STRIPE_PUBLISHABLE_KEY);
+
+    // 1) Vytvoř PaymentIntent (CZK 290 = 29000 hal.)
+    const intent = await safeFetch(PAY_INTENT_URL, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ amount: 29000, currency:'czk', plan:'pro' })
+    });
+    if(!intent?.client_secret){ showPayError('Nepodařilo se vytvořit PaymentIntent.'); return; }
+    clientSecret = intent.client_secret;
+
+    // 2) Apple/Google Pay
+    paymentRequest = stripe.paymentRequest({
+      country: 'CZ',
+      currency: 'czk',
+      total: { label: 'StrategyMind Pro (měsíc)', amount: 29000 },
+      requestPayerName: true,
+      requestPayerEmail: true
     });
 
-    // ====== LOCATION SCANNER – Handler ======
-    const locForm = document.getElementById('locForm');
-    const locOut  = document.getElementById('locOut');
-    locForm.addEventListener('submit', async (e)=>{
-      e.preventDefault();
-      locOut.innerHTML = '';
-      const loc   = document.getElementById('loc').value.trim() || 'ČR';
-      const asset = document.getElementById('asset').value;
-      const cap   = document.getElementById('cap').value.trim() || 'neuvedeno';
+    const result = await paymentRequest.canMakePayment();
+    if (result) {
+      const elements = stripe.elements();
+      const prEl = elements.create('paymentRequestButton', { paymentRequest });
+      prEl.mount('#paymentRequestButton');
 
-      const loading = el('div','rounded-2xl border border-slate-200 bg-white p-6 text-sm shadow-sm','⏳ Analýza lokací…');
-      locOut.appendChild(loading);
-
-      const system = `Jsi AI analytik pro reality/investice. Navrhni top lokace (města/oblasti) dle aktiva a rozpočtu v kontextu evropského trhu. Přidej důvody, odhad výnosu (roční % nebo cashflow), rizika a klíčové metriky.`;
-      const user   = `Region preferovaný: ${loc}\nAktivum: ${asset}\nRozpočet: ${cap}\nVrať 3 karty lokací (název, proč teď, oček. výnos, rizika, první krok due diligence). Output markdownem.`;
-
-      const ai = await askAI({ system, user });
-
-      loading.remove();
-      const text = ai.content || '';
-      const parts = text.split(/\n\s*\n/).filter(Boolean).slice(0,3);
-      parts.forEach(md=>{
-        const card = el('div','rounded-2xl border border-slate-200 bg-white p-6 shadow-sm text-sm');
-        card.innerHTML = md.replace(/\n/g,'<br>');
-        locOut.appendChild(card);
+      paymentRequest.on('paymentmethod', async (ev) => {
+        const { error } = await stripe.confirmCardPayment(clientSecret, { payment_method: ev.paymentMethod.id }, { handleActions: false });
+        if (error) {
+          ev.complete('fail'); showPayError(error.message || 'Platba selhala.');
+        } else {
+          ev.complete('success');
+          const { error: actErr } = await stripe.confirmCardPayment(clientSecret);
+          if (actErr) showPayError(actErr.message || 'Dvoufázové ověření selhalo.');
+          else showPaySuccess('Platba proběhla úspěšně. Děkujeme! ✅');
+        }
       });
-    });
-  </script>
+    } else {
+      document.getElementById('paymentRequestButton').innerHTML = '<div class="rounded-lg border bg-slate-50 p-3 text-sm text-slate-600">Apple/Google Pay není na tomto zařízení k dispozici.</div>';
+    }
+  }catch(e){ showPayError(e?.message || 'Neočekávaná chyba.'); }
+}
+function showPayError(msg){ const el=document.getElementById('payError'); el.textContent=msg; el.classList.remove('hidden'); document.getElementById('paySuccess').classList.add('hidden'); }
+function showPaySuccess(msg){ const el=document.getElementById('paySuccess'); el.textContent=msg; el.classList.remove('hidden'); document.getElementById('payError').classList.add('hidden'); }
+</script>
 </body>
 </html>
 
