@@ -1,575 +1,568 @@
 <!doctype html>
 <html lang="cs" dir="auto">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>StrategyMind — AI pro příležitosti, trhy, reality a money management</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>StrategyMind — Inteligentní dashboard pro trhy, reality a peníze</title>
 
-  <!-- Performance -->
-  <link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin>
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="preload" as="image" href="logo.png" imagesrcset="logo.png 1x">
-  <meta name="color-scheme" content="light dark"/>
+<!-- inline Favicon (instant paint) -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='128' height='128' viewBox='0 0 256 256'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop stop-color='%232bd4a9'/%3E%3Cstop offset='1' stop-color='%230A2342'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect rx='56' width='256' height='256' fill='%230b1220'/%3E%3Cpath d='M58 164c24-46 64-70 118-74l-16 20c22 2 40 16 50 38-36 12-68 16-96 12-22-3-40 5-56 16z' fill='url(%23g)' opacity='.92'/%3E%3Ccircle cx='92' cy='96' r='18' fill='%23fff' opacity='.9'/%3E%3C/svg%3E" />
 
-  <!-- OG / ikony -->
-  <link rel="icon" type="image/png" href="logo.png" />
-  <meta property="og:title" content="StrategyMind — AI pro příležitosti, reality a money management" />
-  <meta property="og:image" content="logo.png" />
-  <meta name="twitter:card" content="summary_large_image" />
-
-  <!-- Tailwind (CDN) -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: { brand:'#0A2342', mint:'#2bd4a9', ink:'#0f172a', warn:'#FFB020' },
-          boxShadow: { soft:'0 20px 60px -20px rgba(2,6,23,.12)' },
-          borderRadius: { xl2:'1.25rem' }
-        }
-      }
+<!-- Tailwind -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors:{ brand:'#0A2342', mint:'#2bd4a9', ink:'#0f172a', bull:'#059669', bear:'#dc2626'},
+      boxShadow:{ soft:'0 20px 60px -20px rgba(2,6,23,.12)'},
+      borderRadius:{ xl2:'1.25rem'}
     }
-  </script>
-  <style>
-    html{ -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
-    .glass{ backdrop-filter: blur(8px); background: rgba(255,255,255,.6); }
-    .dark .glass{ background: rgba(17,24,39,.5); }
-    .ticker-up{ color:#059669 }
-    .ticker-down{ color:#dc2626 }
-    canvas{ image-rendering: -webkit-optimize-contrast; }
-  </style>
+  }
+}
+</script>
+<style>
+html{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+.card{box-shadow:0 20px 60px -20px rgba(2,6,23,.12)}
+.btn{display:inline-flex;align-items:center;gap:.5rem;padding:.6rem 1rem;border-radius:.9rem}
+.btn-primary{background:#0A2342;color:#fff}
+.badge{font-size:.7rem;padding:.2rem .55rem;border:1px solid #e2e8f0;border-radius:.6rem}
+.tab-active{background:#0A2342;color:#fff}
+input,select,textarea{border-radius:.7rem;border:1px solid #cbd5e1;padding:.55rem .8rem}
+.canvas{width:100%;height:240px}
+.modal{position:fixed;inset:0;background:rgba(15,23,42,.55);display:none;align-items:center;justify-content:center}
+.modal.open{display:flex}
+.prose{line-height:1.55}
+.kv{display:grid;grid-template-columns:140px 1fr;gap:.35rem .7rem}
+.kv b{color:#475569}
+</style>
 </head>
-<body class="bg-gradient-to-b from-slate-50 via-white to-slate-50 text-slate-900 dark:from-slate-900 dark:via-slate-950 dark:to-slate-900 dark:text-slate-100">
+<body class="bg-gradient-to-b from-slate-50 via-white to-slate-50 text-slate-900">
 
-  <!-- NAV -->
-  <header class="sticky top-0 z-50 border-b border-slate-200/70 dark:border-slate-800/60 glass">
-    <div class="mx-auto flex max-w-7xl items-center justify-between px-6 py-3">
-      <a href="#" class="flex items-center gap-3">
-        <!-- Fast logo: svg fallback (okamžitě), obrázek naskočí hned jak se načte -->
-        <svg class="h-9 w-9 rounded-2xl overflow-hidden bg-brand/10" viewBox="0 0 64 64" aria-hidden="true">
-          <circle cx="32" cy="32" r="28" fill="#0A2342"></circle>
-          <path d="M18 36l8 8 20-24" stroke="#2bd4a9" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-        <img src="logo.png" alt="" class="h-9 w-9 rounded-2xl absolute opacity-0" onload="this.classList.remove('opacity-0')" decoding="async" fetchpriority="high" />
-        <span class="ml-11 text-xl font-semibold tracking-tight">StrategyMind</span>
-      </a>
-      <nav class="hidden items-center gap-6 text-sm md:flex">
-        <a class="hover:text-slate-700 dark:hover:text-slate-200" href="#trading">Trading</a>
-        <a class="hover:text-slate-700 dark:hover:text-slate-200" href="#realestate">Reality</a>
-        <a class="hover:text-slate-700 dark:hover:text-slate-200" href="#money">Money Management</a>
-        <a class="hover:text-slate-700 dark:hover:text-slate-200" href="#ideas">Idea Lab</a>
-      </nav>
-      <div class="hidden md:flex items-center gap-3">
-        <a href="#pricing" class="rounded-xl border border-slate-300/60 dark:border-slate-700 bg-white/60 dark:bg-slate-800/60 px-3 py-1.5 text-sm shadow-sm">Ceník</a>
-        <a href="#trading" class="rounded-xl bg-brand px-3 py-1.5 text-white shadow-soft">Spustit</a>
-      </div>
-      <button id="menuBtn" class="md:hidden inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 dark:border-slate-700">☰</button>
+<!-- NAV -->
+<header class="sticky top-0 z-40 border-b border-slate-200 bg-white/80 backdrop-blur">
+  <div class="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6 py-3">
+    <a href="#" class="flex items-center gap-3">
+      <svg width="34" height="34" viewBox="0 0 256 256"><rect rx="56" width="256" height="256" fill="#0b1220"/><path d="M58 164c24-46 64-70 118-74l-16 20c22 2 40 16 50 38-36 12-68 16-96 12-22-3-40 5-56 16z" fill="url(#g0)"/><defs><linearGradient id="g0" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#2bd4a9"/><stop offset="1" stop-color="#0A2342"/></linearGradient></defs><circle cx="92" cy="96" r="18" fill="#fff" opacity=".9"/></svg>
+      <span class="text-xl font-semibold tracking-tight">StrategyMind</span>
+    </a>
+    <nav class="hidden gap-7 text-sm md:flex">
+      <a class="hover:text-slate-700" href="#trading">Trading</a>
+      <a class="hover:text-slate-700" href="#re">Reality</a>
+      <a class="hover:text-slate-700" href="#money">Money</a>
+      <a class="hover:text-slate-700" href="#ideas">Idea Lab</a>
+    </nav>
+    <div class="hidden md:flex items-center gap-2">
+      <a href="#pricing" class="badge">Ceník</a>
+      <button id="quickRun" class="btn btn-primary">Spustit</button>
     </div>
-    <div id="menuSheet" class="hidden border-t border-slate-200 dark:border-slate-800 md:hidden">
-      <div class="mx-auto flex max-w-7xl flex-col gap-4 px-6 py-4 text-sm">
-        <a href="#trading" onclick="closeMenu()">Trading</a>
-        <a href="#realestate" onclick="closeMenu()">Reality</a>
-        <a href="#money" onclick="closeMenu()">Money Management</a>
-        <a href="#ideas" onclick="closeMenu()">Idea Lab</a>
-        <a href="#pricing" onclick="closeMenu()">Ceník</a>
-      </div>
+    <button id="menuBtn" class="md:hidden inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200">☰</button>
+  </div>
+  <div id="menuSheet" class="hidden border-t border-slate-200 md:hidden">
+    <div class="mx-auto flex max-w-7xl flex-col gap-4 px-6 py-4 text-sm">
+      <a href="#trading" onclick="closeMenu()">Trading</a>
+      <a href="#re" onclick="closeMenu()">Reality</a>
+      <a href="#money" onclick="closeMenu()">Money</a>
+      <a href="#ideas" onclick="closeMenu()">Idea Lab</a>
+      <a href="#pricing" onclick="closeMenu()">Ceník</a>
     </div>
-  </header>
+  </div>
+</header>
 
-  <!-- HERO compact -->
-  <section class="mx-auto max-w-7xl px-6 pt-8 pb-6">
-    <div class="grid md:grid-cols-2 gap-8 items-center">
-      <div>
-        <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight">
-          <span class="block">Inteligentní dashboard</span>
-          <span class="bg-gradient-to-r from-emerald-600 to-teal-400 bg-clip-text text-transparent">pro trhy, reality a peníze</span>
-        </h1>
-        <p class="mt-3 text-slate-600 dark:text-slate-300">
-          Live tickery s predikcí, zprávy, real-estate nápady s ROI a osobní plán financí. Vše propojené s AI specialisty.
-        </p>
-        <div class="mt-4 flex flex-wrap gap-3">
-          <a href="#trading" class="rounded-xl bg-brand px-4 py-2 text-white shadow-soft">Do Tradingu</a>
-          <a href="#realestate" class="rounded-xl border border-slate-300 px-4 py-2 dark:border-slate-700">Hledat reality</a>
+<!-- HERO -->
+<main class="mx-auto max-w-7xl px-4 sm:px-6 pb-4 pt-6">
+  <div class="grid lg:grid-cols-3 gap-6 items-stretch">
+    <div class="lg:col-span-2">
+      <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight">
+        Inteligentní dashboard<br>
+        <span class="bg-gradient-to-r from-emerald-600 to-teal-400 bg-clip-text text-transparent">pro trhy, reality a peníze</span>
+      </h1>
+      <p class="mt-4 max-w-2xl text-slate-600">
+        Live tickery s predikcí, TA indikátory, korelace, real-estate nápady s ROI a osobní plán financí. Vše propojené s AI specialisty.
+      </p>
+
+      <!-- Quick CTA -->
+      <div class="mt-6 flex items-center gap-3">
+        <a href="#trading" class="btn btn-primary">Do Tradingu</a>
+        <a href="#re" class="btn border border-slate-300 bg-white">Hledat reality</a>
+      </div>
+    </div>
+
+    <!-- Live mini-dashboard -->
+    <div class="rounded-[1.6rem] border border-slate-200 bg-white p-4 sm:p-5 card">
+      <div class="text-sm text-slate-500 mb-2">Rychlý přehled</div>
+      <div class="grid grid-cols-3 gap-3">
+        <button id="quickIntraday" class="rounded-xl2 border border-slate-200 p-4 text-left hover:shadow-sm">
+          <div class="text-xs text-slate-500">AI predikce</div>
+          <div class="mt-1 text-lg font-semibold">Intraday</div>
+        </button>
+        <button id="quickIdeas" class="rounded-xl2 border border-slate-200 p-4 text-left hover:shadow-sm">
+          <div class="text-xs text-slate-500">Reality</div>
+          <div class="mt-1 text-lg font-semibold">Nápady</div>
+        </button>
+        <button id="quickBudget" class="rounded-xl2 border border-slate-200 p-4 text-left hover:shadow-sm">
+          <div class="text-xs text-slate-500">Rozpočet</div>
+          <div class="mt-1 text-lg font-semibold">50/30/20</div>
+        </button>
+      </div>
+
+      <div class="mt-4 text-xs text-slate-500">
+        Sentiment: <span id="sentTag" class="badge">—</span>
+        <button id="sentRefresh" class="badge ml-2">Aktualizovat</button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- Tabs -->
+<div class="mx-auto max-w-7xl px-4 sm:px-6">
+  <div class="flex items-center gap-3 overflow-x-auto pb-2">
+    <button data-tab="trading" class="tab btn border border-slate-300">Trading</button>
+    <button data-tab="re" class="tab btn border border-slate-300">Reality</button>
+    <button data-tab="money" class="tab btn border border-slate-300">Money</button>
+    <button data-tab="ideas" class="tab btn border border-slate-300">Idea Lab</button>
+    <div class="ml-auto text-xs text-slate-500">Refresh: <span id="refreshTs">—</span></div>
+  </div>
+</div>
+
+<!-- ================= TRADING ================= -->
+<section id="trading" class="tabpane mx-auto max-w-7xl px-4 sm:px-6 pt-5 pb-10">
+  <div class="grid lg:grid-cols-[2fr_1fr] gap-4">
+    <div class="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 card">
+      <div class="flex flex-wrap items-center gap-2 mb-3">
+        <input id="tSymbols" class="flex-1" value="AAPL,NVDA,SPY,QQQ,MSFT,TSLA,BTCUSD,ETHUSD,EURUSD,XAUUSD,USOIL">
+        <label class="flex items-center gap-2 text-sm"><span>Filtr</span>
+          <select id="tFilter"><option value="all">Vše</option><option value="gainers">Rostoucí</option><option value="losers">Klesající</option><option value="flat">Plochá</option></select>
+        </label>
+        <label class="flex items-center gap-2 text-sm"><span>Detail</span>
+          <select id="tRes"><option value="D">1Y</option><option value="60">1M</option><option value="15">5D</option></select>
+        </label>
+        <label class="flex items-center gap-2 text-sm"><span>Auto</span>
+          <select id="tAuto"><option value="30">30s</option><option value="60">60s</option><option value="0">Vyp</option></select>
+        </label>
+        <button id="tLoad" class="btn btn-primary">Načíst</button>
+        <button id="tScreenerG" class="btn border">Screener ▲</button>
+        <button id="tScreenerL" class="btn border">Screener ▼</button>
+        <button class="btn border" onclick="openChat('trading')">Chatbot</button>
+      </div>
+      <div id="tList" class="grid md:grid-cols-2 xl:grid-cols-3 gap-4"></div>
+      <p class="text-xs text-slate-500 mt-4">Upozornění: Informace nejsou investičním doporučením. Data mohou být zpožděná a bez záruky.</p>
+    </div>
+
+    <div class="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 card">
+      <div class="font-semibold mb-2">Zprávy & sentiment</div>
+      <div class="flex items-center gap-2 mb-2">
+        <input id="newsQ" class="flex-1" placeholder="Téma (NVDA, AI, energetika…)" value="markets">
+        <button id="newsRun" class="btn border">Načíst</button>
+      </div>
+      <div id="newsList" class="grid gap-3"></div>
+
+      <div class="mt-5">
+        <div class="font-semibold mb-2">Korelace (90 dní)</div>
+        <div class="flex items-center gap-2">
+          <input id="cSyms" class="flex-1" value="AAPL,MSFT,SPY,NVDA,TSLA,QQQ">
+          <button id="cRun" class="btn border">Výpočet</button>
+        </div>
+        <div id="cOut" class="text-sm text-slate-700 mt-3"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= REAL ESTATE ================= -->
+<section id="re" class="tabpane hidden mx-auto max-w-7xl px-4 sm:px-6 pt-5 pb-10">
+  <div class="grid lg:grid-cols-2 gap-4">
+    <div class="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 card">
+      <div class="font-semibold mb-2">Rychlý scan lokality / aktiva</div>
+      <div class="flex items-center gap-2">
+        <input id="reQuery" class="flex-1" placeholder="např. Brno pozemek 2000 m2 u nákupního centra">
+        <button id="reScan" class="btn btn-primary">Analyzovat</button>
+        <button class="btn border" onclick="openChat('realestate')">Chatbot</button>
+      </div>
+      <div id="reOut" class="grid gap-3 mt-4"></div>
+
+      <div class="mt-6">
+        <div class="text-sm text-slate-600 mb-2">Katastr / registry:</div>
+        <div id="cadList" class="grid md:grid-cols-2 gap-3"></div>
+      </div>
+    </div>
+
+    <div class="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 card">
+      <div class="font-semibold mb-2">ROI kalkulačka (rychlý odhad)</div>
+      <div class="grid grid-cols-2 gap-2">
+        <label>Pořizovací cena<input id="rPrice" type="number" value="3000000"></label>
+        <label>Náklady (capex) %<input id="rCapex" type="number" value="20"></label>
+        <label>Roční hrubý příjem<input id="rIncome" type="number" value="240000"></label>
+        <label>Provozní náklady %<input id="rOpex" type="number" value="25"></label>
+      </div>
+      <button id="rRun" class="btn btn-primary mt-3">Spočítat</button>
+      <div id="rOut" class="kv text-sm mt-3"></div>
+
+      <div class="mt-6">
+        <div class="font-semibold mb-2">OpenAI nápady využití</div>
+        <div class="flex items-center gap-2">
+          <input id="riPrompt" class="flex-1" placeholder="Stručný popis (lokalita, typ, okolí)…">
+          <button id="riRun" class="btn border">Navrhnout</button>
+        </div>
+        <div id="riOut" class="text-sm whitespace-pre-wrap mt-3"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= MONEY ================= -->
+<section id="money" class="tabpane hidden mx-auto max-w-7xl px-4 sm:px-6 pt-5 pb-10">
+  <div class="grid lg:grid-cols-3 gap-4">
+    <div class="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 card lg:col-span-2">
+      <div class="flex items-center justify-between">
+        <div class="font-semibold">Rozpočet 50/30/20</div>
+        <div class="flex items-center gap-2">
+          <span class="text-sm">Persona:</span>
+          <select id="persona" class="text-sm">
+            <option value="standard">Zaměstnanec</option>
+            <option value="freelance">Freelancer</option>
+            <option value="trader">Trader/Investor</option>
+          </select>
+          <button class="btn border" onclick="openChat('money')">Chatbot</button>
         </div>
       </div>
-      <div class="relative">
-        <div class="pointer-events-none absolute -inset-6 -z-10 rounded-[2rem] bg-gradient-to-tr from-emerald-500/20 via-teal-400/10 to-transparent blur-2xl"></div>
-        <div class="relative mx-auto max-w-md rounded-[2rem] border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-2xl">
-          <div class="text-sm text-slate-600 dark:text-slate-300">Rychlý přehled</div>
-          <div class="mt-3 grid grid-cols-3 gap-3 text-center">
-            <div class="rounded-xl border border-slate-200 dark:border-slate-800 p-3">
-              <div class="text-xs">AI predikce</div>
-              <div class="text-xl font-bold">Intraday</div>
-            </div>
-            <div class="rounded-xl border border-slate-200 dark:border-slate-800 p-3">
-              <div class="text-xs">Reality</div>
-              <div class="text-xl font-bold">Nápady</div>
-            </div>
-            <div class="rounded-xl border border-slate-200 dark:border-slate-800 p-3">
-              <div class="text-xs">Rozpočet</div>
-              <div class="text-xl font-bold">50/30/20</div>
-            </div>
-          </div>
-        </div>
+      <div class="grid sm:grid-cols-3 gap-3 mt-3">
+        <label>Fixní výdaje %<input id="bFix" type="number" value="50"></label>
+        <label>Volné %<input id="bFree" type="number" value="30"></label>
+        <label>Investice %<input id="bInv" type="number" value="20"></label>
+      </div>
+      <canvas id="budgetPie" class="canvas mt-4"></canvas>
+      <div class="text-sm text-slate-600 mt-3">Tipy: vyplaťte se nejdříve, automatizujte investice, udržujte 3–6 měsíců rezervy.</div>
+    </div>
+
+    <div class="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 card">
+      <div class="font-semibold mb-2">Složené úročení</div>
+      <label><span>Počáteční kapitál</span><input id="ciStart" type="number" value="100000"></label>
+      <label class="mt-2"><span>Měsíční vklad</span><input id="ciMonthly" type="number" value="5000"></label>
+      <label class="mt-2"><span>Roční výnos (%)</span><input id="ciRate" type="number" value="7"></label>
+      <label class="mt-2"><span>Let</span><input id="ciYears" type="number" value="10"></label>
+      <button id="ciRun" class="btn btn-primary mt-3">Spočítat</button>
+      <div id="ciOut" class="text-sm text-slate-700 mt-3"></div>
+
+      <div class="mt-6">
+        <div class="font-semibold mb-2">Hypoteční kalkulačka</div>
+        <label><span>Cena nemovitosti</span><input id="mPrice" type="number" value="6000000"></label>
+        <label class="mt-2"><span>Vlastní zdroje</span><input id="mOwn" type="number" value="1200000"></label>
+        <label class="mt-2"><span>Úrok p.a. (%)</span><input id="mRate" type="number" value="5.5"></label>
+        <label class="mt-2"><span>Let</span><input id="mYears" type="number" value="30"></label>
+        <button id="mRun" class="btn border mt-3">Výpočet</button>
+        <div id="mOut" class="text-sm text-slate-700 mt-3"></div>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- DASHBOARD TABS -->
-  <section class="mx-auto max-w-7xl px-6 pb-2">
-    <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/70 dark:bg-slate-900/60 p-3 shadow-sm">
-      <div class="flex flex-wrap items-center justify-between gap-3">
-        <div class="flex gap-2 text-sm">
-          <button data-tab="tab-trading" class="tab-btn rounded-lg bg-brand/10 text-brand px-3 py-1.5">Trading</button>
-          <button data-tab="tab-realestate" class="tab-btn rounded-lg px-3 py-1.5">Reality</button>
-          <button data-tab="tab-money" class="tab-btn rounded-lg px-3 py-1.5">Money</button>
-          <button data-tab="tab-ideas" class="tab-btn rounded-lg px-3 py-1.5">Idea Lab</button>
-        </div>
-        <div class="text-xs text-slate-500">Refresh: <span id="lastRefresh">–</span></div>
-      </div>
+<!-- ================= IDEA LAB ================= -->
+<section id="ideas" class="tabpane hidden mx-auto max-w-7xl px-4 sm:px-6 pt-5 pb-10">
+  <div class="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 card">
+    <div class="flex items-center justify-between">
+      <div class="font-semibold">Generátor plánů</div>
+      <button class="btn border" onclick="openChat('ideas')">Chatbot</button>
     </div>
-  </section>
 
-  <!-- TAB: TRADING -->
-  <section id="tab-trading" class="tab-panel mx-auto max-w-7xl px-6 py-6">
-    <div class="flex flex-wrap items-end gap-3">
-      <div class="grow">
-        <label class="text-sm">Symboly (čárkou):</label>
-        <input id="symbolsInput" class="mt-1 w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white/70 dark:bg-slate-900/60 px-3 py-2 text-sm" placeholder="AAPL,NVDA,SPY,BTCUSD,XAUUSD">
-      </div>
-      <div>
-        <label class="text-sm">Filtr:</label>
-        <select id="filterSelect" class="mt-1 rounded-xl border border-slate-300 dark:border-slate-700 bg-white/70 dark:bg-slate-900/60 px-3 py-2 text-sm">
-          <option value="all">Vše</option>
-          <option value="equity">Akcie</option>
-          <option value="index">Indexy</option>
-          <option value="crypto">Krypto</option>
-          <option value="commodity">Komodity</option>
+    <div class="grid sm:grid-cols-3 gap-3 mt-3">
+      <label>Šablona
+        <select id="tpl">
+          <option value="saas">SaaS</option>
+          <option value="eshop">E-shop</option>
+          <option value="content">Obsah/YouTube</option>
+          <option value="mobile">Mobilní appka</option>
         </select>
-      </div>
-      <div>
-        <label class="text-sm">Sparkline:</label>
-        <select id="rangeSelect" class="mt-1 rounded-xl border border-slate-300 dark:border-slate-700 bg-white/70 dark:bg-slate-900/60 px-3 py-2 text-sm">
-          <option value="">Off</option>
-          <option value="1y" selected>1Y</option>
-        </select>
-      </div>
-      <button id="loadSymbols" class="rounded-xl bg-brand px-4 py-2 text-white shadow-soft">Načíst</button>
+      </label>
+      <label>Název / nápad<input id="ideaTitle" value="Mikro-SaaS pro účetní (automatická fakturace)"></label>
+      <button id="ideaRun" class="btn btn-primary self-end">Vygenerovat</button>
     </div>
 
-    <!-- Live grid -->
-    <div id="tickersGrid" class="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"></div>
-
-    <!-- Detail modal -->
-    <dialog id="symbolModal" class="rounded-2xl border border-slate-200 dark:border-slate-800 p-0 w-[min(96vw,1000px)]">
-      <div class="glass border-b border-slate-200 dark:border-slate-800 px-4 py-3 flex items-center justify-between">
-        <div class="text-lg font-semibold"><span id="mSymbol">SYMB</span> – detail</div>
-        <button onclick="closeModal()" class="px-3 py-1 rounded-lg border border-slate-300 dark:border-slate-700">Zavřít</button>
-      </div>
-      <div class="p-4 grid md:grid-cols-3 gap-4">
-        <div class="md:col-span-2">
-          <canvas id="sparkCanvas" height="140"></canvas>
-          <div class="mt-3 grid grid-cols-3 gap-3 text-sm">
-            <div class="rounded-xl border border-slate-200 dark:border-slate-800 p-3">
-              <div class="text-xs text-slate-500">Intraday</div>
-              <div class="font-semibold"><span id="pIntraday"></span></div>
-            </div>
-            <div class="rounded-xl border border-slate-200 dark:border-slate-800 p-3">
-              <div class="text-xs text-slate-500">Swing</div>
-              <div class="font-semibold"><span id="pSwing"></span></div>
-            </div>
-            <div class="rounded-xl border border-slate-200 dark:border-slate-800 p-3">
-              <div class="text-xs text-slate-500">Long</div>
-              <div class="font-semibold"><span id="pLong"></span></div>
-            </div>
-          </div>
-          <label class="mt-3 inline-flex items-center gap-2 text-sm">
-            <input id="analyzePast" type="checkbox" class="h-4 w-4 rounded border-slate-300 dark:border-slate-700">
-            <span>Analyze past (shrnutí korelací)</span>
-          </label>
-          <button id="askStockAI" class="ml-3 rounded-lg border border-slate-300 dark:border-slate-700 px-3 py-1.5 text-sm">Zeptat se AI</button>
-          <div id="stockAIOut" class="mt-3 whitespace-pre-wrap text-sm hidden"></div>
-        </div>
-        <div>
-          <div class="text-sm font-semibold mb-2">Zprávy</div>
-          <div id="newsList" class="space-y-2 max-h-[340px] overflow-auto pr-1"></div>
-        </div>
-      </div>
-    </dialog>
-  </section>
-
-  <!-- TAB: REAL ESTATE -->
-  <section id="tab-realestate" class="tab-panel hidden mx-auto max-w-7xl px-6 py-6">
-    <div class="grid md:grid-cols-3 gap-4">
-      <div class="md:col-span-2 rounded-2xl border border-slate-200 dark:border-slate-800 p-4 bg-white/70 dark:bg-slate-900/60">
-        <div class="flex gap-3 items-end">
-          <div class="grow">
-            <label class="text-sm">Lokalita / dotaz</label>
-            <input id="reQuery" class="mt-1 w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white/70 dark:bg-slate-900/60 px-3 py-2 text-sm" placeholder="Praha byt, Brno pozemek, Barcelona commercial…">
-          </div>
-          <div>
-            <label class="text-sm">Typ</label>
-            <select id="reType" class="mt-1 rounded-xl border border-slate-300 dark:border-slate-700 bg-white/70 dark:bg-slate-900/60 px-3 py-2 text-sm">
-              <option value="auto">Auto</option>
-              <option value="apartment">Byt</option>
-              <option value="house">Dům</option>
-              <option value="land">Pozemek</option>
-              <option value="commercial">Komerční</option>
-            </select>
-          </div>
-          <button id="reSearch" class="rounded-xl bg-brand px-4 py-2 text-white shadow-soft">Hledat</button>
-        </div>
-        <div id="reList" class="mt-4 grid sm:grid-cols-2 lg:grid-cols-3 gap-3"></div>
-      </div>
-      <div class="rounded-2xl border border-slate-200 dark:border-slate-800 p-4 bg-white/70 dark:bg-slate-900/60">
-        <div class="text-sm font-semibold mb-2">AI nápady & ROI</div>
-        <div class="text-xs text-slate-500 mb-2">Vyber z výsledků vlevo a stiskni „Nápady“.</div>
-        <div id="reIdeas" class="text-sm whitespace-pre-wrap"></div>
-      </div>
+    <div class="flex items-center gap-2 mt-3">
+      <input id="ideaPrompt" class="flex-1" placeholder="Upřesnění (cílovka, rozpočet, cíle…)" />
+      <button id="ideaExport" class="btn border">Export do MD</button>
     </div>
-  </section>
 
-  <!-- TAB: MONEY -->
-  <section id="tab-money" class="tab-panel hidden mx-auto max-w-7xl px-6 py-6">
-    <div class="grid md:grid-cols-3 gap-4">
-      <div class="rounded-2xl border border-slate-200 dark:border-slate-800 p-4 bg-white/70 dark:bg-slate-900/60">
-        <div class="text-sm font-semibold">Rozpočtový koláč</div>
-        <canvas id="pieCanvas" class="mt-3" height="200"></canvas>
-        <div class="mt-3 grid grid-cols-3 gap-3 text-sm">
-          <div><label>Fixní</label><input id="pieFixed" type="number" value="50" class="mt-1 w-full rounded-lg border px-2 py-1"></div>
-          <div><label>Volné</label><input id="pieFlex" type="number" value="30" class="mt-1 w-full rounded-lg border px-2 py-1"></div>
-          <div><label>Investice</label><input id="pieInv" type="number" value="20" class="mt-1 w-full rounded-lg border px-2 py-1"></div>
-        </div>
-        <button id="pieApply" class="mt-3 rounded-lg border px-3 py-1.5 text-sm">Přepočítat</button>
-        <div class="mt-3 text-xs text-slate-500">Tip: OSVČ často cílí na 40/30/30. Traderům se osvědčuje 60/20/20 (fix/flex/invest) + „risk budget“.</div>
-      </div>
+    <div id="ideaOut" class="prose max-w-none text-sm whitespace-pre-wrap mt-4"></div>
+  </div>
+</section>
 
-      <div class="rounded-2xl border border-slate-200 dark:border-slate-800 p-4 bg-white/70 dark:bg-slate-900/60">
-        <div class="text-sm font-semibold">Kalkulačky</div>
-        <div class="mt-3 text-sm space-y-2">
-          <div class="rounded-lg border p-2">
-            <div class="font-semibold">Složené úročení</div>
-            <div class="grid grid-cols-2 gap-2 mt-2">
-              <input id="ciPrincipal" class="rounded border px-2 py-1" type="number" placeholder="Počáteční (Kč)" value="100000">
-              <input id="ciMonthly" class="rounded border px-2 py-1" type="number" placeholder="Měsíční vklad (Kč)" value="3000">
-              <input id="ciYears" class="rounded border px-2 py-1" type="number" placeholder="Roky" value="10">
-              <input id="ciRate" class="rounded border px-2 py-1" type="number" placeholder="Roční % (např. 8)" value="8">
-            </div>
-            <button id="ciCalc" class="mt-2 rounded-lg border px-3 py-1.5 text-sm">Spočítat</button>
-            <div id="ciOut" class="mt-2 text-xs whitespace-pre-wrap"></div>
-          </div>
-          <div class="rounded-lg border p-2">
-            <div class="font-semibold">Dluh – sněhová koule</div>
-            <div class="text-xs">Zadej dluhy „částka:úrok%“ po čárce. Např.: <i>40000:19, 120000:9</i></div>
-            <input id="debtInput" class="mt-1 w-full rounded border px-2 py-1 text-sm" placeholder="dluhy…">
-            <button id="debtCalc" class="mt-2 rounded-lg border px-3 py-1.5 text-sm">Plán</button>
-            <div id="debtOut" class="mt-2 text-xs whitespace-pre-wrap"></div>
+<footer class="mx-auto max-w-7xl px-4 sm:px-6 pb-10 mt-6">
+  <div class="rounded-2xl border border-slate-200 bg-white/70 p-5 text-xs text-slate-500 card">
+    © <span id="y"></span> StrategyMind — Demo MVP. Data z třetích stran mohou být zpožděná a bez záruky.
+  </div>
+</footer>
+
+<!-- ======= MODALS ======= -->
+<div id="modal" class="modal" onclick="closeModal(event)">
+  <div class="bg-white rounded-2xl w-[min(920px,92vw)] p-4 sm:p-5 card" onclick="event.stopPropagation()">
+    <div class="flex items-center justify-between gap-3">
+      <div id="mTitle" class="font-semibold"></div>
+      <button onclick="closeModal()" class="badge">Esc</button>
+    </div>
+    <canvas id="mChart" class="canvas mt-3"></canvas>
+    <div id="mText" class="text-sm text-slate-700 mt-3 whitespace-pre-wrap"></div>
+  </div>
+</div>
+
+<!-- ======= CHAT MODAL ======= -->
+<div id="chat" class="modal" onclick="closeChat(event)">
+  <div class="bg-white rounded-2xl w-[min(780px,92vw)] p-4 sm:p-5 card" onclick="event.stopPropagation()">
+    <div class="flex items-center justify-between">
+      <div class="font-semibold">AI Chat</div>
+      <button onclick="closeChat()" class="badge">Esc</button>
+    </div>
+    <div id="chatLog" class="mt-3 max-h-[45vh] overflow-auto text-sm space-y-2"></div>
+    <div class="mt-3 flex gap-2">
+      <input id="chatMsg" class="flex-1" placeholder="Zeptej se…">
+      <button id="chatSend" class="btn btn-primary">Poslat</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========== JS ========== -->
+<script>
+const API = location.origin.includes("workers.dev")
+  ? location.origin
+  : "https://tight-field-436e.matejmelichr.workers.dev";
+
+const $ = (s)=>document.querySelector(s);
+const $$=(s)=>[...document.querySelectorAll(s)];
+const fmt = (n,cur="")=> n==null? "—" : (cur? `${n.toFixed(2)} ${cur}`: n.toFixed(2));
+function setRefresh(){ $('#refreshTs').textContent=new Date().toLocaleTimeString();}
+document.getElementById('y').textContent = new Date().getFullYear();
+
+// Menu
+const menuBtn=$('#menuBtn'), menuSheet=$('#menuSheet'); function closeMenu(){menuSheet.classList.add('hidden');}
+menuBtn?.addEventListener('click',()=> menuSheet.classList.toggle('hidden'));
+
+// Tabs
+const tabs=$$('.tab'), panes=$$('.tabpane'); tabs.forEach(t=>t.onclick=()=>{tabs.forEach(b=>b.classList.remove('tab-active')); t.classList.add('tab-active'); panes.forEach(p=>p.classList.add('hidden')); $('#'+t.dataset.tab).classList.remove('hidden');});
+
+// Canvas HiDPI
+function scaleCanvas(c){const r=window.devicePixelRatio||1; c.width=c.clientWidth*r; c.height=c.clientHeight*r; c.getContext('2d').scale(r,r);}
+$$('canvas').forEach(scaleCanvas);
+
+// ---------- Trading ----------
+let autoTimer=null;
+
+async function loadQuotes() {
+  const syms=$('#tSymbols').value.trim();
+  const filter=$('#tFilter').value;
+  const r=await fetch(`${API}/api/finance/quotes?symbols=${encodeURIComponent(syms)}`); const d=await r.json();
+  const list=$('#tList'); list.innerHTML="";
+  const arr=(d.symbols||[]).filter(s=>{
+    if(filter==='gainers')return (s.changePct||0)>0.5;
+    if(filter==='losers') return (s.changePct||0)<-0.5;
+    if(filter==='flat')   return Math.abs(s.changePct||0)<0.2;
+    return true;
+  });
+
+  arr.forEach(s=>{
+    const el=document.createElement('div'); el.className="rounded-xl2 border p-4 hover:shadow-sm";
+    el.innerHTML=`
+      <div class="flex items-start justify-between gap-2">
+        <div><div class="text-sm text-slate-500">${s.name||s.symbol}</div><div class="text-lg font-semibold">${s.symbol}</div></div>
+        <div class="text-right">
+          <div class="text-lg font-semibold">${fmt(s.price,s.currency)}</div>
+          <div class="${(s.changePct||0)>=0?'text-bull':'text-bear'} text-sm">
+            ${fmt(s.change)} (${(s.changePct||0).toFixed(2)}%)
           </div>
         </div>
       </div>
-
-      <div class="rounded-2xl border border-slate-200 dark:border-slate-800 p-4 bg-white/70 dark:bg-slate-900/60">
-        <div class="text-sm font-semibold">AI Money kouč</div>
-        <textarea id="moneyAsk" class="mt-2 w-full rounded-lg border px-2 py-1 text-sm" rows="5" placeholder="Zeptej se na cokoliv…"></textarea>
-        <button id="moneyGo" class="mt-2 rounded-lg border px-3 py-1.5 text-sm">Zeptat se</button>
-        <div id="moneyOut" class="mt-2 text-sm whitespace-pre-wrap"></div>
+      <div class="mt-3 grid grid-cols-3 gap-2 text-xs">
+        <div class="rounded-lg border p-2">Intraday<br><b>${s.forecast?.intraday?.up? fmt(s.forecast.intraday.up,s.currency):'—'}</b><br><span class="text-slate-500">${s.forecast?.intraday?.pct||'—'} %</span></div>
+        <div class="rounded-lg border p-2">Swing<br><b>${s.forecast?.swing?.up? fmt(s.forecast.swing.up,s.currency):'—'}</b><br><span class="text-slate-500">${s.forecast?.swing?.pct||'—'} %</span></div>
+        <div class="rounded-lg border p-2">Long<br><b>${s.forecast?.long?.up? fmt(s.forecast.long.up,s.currency):'—'}</b><br><span class="text-slate-500">${s.forecast?.long?.pct||'—'} %</span></div>
       </div>
-    </div>
-  </section>
+      <div class="mt-3 flex items-center justify-between">
+        <div class="text-xs text-slate-500">Hi ${fmt(s.high,s.currency)} • Lo ${fmt(s.low,s.currency)}</div>
+        <div class="flex items-center gap-2">
+          <button class="badge" data-more="${s.symbol}">Detail</button>
+        </div>
+      </div>`;
+    el.querySelector('[data-more]').onclick=()=> openDetail(s.symbol,$('#tRes').value);
+    list.appendChild(el);
+  });
+  setRefresh();
+}
 
-  <!-- TAB: IDEA LAB -->
-  <section id="tab-ideas" class="tab-panel hidden mx-auto max-w-7xl px-6 py-6">
-    <div class="grid md:grid-cols-2 gap-4">
-      <div class="rounded-2xl border border-slate-200 dark:border-slate-800 p-4 bg-white/70 dark:bg-slate-900/60">
-        <div class="text-sm font-semibold">Generátor nápadů (digitální produkty, SaaS, AI, obsah…)</div>
-        <textarea id="ideaAsk" class="mt-2 w-full rounded-lg border px-2 py-1 text-sm" rows="6" placeholder="Co chceš vytvořit? Na jaký trh cílíš, rozpočet, skills…"></textarea>
-        <button id="ideaGo" class="mt-2 rounded-lg border px-3 py-1.5 text-sm">Navrhni plán</button>
-      </div>
-      <div class="rounded-2xl border border-slate-200 dark:border-slate-800 p-4 bg-white/70 dark:bg-slate-900/60">
-        <div class="text-sm font-semibold">Výstup</div>
-        <div id="ideaOut" class="mt-2 text-sm whitespace-pre-wrap"></div>
-      </div>
-    </div>
-  </section>
+async function openDetail(symbol,resolution="D"){
+  $('#mTitle').textContent=symbol+" — detail";
+  const to=Math.floor(Date.now()/1000), from=to-(60*60*24*(resolution==="D"?365:30));
+  const candles = await fetch(`${API}/api/finance/candles?symbol=${symbol}&resolution=${resolution}&from=${from}&to=${to}`).then(r=>r.json());
+  const ind = await fetch(`${API}/api/finance/indicators?symbol=${symbol}&resolution=${resolution}&from=${from}&to=${to}`).then(r=>r.json());
+  drawChart('#mChart', candles.c||[], ind);
+  $('#mText').textContent="Zobrazeny SMA/EMA/RSI/BB (jednoduché linie/kanál). Chatbot v Tradingu pomůže s interpretací a riziky.";
+  openModal();
+}
 
-  <!-- FOOTER -->
-  <footer class="mx-auto max-w-7xl px-6 py-10">
-    <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/70 dark:bg-slate-900/60 p-5 text-xs text-slate-500 shadow-sm">
-      Upozornění: Informace nejsou investičním doporučením. Data mohou být zpožděná a bez záruky. © <span id="y"></span> StrategyMind
-    </div>
-  </footer>
+function drawChart(sel,close,ind){
+  const c=$(sel), ctx=c.getContext('2d'); ctx.clearRect(0,0,c.width,c.height);
+  const w=c.clientWidth, h=c.clientHeight, pad=14;
+  const min=Math.min(...close.filter(Number.isFinite)), max=Math.max(...close.filter(Number.isFinite));
+  const y=(v)=> h-pad-((v-min)/(max-min+1e-6))*(h-2*pad);
+  const x=(i)=> pad + (i/(close.length-1))*(w-2*pad);
+  // price
+  ctx.strokeStyle="#0A2342"; ctx.lineWidth=2; ctx.beginPath();
+  close.forEach((v,i)=>{ const X=x(i), Y=y(v); i?ctx.lineTo(X,Y):ctx.moveTo(X,Y); }); ctx.stroke();
+  // SMA (20)
+  const sma20=ind?.sma?.[20]||[], sma50=ind?.sma?.[50]||[], ema12=ind?.ema?.[12]||[], ema26=ind?.ema?.[26]||[];
+  const plot=(arr,col)=>{ ctx.strokeStyle=col; ctx.lineWidth=1; ctx.beginPath(); arr.forEach((v,i)=>{ if(!Number.isFinite(v)) return; const X=x(i), Y=y(v); ctx.lineTo(X,Y)}); ctx.stroke();};
+  plot(sma20,"#10b981"); plot(sma50,"#6366f1"); plot(ema12,"#f59e0b"); plot(ema26,"#e11d48");
+  // BB
+  const bb=ind?.bb||[]; ctx.strokeStyle="#94a3b8"; ctx.lineWidth=.8; ctx.beginPath();
+  bb.forEach((o,i)=>{ if(!o?.upper)return; ctx.lineTo(x(i),y(o.upper))}); ctx.stroke(); ctx.beginPath();
+  bb.forEach((o,i)=>{ if(!o?.lower)return; ctx.lineTo(x(i),y(o.lower))}); ctx.stroke();
+}
 
-  <!-- ========== JS: API klient + UI logika ========== -->
-  <script>
-    // ====== Worker API base (přizpůsob si pokud běží jinde) ======
-    const API_BASE = ""; // prázdné = stejné origin (doporučeno). Nebo 'https://tight-field-436e.matejmelichr.workers.dev'
-    const endpoint = (p) => new URL(p, API_BASE || location.origin).toString();
+async function loadNews(topic){
+  const q=topic||$('#newsQ').value||'markets';
+  const r=await fetch(`${API}/api/news?q=${encodeURIComponent(q)}`); const d=await r.json();
+  const list=$('#newsList'); list.innerHTML="";
+  (d.items||[]).slice(0,8).forEach(n=>{
+    const a=document.createElement('a'); a.href=n.url; a.target="_blank"; a.rel="noopener";
+    a.className="block rounded-xl2 border p-3 hover:shadow-sm";
+    a.innerHTML=`<div class="font-semibold">${n.title}</div><div class="text-xs text-slate-500">${n.source||''}</div><div class="text-sm mt-1">${n.snippet||''}</div>`;
+    list.appendChild(a);
+  });
+}
 
-    // ====== UI init ======
-    const menuBtn=document.getElementById('menuBtn');
-    const menuSheet=document.getElementById('menuSheet');
-    function closeMenu(){ menuSheet.classList.add('hidden'); }
-    menuBtn?.addEventListener('click',()=> menuSheet.classList.toggle('hidden'));
-    document.getElementById('y').textContent = new Date().getFullYear();
+async function refreshSentiment(){
+  const d=await fetch(`${API}/api/news/sentiment?q=markets`).then(r=>r.json());
+  const el=$('#sentTag'); el.textContent=d.sentiment||'—';
+  el.style.borderColor = d.sentiment==='bullish' ? '#059669' : d.sentiment==='bearish' ? '#dc2626' : '#cbd5e1';
+}
 
-    // Tabs
-    const tabs = [...document.querySelectorAll('.tab-btn')];
-    const panels = [...document.querySelectorAll('.tab-panel')];
-    tabs.forEach(btn=>{
-      btn.addEventListener('click',()=>{
-        tabs.forEach(b=>b.classList.remove('bg-brand/10','text-brand'));
-        btn.classList.add('bg-brand/10','text-brand');
-        const id = btn.dataset.tab;
-        panels.forEach(p=>p.classList.add('hidden'));
-        document.getElementById(id).classList.remove('hidden');
-      });
-    });
+async function runCorrelation(){
+  const s=$('#cSyms').value||'AAPL,MSFT,SPY';
+  const d=await fetch(`${API}/api/finance/correlation?symbols=${encodeURIComponent(s)}&period=90`).then(r=>r.json());
+  const box=$('#cOut'); box.innerHTML="";
+  (d.pairs||[]).sort((a,b)=>Math.abs(b.r)-Math.abs(a.r)).slice(0,8).forEach(p=>{
+    const line=document.createElement('div'); line.textContent=`${p.a} × ${p.b} → ${p.r}`;
+    box.appendChild(line);
+  });
+}
 
-    // ====== Helpers ======
-    function el(tag, cls, html){ const n=document.createElement(tag); if(cls) n.className=cls; if(html!==undefined) n.innerHTML=html; return n; }
-    async function safeFetch(url, opts){ try{ const r=await fetch(url,opts); if(!r.ok) throw new Error(await r.text()); return r.json(); } catch(e){ console.warn('fetch failed', e); return null; } }
-    const fmt = (n, d=2)=> (n==null||isNaN(n)) ? '—' : Number(n).toLocaleString('cs-CZ',{maximumFractionDigits:d});
-    const trendIcon = (dp)=> dp>0 ? '▲' : dp<0 ? '▼' : '•';
-    const clsTrend = (dp)=> dp>0 ? 'ticker-up' : dp<0 ? 'ticker-down' : 'text-slate-500';
+async function screener(filter){
+  const list=await fetch(`${API}/api/finance/screener?symbols=${encodeURIComponent($('#tSymbols').value)}&filter=${filter}`).then(r=>r.json());
+  alert(`${filter.toUpperCase()}: ${list.count} nálezů`);
+}
 
-    // ====== Trading ======
-    const DEFAULT_SYMBOLS = "AAPL,NVDA,SPY,QQQ,MSFT,TSLA,BTCUSD,ETHUSD,EURUSD,XAUUSD,USOIL";
-    const symbolsInput = document.getElementById('symbolsInput');
-    const filterSelect = document.getElementById('filterSelect');
-    const rangeSelect = document.getElementById('rangeSelect');
-    const tickersGrid = document.getElementById('tickersGrid');
-    const lastRefresh = document.getElementById('lastRefresh');
-    const loadBtn = document.getElementById('loadSymbols');
+function setAuto(){
+  const v=+$('#tAuto').value||0; if(autoTimer) clearInterval(autoTimer); if(v>0) autoTimer=setInterval(loadQuotes, v*1000);
+}
+$('#tLoad').onclick=loadQuotes; $('#tAuto').onchange=setAuto;
+$('#tScreenerG').onclick=()=>screener('gainers'); $('#tScreenerL').onclick=()=>screener('losers');
+$('#newsRun').onclick=()=>loadNews(); $('#cRun').onclick=runCorrelation; $('#sentRefresh').onclick=refreshSentiment;
 
-    symbolsInput.value = DEFAULT_SYMBOLS;
+// ---------- Real Estate ----------
+async function scanRE(){
+  const q=$('#reQuery').value.trim(); if(!q) return;
+  const d=await fetch(`${API}/api/realestate/scan?q=${encodeURIComponent(q)}`).then(r=>r.json());
+  const out=$('#reOut'); out.innerHTML="";
+  const head=document.createElement('div'); head.className="text-sm text-slate-600"; head.textContent=`Dotaz: ${d.query} | typ: ${d.type} | základní cena: ${d.basePricePerM2} €/m² (demo odhad)`;
+  out.appendChild(head);
+  (d.scenarios||[]).forEach(s=>{
+    const el=document.createElement('div'); el.className="rounded-xl2 border p-3";
+    el.innerHTML=`<div class="font-semibold">${s.idea}</div><div class="text-sm text-slate-600">Náklad €/m² ~ ${s.estimatedCostPerM2} • Cílový výnos ${Math.round(s.targetYield*100)}% • Oček. ROI 5Y ${Math.round(s.fiveYearROI*100)}%</div>`;
+    out.appendChild(el);
+  });
+  const rs=await fetch(`${API}/api/cadastre/search?q=${encodeURIComponent(q)}`).then(r=>r.json());
+  const cad=$('#cadList'); cad.innerHTML="";
+  (rs.items||[]).forEach(x=>{ const a=document.createElement('a'); a.href=x.url; a.target="_blank"; a.rel="noopener"; a.className="block rounded-xl2 border p-3 hover:shadow-sm"; a.textContent=`${x.title} — ${x.source}`; cad.appendChild(a); });
+}
 
-    function classifySymbol(s){
-      if(/USD|EUR|JPY|GBP|AUD|CAD|CHF/i.test(s) && s.length===6) return 'forex';
-      if(/BTC|ETH|USDT|DOGE|ADA|XRP/i.test(s)) return 'crypto';
-      if(/XAU|XAG|USOIL|NG|BRENT/i.test(s)) return 'commodity';
-      if(/SPY|QQQ|DAX|CAC|FTSE|HSI|NIKKEI|^ES$|^NQ$/i.test(s)) return 'index';
-      return 'equity';
-    }
+function roiCalc(){
+  const price=+$('#rPrice').value||0, capex=(+$('#rCapex').value||0)/100, income=+$('#rIncome').value||0, opex=(+$('#rOpex').value||0)/100;
+  const total=price*(1+capex), net=income*(1-opex), yieldPct=total? (net/total)*100 : 0, payback=net? (total/net).toFixed(1)+' let' : '—';
+  const b=$('#rOut'); b.innerHTML="";
+  b.innerHTML=`<b>Nákup celkem</b><div>${total.toLocaleString('cs-CZ')} Kč</div>
+               <b>Čistý roční příjem</b><div>${net.toLocaleString('cs-CZ')} Kč</div>
+               <b>Hrubý výnos</b><div>${yieldPct.toFixed(2)} %</div>
+               <b>Návratnost</b><div>${payback}</div>`;
+}
+async function aiIdeas(){
+  const t=$('#riPrompt').value||'Pozemek u OC 2000 m2, dobrá dostupnost, parkování, obytná zóna poblíž';
+  const d=await fetch(`${API}/api/realestate/ideas`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt:t})}).then(r=>r.json());
+  $('#riOut').textContent=d?.message?.content||'(bez odpovědi)';
+}
+$('#reScan').onclick=scanRE; $('#rRun').onclick=roiCalc; $('#riRun').onclick=aiIdeas;
 
-    async function loadQuotes(){
-      const syms = symbolsInput.value.split(',').map(s=>s.trim().toUpperCase()).filter(Boolean);
-      const filter = filterSelect.value;
-      const range = rangeSelect.value;
+// ---------- Money ----------
+function drawPie(){
+  const fix=+$('#bFix').value||0, free=+$('#bFree').value||0, inv=+$('#bInv').value||0;
+  const total=Math.max(1,fix+free+inv); const data=[fix/total,free/total,inv/total];
+  const ctx=$('#budgetPie').getContext('2d'); ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);
+  const cx=ctx.canvas.width/2, cy=ctx.canvas.height/2, r=Math.min(cx,cy)-10; let a=-Math.PI/2;
+  const cols=['#0ea5e9','#94a3b8','#10b981']; data.forEach((v,i)=>{const b=a+v*2*Math.PI; ctx.beginPath(); ctx.moveTo(cx,cy); ctx.arc(cx,cy,r,a,b); ctx.closePath(); ctx.fillStyle=cols[i]; ctx.fill(); a=b;});
+}
+function compound(){
+  const P=+$('#ciStart').value||0, m=+$('#ciMonthly').value||0, r=(+$('#ciRate').value||0)/100/12, n=(+$('#ciYears').value||0)*12;
+  const FV=P*Math.pow(1+r,n)+m*((Math.pow(1+r,n)-1)/r); $('#ciOut').textContent=`Za ${Math.round(n/12)} let ≈ ${FV.toLocaleString('cs-CZ',{style:'currency',currency:'CZK'})}`;
+}
+function mortgage(){
+  const price=+$('#mPrice').value||0, own=+$('#mOwn').value||0, rate=(+$('#mRate').value||0)/100/12, n=(+$('#mYears').value||0)*12;
+  const loan=Math.max(0,price-own); const ann = rate? loan*(rate*Math.pow(1+rate,n))/(Math.pow(1+rate,n)-1) : loan/n;
+  $('#mOut').textContent = `Úvěr ${loan.toLocaleString('cs-CZ')} Kč • Měsíčně ≈ ${Math.round(ann).toLocaleString('cs-CZ')} Kč`;
+}
+function personaSet(){
+  const p=$('#persona').value; if(p==='standard'){ $('#bFix').value=50; $('#bFree').value=30; $('#bInv').value=20;}
+  if(p==='freelance'){ $('#bFix').value=40; $('#bFree').value=30; $('#bInv').value=30;}
+  if(p==='trader'){ $('#bFix').value=40; $('#bFree').value=20; $('#bInv').value=40;}
+  drawPie();
+}
+['bFix','bFree','bInv'].forEach(id=> $('#'+id).oninput=drawPie); $('#persona').onchange=personaSet;
+$('#ciRun').onclick=compound; $('#mRun').onclick=mortgage;
 
-      const url = endpoint(`/api/market/quotes?symbols=${encodeURIComponent(syms.join(','))}${range?`&range=${range}`:''}`);
-      const data = await safeFetch(url);
-      tickersGrid.innerHTML = '';
+// ---------- Idea Lab ----------
+function tplHint(key){
+  if(key==='saas') return 'MVP: 1–2 core featury; stack Next.js/Prisma/Stripe; akvizice SEO+partnerství; pricing 19–49€;';
+  if(key==='eshop')return 'Niche katalog, 200 SKU; platforma Shopify; akvizice TikTok/IG; fulfillment 3PL;';
+  if(key==='content')return 'Kanál 2× týdně; skripty z trendů; newsletter 1× týdně; monetizace brand deals + členství;';
+  if(key==='mobile')return 'Appka React Native; MVP 2 týdny; store listing ASO; monetizace subscription;';
+  return '';
+}
+async function ideaPlan(){
+  const t=$('#ideaTitle').value||'Nápad';
+  const prompt=$('#ideaPrompt').value||tplHint($('#tpl').value);
+  const body={messages:[{role:'user',content:`Projekt: ${t}\nUpřesnění: ${prompt}\nVrať akční plán (MVP→akvizice→monetizace), stručně, česky.`}]};
+  const d=await fetch(`${API}/api/chat?topic=ideas`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}).then(r=>r.json());
+  $('#ideaOut').textContent=d?.message?.content||'(bez odpovědi)';
+}
+function ideaExport(){
+  const text=($('#ideaOut').textContent||'').trim()||'# Plán bude po vygenerování\n';
+  const blob=new Blob([text],{type:'text/markdown'}); const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob); a.download='strategymind-plan.md'; a.click(); URL.revokeObjectURL(a.href);
+}
+$('#ideaRun').onclick=ideaPlan; $('#ideaExport').onclick=ideaExport;
 
-      (data||[]).forEach(row=>{
-        const kind = classifySymbol(row.symbol);
-        if(filter!=='all' && kind!==filter) return;
-        const dp = row.changePct;
-        const card = el('div','rounded-xl border border-slate-200 dark:border-slate-800 bg-white/70 dark:bg-slate-900/60 p-3 hover:shadow-soft transition cursor-pointer');
-        card.innerHTML = `
-          <div class="flex items-center justify-between">
-            <div class="text-sm font-semibold">${row.symbol} <span class="text-xs text-slate-500">(${kind})</span></div>
-            <div class="text-xs ${clsTrend(dp)}">${trendIcon(dp)} ${fmt(dp,2)}%</div>
-          </div>
-          <div class="mt-1 text-2xl font-bold">${fmt(row.price)}</div>
-          <div class="text-xs text-slate-500">Změna: ${fmt(row.change)} • ${row.time ? new Date(row.time).toLocaleTimeString():''}</div>
-          ${row.history?'<canvas class="mt-2 h-[50px] w-full" data-history></canvas>':''}
-          <div class="mt-2 grid grid-cols-3 gap-2 text-xs">
-            <div class="rounded border border-slate-200 dark:border-slate-800 p-2" data-pred="intraday">Intraday…</div>
-            <div class="rounded border border-slate-200 dark:border-slate-800 p-2" data-pred="swing">Swing…</div>
-            <div class="rounded border border-slate-200 dark:border-slate-800 p-2" data-pred="long">Long…</div>
-          </div>
-        `;
-        card.addEventListener('click',()=>openSymbol(row));
-        tickersGrid.appendChild(card);
+// ---------- Chat modal ----------
+let CHAT_TOPIC="general";
+function openChat(topic){ CHAT_TOPIC=topic; $('#chat').classList.add('open'); $('#chatMsg').focus(); $('#chatLog').innerHTML=""; }
+function closeChat(e){ if(e && e.target!==e.currentTarget) return; $('#chat').classList.remove('open'); }
+$('#chatSend').onclick=async()=>{
+  const msg=$('#chatMsg').value.trim(); if(!msg) return;
+  const log=$('#chatLog'); const you=document.createElement('div'); you.innerHTML=`<div class="text-sky-700">Ty: ${msg}</div>`; log.appendChild(you); $('#chatMsg').value="";
+  const body={messages:[{role:'user',content:msg}]};
+  const d=await fetch(`${API}/api/chat?topic=${CHAT_TOPIC}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}).then(r=>r.json());
+  const ai=document.createElement('div'); ai.innerHTML=`<div class="text-emerald-700 whitespace-pre-wrap">AI: ${d?.message?.content||'(bez odpovědi)'}</div>`; log.appendChild(ai); log.scrollTop=log.scrollHeight;
+};
 
-        if(row.history){
-          drawSpark(card.querySelector('[data-history]'), row.history);
-        }
-        // predikce
-        fetch(endpoint(`/api/market/predict?symbol=${row.symbol}`)).then(r=>r.json()).then(p=>{
-          ['intraday','swing','long'].forEach(k=>{
-            const b=card.querySelector(`[data-pred="${k}"]`);
-            if(b && p?.[k]){
-              b.innerHTML = `<div class="font-semibold">${Math.round(p[k].prob_up*100)}% ↑</div><div class="text-slate-500">Cíl: ${fmt(p[k].target_up)}</div>`;
-            }
-          });
-        }).catch(()=>{});
-      });
+// ---------- Modal ----------
+function openModal(){ $('#modal').classList.add('open'); }
+function closeModal(e){ if(e && e.target!==e.currentTarget) return; $('#modal').classList.remove('open'); }
 
-      lastRefresh.textContent = new Date().toLocaleTimeString();
-    }
+// ---------- Quick buttons ----------
+$('#quickRun').onclick=()=>{ tabs[0].click(); $('#tLoad').click(); };
+$('#quickIntraday').onclick=()=>{ tabs[0].click(); $('#tLoad').click(); };
+$('#quickIdeas').onclick=()=>{ tabs[2].click(); drawPie(); };
+$('#quickBudget').onclick=()=>{ tabs[2].click(); drawPie(); };
 
-    function drawSpark(canvas, points){
-      if(!canvas||!points?.length) return;
-      const ctx = canvas.getContext('2d');
-      const w = canvas.clientWidth, h = canvas.clientHeight;
-      canvas.width = w*2; canvas.height = h*2; ctx.scale(2,2);
-      ctx.clearRect(0,0,w,h);
-      const xs = points.map(p=>p[0]); const ys = points.map(p=>p[1]);
-      const x0 = Math.min(...xs), x1 = Math.max(...xs);
-      const y0 = Math.min(...ys), y1 = Math.max(...ys);
-      const fx = v=> (w-2)*(v - x0)/(x1-x0+1) + 1;
-      const fy = v=> h - ((h-2)*(v - y0)/(y1-y0+1) + 1);
-      ctx.beginPath(); ctx.lineWidth=1.5; ctx.strokeStyle='#0ea5e9';
-      points.forEach((p,i)=>{ const x=fx(p[0]), y=fy(p[1]); if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y); });
-      ctx.stroke();
-    }
-
-    // Detail modal
-    const modal = document.getElementById('symbolModal');
-    const mSymbol = document.getElementById('mSymbol');
-    const sparkCanvas = document.getElementById('sparkCanvas');
-    const pIntraday = document.getElementById('pIntraday');
-    const pSwing = document.getElementById('pSwing');
-    const pLong = document.getElementById('pLong');
-    const newsList = document.getElementById('newsList');
-    const analyzePast = document.getElementById('analyzePast');
-    const askStockAI = document.getElementById('askStockAI');
-    const stockAIOut = document.getElementById('stockAIOut');
-
-    async function openSymbol(row){
-      mSymbol.textContent = row.symbol;
-      drawSpark(sparkCanvas, row.history||[]);
-      newsList.innerHTML = '<div class="text-xs text-slate-500">Načítám zprávy…</div>';
-      stockAIOut.classList.add('hidden'); stockAIOut.textContent='';
-      modal.showModal();
-
-      // pred
-      const pred = await safeFetch(endpoint(`/api/market/predict?symbol=${row.symbol}`))||{};
-      const fmtPred = (x)=> x ? `${Math.round(x.prob_up*100)}% ↑  • Cíl: ${fmt(x.target_up)}` : '—';
-      pIntraday.textContent = fmtPred(pred.intraday);
-      pSwing.textContent = fmtPred(pred.swing);
-      pLong.textContent = fmtPred(pred.long);
-
-      // news
-      const nw = await safeFetch(endpoint(`/api/news?symbol=${row.symbol}&limit=12`))||[];
-      newsList.innerHTML = '';
-      nw.forEach(n=>{
-        const a = el('a','block rounded-lg border border-slate-200 dark:border-slate-800 p-2 hover:bg-slate-50 dark:hover:bg-slate-800 transition',`
-          <div class="text-sm font-semibold line-clamp-2">${n.title||'(bez názvu)'}</div>
-          <div class="text-xs text-slate-500">${n.source||''} • ${n.time? new Date(n.time).toLocaleString() : ''}</div>
-        `);
-        a.href = n.url||'#'; a.target="_blank"; a.rel="noopener";
-        newsList.appendChild(a);
-      });
-
-      askStockAI.onclick = async ()=>{
-        stockAIOut.classList.remove('hidden'); stockAIOut.textContent='Přemýšlím…';
-        const domain = 'stocks';
-        const user = `Zhodnoť symbol ${row.symbol}. ${analyzePast.checked?'Zaměř se na analyzovat minulost (korelace, období zvýšené volatility).':''}`;
-        const res = await safeFetch(endpoint(`/api/ai/chat?domain=${domain}`),{
-          method:'POST', headers:{'Content-Type':'application/json'},
-          body: JSON.stringify({ messages:[{role:'user', content:user}] })
-        });
-        stockAIOut.textContent = res?.message?.content || '(bez odpovědi)';
-      };
-    }
-    function closeModal(){ modal.close(); }
-
-    // Autorefresh (60s)
-    loadBtn.addEventListener('click', loadQuotes);
-    loadQuotes();
-    setInterval(loadQuotes, 60_000);
-
-    // ====== Real Estate ======
-    const reQuery = document.getElementById('reQuery');
-    const reType = document.getElementById('reType');
-    const reSearchBtn = document.getElementById('reSearch');
-    const reList = document.getElementById('reList');
-    const reIdeas = document.getElementById('reIdeas');
-
-    reSearchBtn.addEventListener('click', async ()=>{
-      reList.innerHTML = '<div class="text-sm text-slate-500">Hledám…</div>';
-      const q = reQuery.value.trim();
-      const t = reType.value;
-      const data = await safeFetch(endpoint(`/api/realestate/search?query=${encodeURIComponent(q)}&type=${encodeURIComponent(t)}`))||[];
-      reList.innerHTML = '';
-      data.forEach(r=>{
-        const card = el('div','rounded-xl border border-slate-200 dark:border-slate-800 bg-white/70 dark:bg-slate-900/60 p-3');
-        card.innerHTML = `
-          <div class="text-sm font-semibold">${r.title||'(bez názvu)'}</div>
-          <div class="text-xs text-slate-500">${r.assetType||''}</div>
-          <div class="text-xs mt-1">${r.address||''}</div>
-          <div class="mt-2 flex gap-2">
-            <a class="rounded-lg border px-2 py-1 text-xs" target="_blank" rel="noopener" href="${r.url}">Mapa</a>
-            <button class="rounded-lg border px-2 py-1 text-xs" data-ideas>Nápady & ROI</button>
-          </div>
-        `;
-        card.querySelector('[data-ideas]').addEventListener('click', async ()=>{
-          reIdeas.textContent='Přemýšlím…';
-          const prompt = `Navrhni 3–5 reálných monetizačních nápadů pro aktivum (typ: ${r.assetType}) v lokaci ${r.address}. U každého uveď orientační CAPEX/OPEX, návrh pricingu a hrubý ROI (%/rok). Přidej rizika a první kroky due diligence.`;
-          const res = await safeFetch(endpoint('/api/ai/chat?domain=realestate'), {
-            method:'POST', headers:{'Content-Type':'application/json'},
-            body: JSON.stringify({ messages:[{role:'user', content: prompt}] })
-          });
-          reIdeas.textContent = res?.message?.content || '(bez odpovědi)';
-        });
-        reList.appendChild(card);
-      });
-      if(!data.length) reList.innerHTML='<div class="text-sm text-slate-500">Nic nenalezeno.</div>';
-    });
-
-    // ====== Money – donut + kalkulačky ======
-    const pieCanvas = document.getElementById('pieCanvas');
-    const pieFixed=document.getElementById('pieFixed'), pieFlex=document.getElementById('pieFlex'), pieInv=document.getElementById('pieInv');
-    const pieApply=document.getElementById('pieApply');
-
-    function drawPie(){
-      const ctx = pieCanvas.getContext('2d'); const w=pieCanvas.clientWidth, h=pieCanvas.clientHeight;
-      pieCanvas.width=w*2; pieCanvas.height=h*2; ctx.scale(2,2); ctx.clearRect(0,0,w,h);
-      const parts=[+pieFixed.value||0,+pieFlex.value||0,+pieInv.value||0];
-      const sum = parts.reduce((a,b)=>a+b,0)||1; const colors=['#0ea5e9','#22c55e','#f59e0b'];
-      let start=-Math.PI/2;
-      parts.forEach((v,i)=>{ const ang = 2*Math.PI*(v/sum); ctx.beginPath(); ctx.moveTo(w/2,h/2); ctx.fillStyle=colors[i]; ctx.arc(w/2,h/2,Math.min(w,h)/2.4,start,start+ang); ctx.closePath(); ctx.fill(); start+=ang; });
-      // legenda
-      const names=['Fixní','Volné','Investice'];
-      names.forEach((n,i)=>{ ctx.fillStyle=colors[i]; ctx.fillRect(10,10+i*18,10,10); ctx.fillStyle='#64748b'; ctx.fillText(`${n} ${parts[i]}%`,26,19+i*18); });
-    }
-    drawPie();
-    pieApply.addEventListener('click', drawPie);
-
-    // Složené úročení
-    document.getElementById('ciCalc').addEventListener('click',()=>{
-      const P=+ciPrincipal.value||0, m=+ciMonthly.value||0, y=+ciYears.value||0, r=(+ciRate.value||0)/100;
-      const n=y*12; const i=r/12; let fv=P*Math.pow(1+i,n);
-      for(let k=1;k<=n;k++) fv += m*Math.pow(1+i,n-k);
-      ciOut.textContent = `Za ${y} let: ${fmt(fv,0)} Kč (vklady: ${fmt(P + m*n,0)} Kč)`;
-    });
-
-    // Dluhy – sněhová koule
-    document.getElementById('debtCalc').addEventListener('click',()=>{
-      const raw = debtInput.value;
-      const items = raw.split(',').map(s=>s.trim()).filter(Boolean).map(x=>{
-        const [a,b]=x.split(':').map(z=>z.trim()); return {amt:+a||0, rate:(+b||0)/100};
-      }).sort((a,b)=> (a.rate-b.rate) || (a.amt-b.amt));
-      if(!items.length){ debtOut.textContent='Zadej alespoň 1 dluh ve tvaru castka:urok%'; return; }
-      let txt='Pořadí splacení (od nejdražšího):\n';
-      items.reverse().forEach((d,i)=> txt+=`${i+1}) ${fmt(d.amt,0)} Kč @ ${(d.rate*100).toFixed(1)}%\n`);
-      debtOut.textContent=txt;
-    });
-
-    // Money AI
-    const moneyGo=document.getElementById('moneyGo'), moneyAsk=document.getElementById('moneyAsk'), moneyOut=document.getElementById('moneyOut');
-    moneyGo.addEventListener('click', async ()=>{
-      moneyOut.textContent='Přemýšlím…';
-      const res = await safeFetch(endpoint('/api/ai/chat?domain=money'),{
-        method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ messages:[{role:'user', content: moneyAsk.value||'Poradíš mi s rozpočtem?'}] })
-      });
-      moneyOut.textContent = res?.message?.content || '(bez odpovědi)';
-    });
-
-    // ====== Idea Lab (AI) ======
-    const ideaGo = document.getElementById('ideaGo'), ideaAsk=document.getElementById('ideaAsk'), ideaOut=document.getElementById('ideaOut');
-    ideaGo.addEventListener('click', async ()=>{
-      ideaOut.textContent='Přemýšlím…';
-      const res = await safeFetch(endpoint('/api/ai/chat?domain=ideas'), {
-        method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ messages:[{role:'user', content: ideaAsk.value||'Chci vytvořit malý SaaS pro SMB…'}] })
-      });
-      ideaOut.textContent = res?.message?.content || '(bez odpovědi)';
-    });
-
-  </script>
+// ---------- Init ----------
+tabs[0].click();
+drawPie(); personaSet();
+loadNews('markets'); refreshSentiment(); setAuto();
+</script>
 </body>
 </html>
