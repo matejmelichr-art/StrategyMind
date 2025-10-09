@@ -1,385 +1,428 @@
 <!doctype html>
 <html lang="cs">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>StrategyMind – Inteligentní dashboard</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<script>tailwind.config={theme:{extend:{colors:{brand:'#0A2342',mint:'#2bd4a9'}}}}</script>
-<style>
-  .card{border:1px solid #e5e7eb;border-radius:1rem;background:#fff;box-shadow:0 20px 60px -20px rgba(2,6,23,.08)}
-  .btn{border-radius:.75rem;padding:.6rem 1rem;font-weight:600}
-  .btn-brand{background:#0A2342;color:#fff}
-  .pill{padding:.35rem .8rem;border:1px solid #e5e7eb;border-radius:999px;background:#fff}
-  .drawer{transition:transform .25s ease}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>StrategyMind — Proměň nápady v ziskovou strategii</title>
+  <meta name="description" content="StrategyMind spojuje chytré otázky, AI doporučení a přehledné formuláře. Od nápadu k akčním krokům s měřitelnými výsledky.">
+
+  <!-- Tailwind -->
+  <link rel="preconnect" href="https://cdn.tailwindcss.com">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: { brand: "#0A2342", mint:"#2bd4a9", ink:"#0f172a" },
+          boxShadow: { sweet: "0 24px 70px -24px rgba(2,6,23,.15)" },
+          borderRadius: { "2xl":"1.25rem" }
+        }
+      }
+    }
+  </script>
+
+  <!-- LOGO: preload + favicon + touch ikonka -->
+  <link rel="preload" href="StrategyMind_App_Icon.jpg" as="image" fetchpriority="high">
+  <link rel="icon" href="StrategyMind_App_Icon.jpg">
+  <link rel="apple-touch-icon" href="StrategyMind_App_Icon.jpg">
+
+  <style>
+    .hero-grad{background: radial-gradient(1200px 600px at 70% 30%,rgba(43,212,169,.20),transparent 60%)}
+    .card{border:1px solid #e5e7eb;background:#fff;border-radius:1.25rem;box-shadow:0 24px 60px -28px rgba(2,6,23,.10)}
+    .pill{border:1px solid #e5e7eb;border-radius:999px;padding:.45rem .9rem;background:#fff}
+    .btn{border-radius:.9rem;padding:.75rem 1.1rem;font-weight:700}
+    .btn-brand{background:#0A2342;color:#fff}
+    .btn-ghost{background:#fff;border:1px solid #e5e7eb}
+    .badge{font-size:.7rem;border:1px solid #e5e7eb;border-radius:999px;padding:.25rem .6rem;background:#fff}
+    .blur-blob{filter:blur(40px);opacity:.14}
+    html{scroll-behavior:smooth}
+  </style>
 </head>
-<body class="bg-slate-50 text-slate-900">
-<header class="sticky top-0 z-50 border-b bg-white/80 backdrop-blur">
-  <div class="mx-auto flex max-w-7xl items-center justify-between px-6 py-3">
+<body class="bg-slate-50 text-slate-900 selection:bg-mint/20 selection:text-ink">
+
+<!-- ======= Fallback šablona loga (když by JPG nebylo k dispozici) ======= -->
+<template id="fallback-logo">
+  <svg class="h-full w-full" viewBox="0 0 100 100" aria-label="StrategyMind logo">
+    <rect width="100" height="100" rx="16" fill="#0A2342"/>
+    <path d="M15 70l28-33 22 35 20-9H75" stroke="#2bd4a9" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+</template>
+
+<!-- Header -->
+<header class="sticky top-0 z-[60] bg-white/80 backdrop-blur border-b">
+  <div class="mx-auto max-w-7xl px-5 py-3 flex items-center justify-between">
     <a class="flex items-center gap-3" href="#">
-      <svg class="h-9 w-9" viewBox="0 0 100 100"><rect width="100" height="100" rx="16" fill="#0A2342"/><path d="M15 70l28-33 22 35 20-9H75" stroke="#2bd4a9" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <!-- LOGO (rychlé načtení, vysoká priorita, fallback na SVG) -->
+      <picture class="h-9 w-9 block rounded-xl shadow overflow-hidden">
+        <img
+          src="StrategyMind_App_Icon.jpg"
+          alt="StrategyMind"
+          class="h-9 w-9 object-cover"
+          width="72" height="72"
+          loading="eager" decoding="async" fetchpriority="high"
+          onerror="this.replaceWith(document.getElementById('fallback-logo').content.cloneNode(true));"
+        />
+      </picture>
       <span class="font-semibold">StrategyMind</span>
     </a>
-    <nav class="hidden gap-6 md:flex text-sm">
-      <a href="#trading">Trading</a><a href="#realestate">Reality</a><a href="#money">Money</a><a href="#idealab">Idea Lab</a>
+    <nav class="hidden md:flex items-center gap-7 text-[15px]">
+      <a href="#funkce" class="hover:text-brand">Funkce</a>
+      <a href="#trhy" class="hover:text-brand">Trhy</a>
+      <a href="#nemovitosti" class="hover:text-brand">Nemovitosti</a>
+      <a href="#cenik" class="hover:text-brand">Ceník</a>
+      <a href="#faq" class="hover:text-brand">FAQ</a>
     </nav>
     <div class="flex items-center gap-2">
-      <button id="libBtn" class="pill hidden sm:inline-flex">Knihovna</button>
-      <a href="#trading" class="btn btn-brand">Spustit</a>
+      <button id="dlBtn" class="pill hidden sm:inline-flex">Stáhnout aplikaci</button>
+      <a href="#funkce" class="btn btn-brand">Vyzkoušet zdarma</a>
     </div>
   </div>
 </header>
 
-<!-- HERO -->
-<section class="mx-auto max-w-7xl px-6 pt-8 pb-4">
-  <div class="grid gap-8 md:grid-cols-2 md:items-center">
-    <div>
-      <h1 class="text-4xl font-extrabold tracking-tight sm:text-5xl">Inteligentní dashboard<br>
-        <span class="bg-gradient-to-r from-emerald-600 to-teal-400 bg-clip-text text-transparent">pro trhy, reality a peníze</span></h1>
-      <p class="mt-4 text-slate-600">Live tickery s predikcí, TA indikátory, korelace, real-estate nápady s ROI a osobní plán financí. Vše napojené na AI specialisty.</p>
-      <div class="mt-6 flex gap-3"><a href="#trading" class="btn btn-brand">Do Tradingu</a><a href="#realestate" class="pill">Hledat reality</a></div>
-    </div>
-    <div class="card p-5">
-      <div class="text-sm text-slate-500">Rychlý přehled</div>
-      <div class="mt-3 grid gap-3 sm:grid-cols-3">
-        <div class="rounded-xl border p-4"><div class="text-xs text-slate-500">AI predikce</div><div id="qIntraday" class="mt-1 font-semibold">—</div></div>
-        <div class="rounded-xl border p-4"><div class="text-xs text-slate-500">Sentiment</div><div id="qSent" class="mt-1 font-semibold">—</div></div>
-        <div class="rounded-xl border p-4"><div class="text-xs text-slate-500">Rozpočet</div><div class="mt-1 font-semibold">50/30/20</div></div>
-      </div>
-      <div class="mt-3"><button id="qSentBtn" class="pill">Aktualizovat sentiment</button></div>
-    </div>
-  </div>
-</section>
+<!-- Hero -->
+<section class="hero-grad">
+  <div class="relative mx-auto max-w-7xl px-5 pt-10 md:pt-14 pb-8">
+    <div class="mb-4"><span class="badge">✨ Novinka: AI strategie pro SMB</span></div>
+    <div class="grid md:grid-cols-2 gap-10 items-center">
+      <div>
+        <h1 class="text-4xl sm:text-5xl font-extrabold leading-[1.15]">
+          Proměňte nápady v<br>
+          <span class="bg-gradient-to-r from-emerald-600 to-teal-400 bg-clip-text text-transparent">
+            ziskovou strategii
+          </span>
+        </h1>
+        <p class="mt-4 text-slate-600 max-w-[48ch]">
+          StrategyMind spojuje chytré otázky, AI doporučení a přehledné formuláře. Od nápadu k akčním krokům s měřitelnými výsledky.
+        </p>
 
-<!-- TABS -->
-<section class="mx-auto max-w-7xl px-6 pb-20">
-  <div class="flex items-center gap-3 mb-4">
-    <button data-tab="trading" class="pill tabBtn">Trading</button>
-    <button data-tab="realestate" class="pill tabBtn">Reality</button>
-    <button data-tab="money" class="pill tabBtn">Money</button>
-    <button data-tab="idealab" class="pill tabBtn">Idea Lab</button>
-    <div class="ml-auto text-xs text-slate-500">Refresh: <span id="refreshTs">—</span></div>
-  </div>
+        <ul class="mt-5 space-y-2 text-sm text-slate-700">
+          <li>• Nápad → cíle → kroky s metrikami</li>
+          <li>• Bezpečné uložení nápadů a poznámek</li>
+          <li>• Mobilní aplikace pro rychlé brainstomy &amp; AI tipy</li>
+        </ul>
 
-  <!-- TRADING -->
-  <div id="trading" class="tab card p-5 space-y-5">
-    <div class="grid gap-3 md:grid-cols-12">
-      <div class="md:col-span-7">
-        <label class="text-xs">Symboly</label>
-        <input id="symInput" class="mt-1 w-full rounded-xl border px-3 py-2 text-sm"
-               value="AAPL,NVDA,SPY,QQQ,MSFT,TSLA,BTCUSD,ETHUSD,EURUSD,XAUUSD,USOIL">
-      </div>
-      <div class="md:col-span-2">
-        <label class="text-xs">Filtr</label>
-        <select id="symFilter" class="mt-1 w-full rounded-xl border px-3 py-2 text-sm">
-          <option value="all">Vše</option><option value="gainers">Roste</option><option value="losers">Klesá</option>
-          <option value="flat">Plochá</option><option value="rsi_overbought">RSI overbought</option><option value="rsi_oversold">RSI oversold</option>
-          <option value="volatility">Volatilní</option>
-        </select>
-      </div>
-      <div class="md:col-span-2">
-        <label class="text-xs">Sparkline</label>
-        <select id="sparkRes" class="mt-1 w-full rounded-xl border px-3 py-2 text-sm">
-          <option value="D">1D</option><option value="60">1H</option><option value="W">1W</option>
-        </select>
-      </div>
-      <div class="md:col-span-1 flex items-end"><button id="symLoad" class="btn btn-brand w-full">Načíst</button></div>
-    </div>
-
-    <div id="symGrid" class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3"></div>
-
-    <!-- Detail modal -->
-    <dialog id="detailModal" class="w-full max-w-3xl rounded-2xl p-0 backdrop:bg-black/30">
-      <div class="card p-5">
-        <div class="flex items-center justify-between">
-          <div class="text-lg font-semibold" id="dTitle">Detail</div>
-          <button id="dClose" class="pill">Zavřít</button>
+        <div class="mt-6 flex flex-col sm:flex-row gap-3 sm:items-center">
+          <button id="dlBtn2" class="btn btn-ghost">Stáhnout aplikaci</button>
+          <div class="flex items-stretch gap-2">
+            <input class="w-64 rounded-xl border px-3" placeholder="email@domain.com" />
+            <button class="btn btn-brand">Zaslat demo</button>
+          </div>
         </div>
-        <div class="mt-3 grid gap-4 md:grid-cols-2">
-          <canvas id="dChart" height="220" class="rounded-xl border"></canvas>
-          <div class="space-y-3">
-            <div class="text-sm">Indikátory & backtest</div>
-            <div id="dFacts" class="text-sm text-slate-700 space-y-2">—</div>
-            <div class="text-sm">Zprávy</div>
-            <div id="dNews" class="space-y-2 text-sm"></div>
+
+        <div class="mt-4 flex gap-2">
+          <span class="badge">GDPR</span>
+          <span class="badge">AI</span>
+          <span class="badge">iOS &amp; Android</span>
+        </div>
+      </div>
+
+      <!-- Hero mockup s reálným logem -->
+      <div class="relative">
+        <div class="absolute inset-0 blur-blob bg-mint rounded-full"></div>
+        <div class="relative card shadow-sweet p-6 flex items-center justify-center">
+          <div class="rounded-2xl bg-slate-100 p-6">
+            <img
+              src="StrategyMind_App_Icon.jpg"
+              alt="StrategyMind App"
+              class="h-24 w-24 rounded-2xl object-cover"
+              width="192" height="192"
+              loading="eager" decoding="async" fetchpriority="high"
+              onerror="this.replaceWith(document.getElementById('fallback-logo').content.cloneNode(true));"
+            />
           </div>
         </div>
       </div>
-    </dialog>
-
-    <!-- Chat -->
-    <div class="card p-4">
-      <div class="flex items-center justify-between mb-2"><div class="font-semibold">AI trader – chat</div><div class="text-xs text-slate-500">topic: trading</div></div>
-      <div class="flex gap-2"><textarea id="chatTrading" class="w-full rounded-xl border p-2 text-sm" rows="2" placeholder="Intraday/swing/long-term..."></textarea>
-        <button data-topic="trading" class="btn btn-brand askBtn">Zeptat</button></div>
-      <div id="chatTradingOut" class="mt-2 whitespace-pre-wrap text-sm"></div>
-    </div>
-  </div>
-
-  <!-- REAL ESTATE -->
-  <div id="realestate" class="tab hidden card p-5 space-y-4">
-    <div class="grid gap-3 md:grid-cols-12">
-      <div class="md:col-span-9"><input id="reQuery" class="w-full rounded-xl border px-3 py-2 text-sm" placeholder="např. pozemek Praha 1500 m2"></div>
-      <div class="md:col-span-3"><button id="reScan" class="btn btn-brand w-full">Analyzovat</button></div>
-    </div>
-    <div id="reOut" class="text-sm"></div>
-
-    <div class="grid gap-3 md:grid-cols-12">
-      <div class="md:col-span-9"><input id="reComps" class="w-full rounded-xl border px-3 py-2 text-sm" placeholder="např. byt Praha 2+kk 55 m2"></div>
-      <div class="md:col-span-3"><button id="reCompsBtn" class="pill w-full">Srovnat ceny</button></div>
-    </div>
-    <div id="reCompsOut" class="text-sm"></div>
-
-    <div class="card p-4">
-      <div class="mb-2 font-semibold">AI developer – nápady</div>
-      <div class="flex gap-2"><textarea id="reIdeas" class="w-full rounded-xl border p-2 text-sm" rows="2" placeholder="Popiš pozemek/bydlení/komerci..."></textarea>
-        <button id="reIdeasBtn" class="btn btn-brand">Vygenerovat</button></div>
-      <div id="reIdeasOut" class="mt-2 whitespace-pre-wrap text-sm"></div>
-    </div>
-
-    <div class="card p-4">
-      <div class="mb-2 font-semibold">AI real-estate – chat</div>
-      <div class="flex gap-2"><textarea id="chatRe" class="w-full rounded-xl border p-2 text-sm" rows="2"></textarea>
-        <button data-topic="realestate" class="btn btn-brand askBtn">Zeptat</button></div>
-      <div id="chatReOut" class="mt-2 whitespace-pre-wrap text-sm"></div>
-    </div>
-  </div>
-
-  <!-- MONEY -->
-  <div id="money" class="tab hidden card p-5 space-y-4">
-    <div class="grid gap-3 md:grid-cols-12">
-      <div class="md:col-span-3"><label class="text-xs">Příjem (Kč/měs.)</label><input id="mIncome" class="mt-1 w-full rounded-xl border px-3 py-2 text-sm" value="60000"></div>
-      <div class="md:col-span-3"><label class="text-xs">Profil</label>
-        <select id="mRisk" class="mt-1 w-full rounded-xl border px-3 py-2 text-sm">
-          <option value="conservative">Konzervativní</option><option selected value="balanced">Vyvážený</option><option value="aggressive">Agresivní</option>
-        </select></div>
-      <div class="md:col-span-3 flex items-end"><button id="mPlanBtn" class="btn btn-brand w-full">Spočítat plán</button></div>
-    </div>
-    <div class="grid gap-3 md:grid-cols-2">
-      <div class="card p-4"><div class="mb-2 font-semibold">Rozdělení 50/30/20</div><canvas id="mPie" height="200"></canvas><div id="mBuckets" class="mt-2 text-sm"></div></div>
-      <div class="card p-4">
-        <div class="mb-2 font-semibold">Složené úročení</div>
-        <div class="grid grid-cols-2 gap-2 text-sm">
-          <input id="cP" class="rounded-xl border px-3 py-2" value="150000" placeholder="Počáteční vklad">
-          <input id="cM" class="rounded-xl border px-3 py-2" value="2000" placeholder="Měsíční vklad">
-          <input id="cR" class="rounded-xl border px-3 py-2" value="8" placeholder="Roční %">
-          <input id="cY" class="rounded-xl border px-3 py-2" value="10" placeholder="Let">
-        </div>
-        <button id="cBtn" class="btn btn-brand mt-3">Spočítat</button>
-        <div id="cOut" class="mt-2 text-sm"></div>
-      </div>
-    </div>
-
-    <div class="card p-4">
-      <div class="mb-2 font-semibold">AI money – chat</div>
-      <div class="flex gap-2"><textarea id="chatMoney" class="w-full rounded-xl border p-2 text-sm" rows="2"></textarea>
-        <button data-topic="money" class="btn btn-brand askBtn">Zeptat</button></div>
-      <div id="chatMoneyOut" class="mt-2 whitespace-pre-wrap text-sm"></div>
-    </div>
-  </div>
-
-  <!-- IDEA LAB -->
-  <div id="idealab" class="tab hidden card p-5 space-y-4">
-    <div class="grid gap-3 md:grid-cols-12">
-      <div class="md:col-span-9"><input id="ideaName" class="w-full rounded-xl border px-3 py-2 text-sm" value="Mikro-SaaS pro účetní (automatizace)" /></div>
-      <div class="md:col-span-3"><button id="ideaGen" class="btn btn-brand w-full">Vygenerovat plán</button></div>
-    </div>
-    <textarea id="ideaOut" class="w-full rounded-xl border p-3 text-sm" rows="10" placeholder="Výstup..."></textarea>
-    <div class="flex gap-2"><button id="ideaMd" class="pill">Export do MD</button></div>
-
-    <div class="card p-4">
-      <div class="mb-2 font-semibold">AI ideas – chat</div>
-      <div class="flex gap-2"><textarea id="chatIdeas" class="w-full rounded-xl border p-2 text-sm" rows="2"></textarea>
-        <button data-topic="ideas" class="btn btn-brand askBtn">Zeptat</button></div>
-      <div id="chatIdeasOut" class="mt-2 whitespace-pre-wrap text-sm"></div>
     </div>
   </div>
 </section>
 
-<!-- KNIHOVNA (drawer) -->
-<aside id="drawer" class="fixed right-0 top-0 z-50 h-full w-[320px] translate-x-full bg-white shadow-xl drawer">
-  <div class="flex items-center justify-between border-b p-4">
-    <div class="font-semibold">Knihovna</div>
-    <button id="libClose" class="pill">Zavřít</button>
+<!-- Funkce (dlaždice) -->
+<section id="funkce" class="mx-auto max-w-7xl px-5 py-10">
+  <h2 class="text-2xl font-bold">Funkce</h2>
+  <p class="mt-2 text-slate-600 max-w-[60ch]">Jednoduše scrollni níž a projdi si vše, co StrategyMind umí. Dlaždice níže tě přenesou na detaily sekcí.</p>
+
+  <div class="mt-6 grid gap-5 md:grid-cols-2">
+    <!-- Trading -->
+    <a href="#trhy" class="card p-5 hover:shadow-sweet transition">
+      <div class="flex items-start gap-3">
+        <span class="badge">Trading Analyzer</span>
+      </div>
+      <h3 class="mt-2 text-xl font-semibold">Trhy a indexy — živé tickery s predikcí</h3>
+      <p class="mt-1 text-slate-600">Screener (gainers/losers/RSI/volatilita), korelace, TA indikátory, rychlý backtest a zprávy ovlivňující trh.</p>
+      <div class="mt-4 flex items-center gap-2 text-sm">
+        <span class="pill">1m zpoždění max</span>
+        <span class="pill">TA indikátory</span>
+        <span class="pill">Backtest SMA</span>
+      </div>
+    </a>
+
+    <!-- Real Estate -->
+    <a href="#nemovitosti" class="card p-5 hover:shadow-sweet transition">
+      <span class="badge">Real-Estate Lab</span>
+      <h3 class="mt-2 text-xl font-semibold">Nemovitosti — nápady, ROI a katastr</h3>
+      <p class="mt-1 text-slate-600">Heuristiky pro využití pozemků/bytů, srovnávací ceny (comps), odhady výnosu a napojení na veřejné registry.</p>
+      <div class="mt-4 flex items-center gap-2 text-sm">
+        <span class="pill">Scénáře využití</span>
+        <span class="pill">ROI 3/5/10 let</span>
+        <span class="pill">Registry</span>
+      </div>
+    </a>
+
+    <!-- Money -->
+    <a href="#money" class="card p-5 hover:shadow-sweet transition">
+      <span class="badge">Money Management</span>
+      <h3 class="mt-2 text-xl font-semibold">Osobní finance — 50/30/20 a kalkulačky</h3>
+      <p class="mt-1 text-slate-600">Rozpočet podle profilu (konzervativní–agresivní), koláč rozdělení, složené úročení a další chytré kalkulačky.</p>
+      <div class="mt-4 flex items-center gap-2 text-sm">
+        <span class="pill">50/30/20</span>
+        <span class="pill">Compound</span>
+        <span class="pill">AI poradce</span>
+      </div>
+    </a>
+
+    <!-- Idea Lab -->
+    <a href="#idealab" class="card p-5 hover:shadow-sweet transition">
+      <span class="badge">Idea Lab</span>
+      <h3 class="mt-2 text-xl font-semibold">Nápady a produkty — plán krok za krokem</h3>
+      <p class="mt-1 text-slate-600">AI generuje MVP, akviziční kanály, monetizaci, KPI a timeline. Export do Markdownu pro rychlou realizaci.</p>
+      <div class="mt-4 flex items-center gap-2 text-sm">
+        <span class="pill">MVP &amp; KPI</span>
+        <span class="pill">Monetizace</span>
+        <span class="pill">Export .md</span>
+      </div>
+    </a>
   </div>
-  <div class="p-4 text-sm space-y-3">
-    <div><div class="font-semibold mb-1">Odkazy</div>
-      <ul class="list-disc pl-5 space-y-1">
-        <li><a class="text-sky-700" href="#trading">Trading – přehled</a></li>
-        <li><a class="text-sky-700" href="#realestate">Reality – nápady</a></li>
-        <li><a class="text-sky-700" href="#money">Money – plán</a></li>
-        <li><a class="text-sky-700" href="#idealab">Idea Lab – generátor</a></li>
+</section>
+
+<!-- Trhy -->
+<section id="trhy" class="mx-auto max-w-7xl px-5 py-12">
+  <div class="grid md:grid-cols-2 gap-8 items-start">
+    <div>
+      <span class="badge">Trading Analyzer</span>
+      <h2 class="mt-2 text-2xl font-bold">Trhy, akcie a indexy</h2>
+      <p class="mt-2 text-slate-600">Živé tickery (max. ~1 min zpoždění), predikce pro intraday/swing/long-term, TA indikátory (SMA/EMA/RSI/BB), korelace a rychlý backtest. Po kliknutí na symbol otevřeme detail s grafem, zprávami a odhadem pohybu.</p>
+      <ul class="mt-4 space-y-2 text-sm">
+        <li>• Filtry: gainers/losers/flat, RSI overbought/oversold, volatilita</li>
+        <li>• Korelace mezi páry symbolů</li>
+        <li>• Backtest SMA crossover (rychlý sanity check)</li>
+      </ul>
+      <div class="mt-5 flex gap-3">
+        <a class="btn btn-brand" href="#funkce">Zpět na přehled</a>
+        <a class="pill" href="#idealab">AI nápady pro trading</a>
+      </div>
+    </div>
+    <div class="card p-5">
+      <div class="text-sm text-slate-500 mb-2">Ukázka dlaždic (preview)</div>
+      <div class="grid sm:grid-cols-2 gap-3">
+        <div class="border rounded-2xl p-4">
+          <div class="text-xs text-slate-500">AAPL</div>
+          <div class="font-semibold text-lg">219.85 <span class="text-emerald-600 text-sm">+1.26%</span></div>
+          <div class="text-xs mt-1">Intraday ▲ 227.3 (74%)</div>
+        </div>
+        <div class="border rounded-2xl p-4">
+          <div class="text-xs text-slate-500">NVDA</div>
+          <div class="font-semibold text-lg">108.20 <span class="text-rose-600 text-sm">-0.82%</span></div>
+          <div class="text-xs mt-1">Swing ▲ 121.0 (68%)</div>
+        </div>
+        <div class="border rounded-2xl p-4">
+          <div class="text-xs text-slate-500">SPY</div>
+          <div class="font-semibold text-lg">520.10 <span class="text-emerald-600 text-sm">+0.41%</span></div>
+          <div class="text-xs mt-1">Long ▲ 585.0 (72%)</div>
+        </div>
+        <div class="border rounded-2xl p-4">
+          <div class="text-xs text-slate-500">BTCUSD</div>
+          <div class="font-semibold text-lg">67 200 <span class="text-emerald-600 text-sm">+2.3%</span></div>
+          <div class="text-xs mt-1">Volatilita: 4.2%</div>
+        </div>
+      </div>
+      <div class="mt-4 text-xs text-slate-500">*Data jsou ilustrační. V ostré verzi nahradí živý screener a grafy.</div>
+    </div>
+  </div>
+</section>
+
+<!-- Nemovitosti -->
+<section id="nemovitosti" class="mx-auto max-w-7xl px-5 pb-12">
+  <div class="grid md:grid-cols-2 gap-8 items-start">
+    <div>
+      <span class="badge">Real-Estate Lab</span>
+      <h2 class="mt-2 text-2xl font-bold">Nemovitosti &amp; nápady s ROI</h2>
+      <p class="mt-2 text-slate-600">Z popisu lokality a typu (pozemek/byt/komerce) navrhneme varianty využití s odhadem capex/opex a yieldu. Přidáme srovnání (comps) a odkazy do registrů/katastrů.</p>
+      <ul class="mt-4 space-y-2 text-sm">
+        <li>• Využití: rezidenční, parkoviště, self-storage, retail…</li>
+        <li>• ROI scénáře 3/5/10 let + první kroky due-diligence</li>
+        <li>• Doporučení pro financování a cash-flow</li>
       </ul>
     </div>
-    <div><div class="font-semibold mb-1">Poznámky</div>
-      <p>Data nejsou investičním doporučením. Mohou být zpožděná a bez záruky.</p>
+    <div class="card p-5">
+      <div class="text-sm text-slate-500">Preview nápadů</div>
+      <ul class="mt-3 space-y-2 text-sm">
+        <li>• Pozemek u OC: parkoviště (automat) — target yield ~14%, ROI 5Y ≈ +45 %</li>
+        <li>• Byt 2+kk: krátkodobý nájem — yield ~7 %, obsazenost 78–85 %</li>
+        <li>• Komerce: retail + služby — yield ~11 %, citlivost na nájemní mix</li>
+      </ul>
     </div>
   </div>
-</aside>
+</section>
+
+<!-- Money -->
+<section id="money" class="mx-auto max-w-7xl px-5 pb-12">
+  <div class="grid md:grid-cols-2 gap-8 items-start">
+    <div>
+      <span class="badge">Money Management</span>
+      <h2 class="mt-2 text-2xl font-bold">Rozpočet 50/30/20 &amp; kalkulačky</h2>
+      <p class="mt-2 text-slate-600">Doporučené rozdělení rozpočtu podle profilu, koláčové zobrazení, složené úročení a další užitečné nástroje pro běžné i podnikatele.</p>
+      <ul class="mt-4 space-y-2 text-sm">
+        <li>• Rychlý přehled „Needs / Wants / Invest“</li>
+        <li>• Simulace složeného úročení (vklad, % p.a., čas)</li>
+        <li>• AI poradce pro specifické situace</li>
+      </ul>
+    </div>
+    <div class="card p-6">
+      <div class="text-sm text-slate-500">Ukázkový koláč</div>
+      <div class="mt-3 grid grid-cols-3 gap-2">
+        <div class="rounded-xl bg-sky-100 p-4 text-center">
+          <div class="text-xs">Needs</div><div class="text-lg font-semibold">50%</div>
+        </div>
+        <div class="rounded-xl bg-emerald-100 p-4 text-center">
+          <div class="text-xs">Wants</div><div class="text-lg font-semibold">30%</div>
+        </div>
+        <div class="rounded-xl bg-amber-100 p-4 text-center">
+          <div class="text-xs">Invest</div><div class="text-lg font-semibold">20%</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Idea Lab -->
+<section id="idealab" class="mx-auto max-w-7xl px-5 pb-16">
+  <div class="grid md:grid-cols-2 gap-8 items-start">
+    <div>
+      <span class="badge">Idea Lab</span>
+      <h2 class="mt-2 text-2xl font-bold">Nápady → plán → exekuce</h2>
+      <p class="mt-2 text-slate-600">AI pomocník navrhne MVP, akviziční kanály, monetizaci, KPI, timeline a rizika. Výstup snadno vyexportuješ do Markdownu či Notionu.</p>
+      <div class="mt-5 flex gap-3">
+        <a class="btn btn-brand" href="#funkce">Zpět na přehled</a>
+        <a class="pill" href="#faq">Jak funguje AI</a>
+      </div>
+    </div>
+    <div class="card p-5">
+      <div class="text-sm text-slate-500">Ukázka osnovy</div>
+      <ol class="mt-3 space-y-2 text-sm list-decimal pl-5">
+        <li>MVP: minimální sada funkcí</li>
+        <li>Akvizice: SEO, partnerství, komunita</li>
+        <li>Monetizace: freemium + Pro</li>
+        <li>KPI: MAU, CAC, LTV, konverze</li>
+        <li>Timeline: sprinty po 2 týdnech</li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- Ceník -->
+<section id="cenik" class="bg-white border-y">
+  <div class="mx-auto max-w-7xl px-5 py-16">
+    <h2 class="text-2xl font-bold">Ceník (preview)</h2>
+    <p class="mt-2 text-slate-600">Začneme zdarma, placené tarify přidáme brzy. Tvé nápady můžeš rozjet bez bariér.</p>
+    <div class="mt-6 grid md:grid-cols-3 gap-5">
+      <div class="card p-6">
+        <div class="font-semibold">Free</div>
+        <div class="text-3xl font-extrabold mt-1">0 Kč</div>
+        <ul class="mt-3 text-sm space-y-1">
+          <li>• Základní šablony &amp; poznámky</li>
+          <li>• 40+ UI komponent</li>
+          <li>• Základní podpora</li>
+        </ul>
+        <div class="mt-5"><a href="#funkce" class="btn btn-ghost w-full">Začít</a></div>
+      </div>
+      <div class="card p-6 border-brand/30">
+        <div class="font-semibold">Pro</div>
+        <div class="text-3xl font-extrabold mt-1">—</div>
+        <ul class="mt-3 text-sm space-y-1">
+          <li>• Trading/Real-Estate moduly</li>
+          <li>• AI chatboti pro každou sekci</li>
+          <li>• Exporty a sdílení</li>
+        </ul>
+        <div class="mt-5"><span class="pill">Již brzy</span></div>
+      </div>
+      <div class="card p-6">
+        <div class="font-semibold">Enterprise</div>
+        <div class="text-3xl font-extrabold mt-1">Custom</div>
+        <ul class="mt-3 text-sm space-y-1">
+          <li>• Single Sign-On</li>
+          <li>• SLA a onboarding</li>
+          <li>• Vlastní integrace</li>
+        </ul>
+        <div class="mt-5"><a href="#faq" class="btn btn-ghost w-full">Kontakt</a></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq" class="mx-auto max-w-7xl px-5 py-16">
+  <h2 class="text-2xl font-bold">FAQ</h2>
+  <div class="mt-6 grid md:grid-cols-2 gap-5">
+    <div class="card p-5">
+      <div class="font-semibold">Je to investiční poradenství?</div>
+      <p class="mt-1 text-slate-600 text-sm">Ne. StrategyMind slouží jako nástroj pro ideaci, vzdělávání a plánování. Data mohou být zpožděná a bez záruky.</p>
+    </div>
+    <div class="card p-5">
+      <div class="font-semibold">Kdy bude mobilní aplikace?</div>
+      <p class="mt-1 text-slate-600 text-sm">Brzy. Zatím můžeš používat webovou verzi na mobilu. Tlačítko „Stáhnout aplikaci“ zobrazuje „Coming soon“.</p>
+    </div>
+    <div class="card p-5">
+      <div class="font-semibold">Jak funguje AI?</div>
+      <p class="mt-1 text-slate-600 text-sm">Každá sekce má vlastního „specialistu“ (trhy, reality, finance, nápady). Modely vrací přehledné odpovědi a kroky.</p>
+    </div>
+    <div class="card p-5">
+      <div class="font-semibold">Co bezpečnost a soukromí?</div>
+      <p class="mt-1 text-slate-600 text-sm">Respektujeme GDPR a ukládáme pouze to, co je nutné. Citlivé klíče zůstávají na serveru.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="border-t bg-white">
+  <div class="mx-auto max-w-7xl px-5 py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+    <div class="flex items-center gap-3">
+      <picture class="h-7 w-7 block rounded-lg overflow-hidden">
+        <img
+          src="StrategyMind_App_Icon.jpg"
+          alt="StrategyMind"
+          class="h-7 w-7 object-cover"
+          width="56" height="56"
+          loading="lazy" decoding="async"
+          onerror="this.replaceWith(document.getElementById('fallback-logo').content.cloneNode(true));"
+        />
+      </picture>
+      <span class="text-sm">© 2025 StrategyMind</span>
+    </div>
+    <div class="flex gap-4 text-sm">
+      <a href="#faq" class="hover:text-brand">Podmínky</a>
+      <a href="#faq" class="hover:text-brand">Soukromí</a>
+      <a href="#funkce" class="hover:text-brand">Funkce</a>
+    </div>
+  </div>
+</footer>
+
+<!-- Coming soon modal -->
+<dialog id="soon" class="rounded-2xl p-0 w-[92%] max-w-md backdrop:bg-black/30">
+  <div class="card p-5">
+    <div class="text-lg font-semibold">Aplikace brzy!</div>
+    <p class="mt-1 text-slate-600 text-sm">Mobilní appku finišujeme. Nech nám email v hero sekci a pošleme ti přístup mezi prvními.</p>
+    <div class="mt-4 flex justify-end">
+      <button id="soonClose" class="pill">OK</button>
+    </div>
+  </div>
+</dialog>
 
 <script>
-const API = location.origin.replace(/\/$/,''); // funguje v Preview i produkci
-
-// ====== util ======
-const $ = (sel, root=document)=>root.querySelector(sel);
-const $$ = (sel, root=document)=>Array.from(root.querySelectorAll(sel));
-const fmt = n => (n==null||isNaN(n)) ? "—" : new Intl.NumberFormat('cs-CZ').format(n);
-const toTs = d => new Date(d*1000).toLocaleString('cs-CZ');
-const setRefresh = ()=> $('#refreshTs').textContent = new Date().toLocaleTimeString('cs-CZ');
-
-// ====== drawer ======
-$('#libBtn')?.addEventListener('click', ()=> $('#drawer').style.transform='translateX(0)');
-$('#libClose')?.addEventListener('click', ()=> $('#drawer').style.transform='translateX(100%)');
-
-// ====== tabs ======
-$$('.tabBtn').forEach(b=>b.addEventListener('click', ()=>{
-  const t=b.dataset.tab; $$('.tab').forEach(el=>el.classList.add('hidden'));
-  $('#'+t).classList.remove('hidden');
-}));
-
-// ====== quick sentiment ======
-$('#qSentBtn')?.addEventListener('click', async ()=>{
-  $('#qSent').textContent = '...';
-  const r = await fetch(`${API}/api/news/sentiment?q=markets`).then(r=>r.json()).catch(()=>({sentiment:'neutral',confidence:0}));
-  $('#qSent').textContent = `${r.sentiment||'neutral'} (${r.confidence||0}%)`;
-});
-
-// ====== TRADING ======
-let pollId=null;
-
-async function loadGrid(){
-  const syms = $('#symInput').value;
-  const filter = $('#symFilter').value;
-  $('#symGrid').innerHTML = '<div class="text-sm text-slate-500">Načítám...</div>';
-  const res = await fetch(`${API}/api/finance/screener?symbols=${encodeURIComponent(syms)}&filter=${filter}`).then(r=>r.json());
-  const items = res.items||[];
-  $('#qIntraday').textContent = items[0]?.forecast?.intraday?.pct ? items[0].forecast.intraday.pct+'%' : '—';
-  $('#symGrid').innerHTML = items.map(it=>cardSymbol(it)).join('') || '<div class="text-sm">Nic k zobrazení.</div>';
-  setRefresh();
-}
-
-function cardSymbol(s){
-  const dir = (s.changePct||0)>=0 ? 'text-emerald-600' : 'text-rose-600';
-  return `
-  <div class="card p-4 cursor-pointer" onclick="openDetail('${s.symbol}')">
-    <div class="flex items-center justify-between">
-      <div class="font-semibold">${s.symbol}</div>
-      <div class="text-xs text-slate-500">${s.name||''}</div>
-    </div>
-    <div class="mt-1 text-lg font-semibold">${fmt(s.price)} <span class="${dir} text-sm">(${(s.changePct||0).toFixed(2)}%)</span></div>
-    <div class="text-xs mt-1">Intraday ▲ ${s.forecast?.intraday?.up? fmt(s.forecast.intraday.up):'—'} (${s.forecast?.intraday?.pct||'—'}%)</div>
-    <div class="text-xs">Volatilita: ${(s.volatility*100||0).toFixed(1)}%</div>
-  </div>`;
-}
-$('#symLoad')?.addEventListener('click', ()=>{ loadGrid(); clearInterval(pollId); pollId=setInterval(loadGrid, 60000); });
-loadGrid(); pollId=setInterval(loadGrid, 60000);
-
-// ====== detail modal ======
-window.openDetail = async (sym)=>{
-  $('#dTitle').textContent = sym; $('#dFacts').textContent='...'; $('#dNews').textContent='Načítám...';
-  const modal = $('#detailModal'); modal.showModal();
-
-  // indicators + quick backtest
-  const to = Math.floor(Date.now()/1000), from = to - 60*60*24*365;
-  const [ind, bt, news] = await Promise.all([
-    fetch(`${API}/api/finance/indicators?symbol=${sym}&resolution=D&from=${from}&to=${to}&sma=20,50,200&ema=12,26&rsi=14&bb=20`).then(r=>r.json()),
-    fetch(`${API}/api/finance/backtest?symbol=${sym}&resolution=D&fast=20&slow=50`).then(r=>r.json()),
-    fetch(`${API}/api/news?q=${encodeURIComponent(sym+' stock')}`).then(r=>r.json())
-  ]);
-
-  // fakey tiny chart (SMA vs price basis BB)
-  const can = $('#dChart'); const ctx = can.getContext('2d'); ctx.clearRect(0,0,can.width,can.height);
-  const close = (ind.bb||[]).map(_=>_?.basis||null).filter(Boolean).slice(-100);
-  const max = Math.max(...close), min=Math.min(...close), pad=10;
-  const scaleY=v=> pad + (200 - pad*2) * (1 - (v-min)/(max-min+1e-9));
-  ctx.strokeStyle='#0A2342'; ctx.lineWidth=1.5; ctx.beginPath();
-  close.forEach((v,i)=>{ const x = 10 + i*(can.width-20)/Math.max(close.length-1,1); const y = scaleY(v); i?ctx.lineTo(x,y):ctx.moveTo(x,y);});
-  ctx.stroke();
-
-  $('#dFacts').innerHTML = `
-    <div>SMA20 poslední: ${fmt(ind.sma?.[20]?.slice(-1)[0])}</div>
-    <div>EMA12 poslední: ${fmt(ind.ema?.[12]?.slice(-1)[0])}</div>
-    <div>RSI14: ${(ind.rsi?.slice(-1)[0]??'—')}</div>
-    <div class="mt-2 text-sm">Backtest SMA(20/50): trades ${bt.trades||0}, win ${bt.winrate||0}%, PnL ${bt.pnlPct||0}% , DD ${bt.maxDrawdownPct||0}%</div>
-  `;
-  $('#dNews').innerHTML = (news.items||[]).slice(0,5).map(n=>`<div>• <a class="text-sky-700" href="${n.url}" target="_blank">${n.title}</a> <span class="text-xs text-slate-500">(${n.source})</span></div>`).join('') || '—';
-};
-$('#dClose')?.addEventListener('click', ()=> $('#detailModal').close());
-
-// ====== REAL ESTATE ======
-$('#reScan')?.addEventListener('click', async ()=>{
-  const q = $('#reQuery').value || 'pozemek Praha 1500 m2';
-  $('#reOut').textContent='Analyzuji...';
-  const r = await fetch(`${API}/api/realestate/scan?q=${encodeURIComponent(q)}`).then(r=>r.json());
-  $('#reOut').innerHTML = `
-    <div><b>Typ:</b> ${r.type}</div>
-    <div><b>Základní cena/m2:</b> €${fmt(r.basePricePerM2)}</div>
-    <div class="mt-2"><b>Scénáře:</b></div>
-    <ul class="list-disc pl-5">${(r.scenarios||[]).map(s=>`<li>${s.idea} — ROI 5Y: ${(s.fiveYearROI*100).toFixed(1)}% (target yield ${Math.round(s.targetYield*100)}%)</li>`).join('')}</ul>`;
-});
-
-$('#reCompsBtn')?.addEventListener('click', async ()=>{
-  const q = $('#reComps').value || 'byt Praha 2+kk 55 m2';
-  $('#reCompsOut').textContent='Hledám srovnání...';
-  const r = await fetch(`${API}/api/realestate/comps?q=${encodeURIComponent(q)}`).then(r=>r.json());
-  $('#reCompsOut').innerHTML = `Průměr: €${fmt(r.avg)}/m² (min €${fmt(r.min)} / max €${fmt(r.max)})<div class="mt-1 text-xs">${(r.refs||[]).slice(0,3).map(x=>`<div>• <a class="text-sky-700" href="${x.url}" target="_blank">${x.title}</a></div>`).join('')}</div>`;
-});
-
-$('#reIdeasBtn')?.addEventListener('click', async ()=>{
-  const prompt = $('#reIdeas').value || 'Pozemek u obchodního centra 2000 m2';
-  $('#reIdeasOut').textContent='Generuji...';
-  const r = await fetch(`${API}/api/realestate/ideas`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt})}).then(r=>r.json());
-  $('#reIdeasOut').textContent = r?.message?.content || '—';
-});
-
-// ====== MONEY ======
-const pie = $('#mPie').getContext('2d');
-function drawPie(needs,wants,invest){
-  const total = needs+wants+invest || 1;
-  const segs=[{v:needs,c:'#0ea5e9'},{v:wants,c:'#22c55e'},{v:invest,c:'#f59e0b'}];
-  pie.clearRect(0,0,300,300);
-  let a= -Math.PI/2; const cx=150,cy=100,r=80;
-  segs.forEach(s=>{ const ang = 2*Math.PI*(s.v/total); pie.beginPath(); pie.moveTo(cx,cy); pie.arc(cx,cy,r,a,a+ang); pie.closePath(); pie.fillStyle=s.c; pie.fill(); a+=ang; });
-}
-
-$('#mPlanBtn')?.addEventListener('click', async ()=>{
-  const income = Number($('#mIncome').value||60000); const risk = $('#mRisk').value;
-  const r = await fetch(`${API}/api/money/plan?income=${income}&risk=${risk}`).then(r=>r.json());
-  drawPie(r.buckets.needs,r.buckets.wants,r.buckets.invest);
-  $('#mBuckets').innerHTML = `Needs: ${fmt(r.buckets.needs)} Kč &nbsp; Wants: ${fmt(r.buckets.wants)} Kč &nbsp; Invest: ${fmt(r.buckets.invest)} Kč`;
-});
-$('#mPlanBtn').click();
-
-$('#cBtn')?.addEventListener('click', async ()=>{
-  const P=+$('#cP').value||0, M=+$('#cM').value||0, R=+$('#cR').value||0, Y=+$('#cY').value||0;
-  const r=await fetch(`${API}/api/money/compound?principal=${P}&monthly=${M}&rate=${R}&years=${Y}`).then(r=>r.json());
-  $('#cOut').textContent = `Budoucí hodnota: ${fmt(r.future)} Kč`;
-});
-
-// ====== IDEA LAB ======
-$('#ideaGen')?.addEventListener('click', async ()=>{
-  const name = $('#ideaName').value || 'Nový produkt';
-  $('#ideaOut').value = 'Generuji plán...';
-  const r = await fetch(`${API}/api/chat?topic=ideas`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:[{role:'user',content:`Vytvoř mi krokový plán pro projekt: ${name}. Chci sekce MVP, akvizice, monetizace, KPI, timeline, rizika a rozpočet.`}]})}).then(r=>r.json());
-  $('#ideaOut').value = r?.message?.content || '—';
-});
-$('#ideaMd')?.addEventListener('click', ()=>{
-  const blob = new Blob([$('#ideaOut').value||''],{type:'text/markdown;charset=utf-8'});
-  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='plan.md'; a.click();
-});
-
-// ====== Chat boty ======
-$$('.askBtn').forEach(btn=>{
-  btn.addEventListener('click', async ()=>{
-    const topic = btn.dataset.topic;
-    const input = topic==='trading' ? $('#chatTrading') : topic==='realestate' ? $('#chatRe') : topic==='money' ? $('#chatMoney') : $('#chatIdeas');
-    const out   = topic==='trading' ? $('#chatTradingOut') : topic==='realestate' ? $('#chatReOut') : topic==='money' ? $('#chatMoneyOut') : $('#chatIdeasOut');
-    out.textContent = '...';
-    const r = await fetch(`${API}/api/chat?topic=${topic}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:[{role:'user',content:input.value||'Ahoj'}]})}).then(r=>r.json());
-    out.textContent = r?.message?.content || '—';
-  });
-});
+  // Coming soon modal
+  const soon = document.getElementById('soon');
+  document.getElementById('dlBtn')?.addEventListener('click', ()=>soon.showModal());
+  document.getElementById('dlBtn2')?.addEventListener('click', ()=>soon.showModal());
+  document.getElementById('soonClose')?.addEventListener('click', ()=>soon.close());
 </script>
 </body>
 </html>
