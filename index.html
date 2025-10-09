@@ -34,18 +34,24 @@
     .btn-brand{background:#0A2342;color:#fff}
     .btn-ghost{background:#fff;border:1px solid #e5e7eb}
     .badge{font-size:.7rem;border:1px solid #e5e7eb;border-radius:999px;padding:.25rem .6rem;background:#fff}
-    .blur-blob{filter:blur(40px);opacity:.14}
+    .blur-blob{filter:blur(46px);opacity:.16}
     html{scroll-behavior:smooth}
 
-    /* Plovoucí ikona v hero – bez bílého rámečku */
+    /* VĚTŠÍ plovoucí ikona v hero – bez velkého obdélníku */
     .logo-float{
-      width:96px;height:96px;border-radius:1rem;
-      box-shadow:0 18px 40px -18px rgba(2,6,23,.28);
-      object-fit:cover; background:#fff;
-      border:1px solid rgba(229,231,235,.85);
+      width:140px;height:140px;border-radius:1.2rem;
+      object-fit:cover;background:#fff;border:1px solid rgba(229,231,235,.9);
+      /* jemný 3D efekt bez rámečku okolo */
+      box-shadow:
+        0 28px 54px -24px rgba(2,6,23,.28),
+        0 2px 6px rgba(2,6,23,.06),
+        inset 0 1px 0 rgba(255,255,255,.65);
     }
     @media (min-width:768px){
-      .logo-float{width:112px;height:112px;border-radius:1.1rem}
+      .logo-float{width:180px;height:180px;border-radius:1.35rem}
+    }
+    @media (min-width:1024px){
+      .logo-float{width:200px;height:200px;border-radius:1.45rem}
     }
   </style>
 </head>
@@ -115,12 +121,12 @@
         </div>
       </div>
 
-      <!-- Pravý sloupec: plovoucí ikona (bez obdélníku) -->
+      <!-- Pravý sloupec: větší plovoucí ikona (bez obdélníku) -->
       <div class="relative flex items-center justify-center">
         <div class="absolute inset-0 blur-blob bg-mint rounded-full"></div>
         <img src="StrategyMind_App_Icon.jpg" alt="StrategyMind App"
              class="relative logo-float"
-             width="160" height="160" loading="eager" decoding="async" fetchpriority="high"
+             width="200" height="200" loading="eager" decoding="async" fetchpriority="high"
              onerror="this.replaceWith(document.getElementById('fallback-logo').content.cloneNode(true));"/>
       </div>
     </div>
