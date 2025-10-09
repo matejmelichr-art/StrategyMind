@@ -1,0 +1,36 @@
+<!doctype html><html lang="cs"><head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Trading — Stock Analyzer</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head><body class="bg-slate-50 text-slate-900">
+<header class="border-b bg-white">
+  <div class="max-w-7xl mx-auto px-5 py-3 flex justify-between">
+    <a href="./" class="font-semibold">← Zpět na StrategyMind</a>
+    <nav class="hidden md:flex gap-6"><a href="./trading.html">Trhy</a><a href="./nemovitosti.html">Nemovitosti</a><a href="./investice.html">Investice</a></nav>
+  </div>
+</header>
+
+<main class="max-w-7xl mx-auto px-5 py-8">
+  <h1 class="text-3xl font-extrabold">Stock Analyzer</h1>
+  <p class="text-slate-600 mt-2">Ukázková tabulka. (Živá AI predikce 1× týdně – dodáme později.)</p>
+
+  <div class="mt-6 overflow-x-auto bg-white border rounded-2xl">
+    <table class="min-w-full text-sm">
+      <thead class="bg-slate-50">
+        <tr class="text-left">
+          <th class="px-4 py-3">Ticker</th>
+          <th class="px-4 py-3">Cena</th>
+          <th class="px-4 py-3">Změna</th>
+          <th class="px-4 py-3">Predikce (7d)</th>
+          <th class="px-4 py-3">Conf.</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="border-t"><td class="px-4 py-3">AAPL</td><td class="px-4 py-3">219.85</td><td class="px-4 py-3 text-emerald-600">+1.2%</td><td class="px-4 py-3">▲ 227.3</td><td class="px-4 py-3">74%</td></tr>
+        <tr class="border-t"><td class="px-4 py-3">NVDA</td><td class="px-4 py-3">108.20</td><td class="px-4 py-3 text-rose-600">-0.8%</td><td class="px-4 py-3">▲ 121.0</td><td class="px-4 py-3">68%</td></tr>
+        <tr class="border-t"><td class="px-4 py-3">SPY</td><td class="px-4 py-3">520.10</td><td class="px-4 py-3 text-emerald-600">+0.4%</td><td class="px-4 py-3">▲ 585.0</td><td class="px-4 py-3">72%</td></tr>
+      </tbody>
+    </table>
+  </div>
+</main>
+</body></html>
