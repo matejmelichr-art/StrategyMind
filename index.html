@@ -5,38 +5,74 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>StrategyMind — Proměň nápady v ziskovou strategii</title>
   <meta name="description" content="StrategyMind spojuje chytré otázky, AI doporučení a přehledné formuláře. Od nápadu k akčním krokům s měřitelnými výsledky.">
+
+  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>tailwind.config={theme:{extend:{colors:{brand:"#0A2342",mint:"#2bd4a9"}}}}</script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: { brand:"#0A2342", mint:"#2bd4a9", ink:"#0f172a" },
+          boxShadow: { sweet:"0 24px 70px -24px rgba(2,6,23,.15)" },
+          borderRadius: { "2xl":"1.25rem" }
+        }
+      }
+    }
+  </script>
+
+  <!-- Logo -->
+  <link rel="preload" href="./StrategyMind_App_Icon.jpg" as="image" fetchpriority="high">
+  <link rel="icon" href="./StrategyMind_App_Icon.jpg">
+  <link rel="apple-touch-icon" href="./StrategyMind_App_Icon.jpg">
+
   <style>
-    .hero-grad{background:radial-gradient(1200px 600px at 70% 30%,rgba(43,212,169,.20),transparent 60%)}
+    .hero-grad{background: radial-gradient(1200px 600px at 70% 30%,rgba(43,212,169,.20),transparent 60%)}
+    .card{border:1px solid #e5e7eb;background:#fff;border-radius:1.25rem;box-shadow:0 24px 60px -28px rgba(2,6,23,.10)}
     .pill{border:1px solid #e5e7eb;border-radius:999px;padding:.45rem .9rem;background:#fff}
     .btn{border-radius:.9rem;padding:.75rem 1.1rem;font-weight:700}
     .btn-brand{background:#0A2342;color:#fff}
+    .btn-ghost{background:#fff;border:1px solid #e5e7eb}
     .badge{font-size:.7rem;border:1px solid #e5e7eb;border-radius:999px;padding:.25rem .6rem;background:#fff}
     .blur-blob{filter:blur(46px);opacity:.16}
-    .logo-float{width:180px;height:180px;border-radius:1.35rem;object-fit:cover;background:#fff;border:1px solid rgba(229,231,235,.9)}
-    @media(min-width:1024px){.logo-float{width:200px;height:200px}}
+    html{scroll-behavior:smooth}
+
+    /* větší plovoucí ikona vpravo */
+    .logo-float{
+      width:180px;height:180px;border-radius:1.35rem;
+      object-fit:cover;background:#fff;border:1px solid rgba(229,231,235,.9);
+      box-shadow:0 28px 54px -24px rgba(2,6,23,.28),0 2px 6px rgba(2,6,23,.06),inset 0 1px 0 rgba(255,255,255,.65);
+    }
+    @media (min-width:1024px){ .logo-float{width:200px;height:200px;border-radius:1.45rem} }
   </style>
 </head>
-<body class="bg-slate-50 text-slate-900">
-<header class="sticky top-0 z-50 bg-white/80 backdrop-blur border-b">
+<body class="bg-slate-50 text-slate-900 selection:bg-mint/20 selection:text-ink">
+
+<!-- Header -->
+<header class="sticky top-0 z-[60] bg-white/80 backdrop-blur border-b">
   <div class="mx-auto max-w-7xl px-5 py-3 flex items-center justify-between">
     <a class="flex items-center gap-3" href="./">
-      <img src="StrategyMind_App_Icon.jpg" alt="StrategyMind" class="h-9 w-9 rounded-xl object-cover"/>
+      <picture class="h-9 w-9 block rounded-xl shadow overflow-hidden">
+        <img src="./StrategyMind_App_Icon.jpg" alt="StrategyMind" class="h-9 w-9 object-cover" width="72" height="72" loading="eager" decoding="async" fetchpriority="high">
+      </picture>
       <span class="font-semibold">StrategyMind</span>
     </a>
+
+    <!-- NAV: proklik na jednotlivé stránky -->
     <nav class="hidden md:flex items-center gap-7 text-[15px]">
-      <a href="trading.html" class="hover:text-brand">Trhy</a>
-      <a href="nemovitosti.html" class="hover:text-brand">Nemovitosti</a>
-      <a href="investice.html" class="hover:text-brand">Investice</a>
+      <a href="./trading.html" class="hover:text-brand">Trhy</a>
+      <a href="./nemovitosti.html" class="hover:text-brand">Nemovitosti</a>
+      <a href="./investice.html" class="hover:text-brand">Investice</a>
       <a href="#faq" class="hover:text-brand">FAQ</a>
     </nav>
+
     <div class="flex items-center gap-2">
-      <a href="trading.html" class="btn btn-brand">Vyzkoušet zdarma</a>
+      <a href="./trading.html" class="pill hidden sm:inline-flex">Stock Analyzer</a>
+      <a href="./investice.html" class="btn btn-brand">Vyzkoušet zdarma</a>
     </div>
   </div>
 </header>
 
+<!-- Hero -->
 <section class="hero-grad">
   <div class="relative mx-auto max-w-7xl px-5 pt-10 md:pt-14 pb-8">
     <div class="mb-4"><span class="badge">✨ Novinka: AI strategie pro SMB</span></div>
@@ -49,42 +85,80 @@
         <p class="mt-4 text-slate-600 max-w-[48ch]">
           StrategyMind spojuje chytré otázky, AI doporučení a přehledné formuláře. Od nápadu k akčním krokům s měřitelnými výsledky.
         </p>
-        <ul class="mt-5 space-y-2 text-sm text-slate-700">
-          <li>• Nápady → plán → realizace</li>
-          <li>• Bezpečné uložení nápadů a poznámek</li>
-          <li>• Mobilní aplikace pro rychlé brainstomy &amp; AI tipy</li>
-        </ul>
-        <div class="mt-6 flex gap-3">
-          <a href="trading.html" class="pill">Přejít na Stock Analyzer</a>
-          <a href="nemovitosti.html" class="pill">Real-Estate Analyzer</a>
+
+        <!-- rychlé CTA na jednotlivé moduly -->
+        <div class="mt-6 flex flex-wrap gap-3">
+          <a class="btn btn-ghost" href="./trading.html">📈 Stock Analyzer</a>
+          <a class="btn btn-ghost" href="./nemovitosti.html">🏠 Real-Estate Analyzer</a>
+          <a class="btn btn-ghost" href="./investice.html">📰 Investiční zprávy & analýzy</a>
         </div>
+
+        <ul class="mt-5 space-y-2 text-sm text-slate-700">
+          <li>• Nápad → cíle → kroky s metrikami</li>
+          <li>• Bezpečné uložení nápadů a poznámek</li>
+          <li>• Mobilní aplikace pro rychlé brainstormy &amp; AI tipy</li>
+        </ul>
       </div>
+
       <div class="relative flex items-center justify-center">
         <div class="absolute inset-0 blur-blob bg-mint rounded-full"></div>
-        <img src="StrategyMind_App_Icon.jpg" alt="StrategyMind App" class="relative logo-float"/>
+        <img src="./StrategyMind_App_Icon.jpg" alt="StrategyMind App" class="relative logo-float" width="200" height="200" loading="eager" decoding="async" fetchpriority="high">
       </div>
     </div>
   </div>
 </section>
 
+<!-- Krátký přehled sekcí (karty odkazují na stránky) -->
+<section class="mx-auto max-w-7xl px-5 py-10">
+  <div class="grid gap-5 md:grid-cols-3">
+    <a href="./trading.html" class="card p-5 hover:shadow-sweet transition">
+      <span class="badge">Trading Analyzer</span>
+      <h3 class="mt-2 text-xl font-semibold">Trhy & predikce</h3>
+      <p class="mt-1 text-slate-600 text-sm">Živé tickery (demo), TA indikátory a týdenní AI predikce cen.</p>
+    </a>
+
+    <a href="./nemovitosti.html" class="card p-5 hover:shadow-sweet transition">
+      <span class="badge">Real-Estate Lab</span>
+      <h3 class="mt-2 text-xl font-semibold">Nemovitostní analýzy</h3>
+      <p class="mt-1 text-slate-600 text-sm">Scénáře využití, ROI a přehled z registrů/katastru.</p>
+    </a>
+
+    <a href="./investice.html" class="card p-5 hover:shadow-sweet transition">
+      <span class="badge">Investice</span>
+      <h3 class="mt-2 text-xl font-semibold">Zprávy & přehled</h3>
+      <p class="mt-1 text-slate-600 text-sm">Kurátorované investiční novinky a shrnutí pro akci.</p>
+    </a>
+  </div>
+</section>
+
+<!-- FAQ (na jedné stránce, odkazy výše vedou na vlastní HTML) -->
 <section id="faq" class="mx-auto max-w-7xl px-5 py-16">
   <h2 class="text-2xl font-bold">FAQ</h2>
   <div class="mt-6 grid md:grid-cols-2 gap-5">
-    <div class="border rounded-2xl p-5 bg-white">Nejde o investiční poradenství. Data mohou být zpožděná a bez záruky.</div>
-    <div class="border rounded-2xl p-5 bg-white">Mobilní appka brzy. Zatím web.</div>
+    <div class="card p-5">
+      <div class="font-semibold">Je to investiční poradenství?</div>
+      <p class="mt-1 text-slate-600 text-sm">Ne. StrategyMind je nástroj pro ideaci, vzdělávání a plánování. Data mohou být zpožděná a bez záruky.</p>
+    </div>
+    <div class="card p-5">
+      <div class="font-semibold">Kde najdu Stock/Real-Estate analyzér?</div>
+      <p class="mt-1 text-slate-600 text-sm">Použij horní menu, nebo tlačítka „Stock Analyzer“ a „Real-Estate Analyzer“ v hero sekci.</p>
+    </div>
   </div>
 </section>
 
+<!-- Footer -->
 <footer class="border-t bg-white">
   <div class="mx-auto max-w-7xl px-5 py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
     <div class="flex items-center gap-3">
-      <img src="StrategyMind_App_Icon.jpg" class="h-7 w-7 rounded-lg object-cover" alt="">
+      <picture class="h-7 w-7 block rounded-lg overflow-hidden">
+        <img src="./StrategyMind_App_Icon.jpg" alt="StrategyMind" class="h-7 w-7 object-cover" width="56" height="56" loading="lazy" decoding="async">
+      </picture>
       <span class="text-sm">© 2025 StrategyMind</span>
     </div>
     <div class="flex gap-4 text-sm">
-      <a href="trading.html" class="hover:text-brand">Trhy</a>
-      <a href="nemovitosti.html" class="hover:text-brand">Nemovitosti</a>
-      <a href="investice.html" class="hover:text-brand">Investice</a>
+      <a href="./investice.html" class="hover:text-brand">Investice</a>
+      <a href="./trading.html" class="hover:text-brand">Trhy</a>
+      <a href="./nemovitosti.html" class="hover:text-brand">Nemovitosti</a>
     </div>
   </div>
 </footer>
