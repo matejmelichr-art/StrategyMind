@@ -1,1 +1,332 @@
+<!doctype html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>StrategyMind — Klientská sekce (Demo)</title>
+  <meta name="robots" content="noindex,nofollow"/>
 
+  <!-- Tailwind -->
+  <link rel="preconnect" href="https://cdn.tailwindcss.com">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme:{extend:{
+        colors:{brand:"#0A2342",mint:"#2bd4a9",ink:"#0f172a"},
+        borderRadius:{'2xl':'1.25rem'}, boxShadow:{sweet:"0 24px 70px -24px rgba(2,6,23,.15)"}
+      }}
+    }
+  </script>
+  <style>
+    .card{border:1px solid #e5e7eb;background:#fff;border-radius:1.25rem;box-shadow:0 24px 60px -28px rgba(2,6,23,.10)}
+    .pill{border:1px solid #e5e7eb;border-radius:999px;padding:.45rem .9rem;background:#fff}
+    .btn{border-radius:.9rem;padding:.75rem 1.1rem;font-weight:700}
+    .btn-brand{background:#0A2342;color:#fff}
+    .btn-ghost{background:#fff;border:1px solid #e5e7eb}
+    .imgph{background:linear-gradient(135deg,#e2e8f0,#f8fafc)}
+    html{scroll-behavior:smooth}
+  </style>
+
+  <!-- (volitelné) místo pro meta-tokeny do ostrého API -->
+  <!-- <meta name="re-api-url" content="https://api.tvoje-domena.com/re/search"> -->
+  <!-- <meta name="chat-api-url" content="https://api.tvoje-domena.com/chat"> -->
+  <!-- <meta name="api-token" content="sk_live_..."> -->
+</head>
+<body class="bg-slate-50 text-slate-900">
+
+<header class="sticky top-0 z-50 bg-white/80 backdrop-blur border-b">
+  <div class="mx-auto max-w-7xl px-5 py-3 flex items-center justify-between">
+    <a href="/" class="flex items-center gap-3">
+      <span class="font-semibold">StrategyMind</span>
+      <span class="text-xs text-slate-500">/ Klient</span>
+    </a>
+    <nav class="hidden md:flex items-center gap-6 text-[15px]">
+      <a href="#opps" class="hover:text-brand">Global Opportunities</a>
+      <a href="#scanner" class="hover:text-brand">Market Scanner</a>
+      <a href="#chat" class="hover:text-brand">Chat analytik</a>
+    </nav>
+    <div class="flex items-center gap-2">
+      <a href="/" class="pill">Zpět na web</a>
+    </div>
+  </div>
+</header>
+
+<main class="mx-auto max-w-7xl px-5 py-8 space-y-12">
+
+  <!-- HERO -->
+  <section class="grid lg:grid-cols-3 gap-5">
+    <div class="card p-5 lg:col-span-2">
+      <h1 class="text-2xl font-bold">Klientská sekce (Demo)</h1>
+      <p class="mt-2 text-slate-600">Živé příležitosti na realitním trhu, skener trhů a chat analytik. Po napojení API se přepne na live data, teď běží demo feed.</p>
+      <div class="mt-4 flex flex-wrap gap-2 text-sm">
+        <span class="pill">Auto-refresh 60 s (demo)</span>
+        <span class="pill">Export CSV/MD brzy</span>
+      </div>
+    </div>
+    <div class="card p-5">
+      <div class="font-semibold">Rychlé přepínače</div>
+      <div class="mt-3 grid grid-cols-2 gap-2 text-sm">
+        <button class="pill" onclick="setOppPreset('cz')">CZ</button>
+        <button class="pill" onclick="setOppPreset('eu')">EU</button>
+        <button class="pill" onclick="setOppPreset('us')">USA</button>
+        <button class="pill" onclick="setOppPreset('hot')">Hot deals</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- GLOBAL OPPORTUNITIES (Real-Estate feed) -->
+  <section id="opps" class="card p-5">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+      <h2 class="text-xl font-bold">Global Opportunities — Reality</h2>
+      <div class="flex flex-wrap items-center gap-2">
+        <input id="qOpp" class="border rounded-lg px-3 py-2 w-56" placeholder="Město/stát/typ…">
+        <select id="typeOpp" class="border rounded-lg px-3 py-2">
+          <option value="">Typ: vše</option>
+          <option value="land">Pozemek</option>
+          <option value="res">Rezidenční</option>
+          <option value="retail">Retail</option>
+          <option value="storage">Self-storage</option>
+          <option value="other">Jiné</option>
+        </select>
+        <select id="roiOpp" class="border rounded-lg px-3 py-2">
+          <option value="">ROI: vše</option>
+          <option value=">12">> 12 %</option>
+          <option value="8-12">8–12 %</option>
+          <option value="<8">< 8 %</option>
+        </select>
+        <button class="btn btn-brand" onclick="reloadOpps(true)">Filtrovat</button>
+      </div>
+    </div>
+
+    <!-- cards -->
+    <div id="oppsGrid" class="mt-5 grid sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+    <div id="oppsMore" class="mt-4 flex justify-center">
+      <button class="btn btn-ghost" onclick="loadMoreOpps()">Načíst další</button>
+    </div>
+    <div class="text-xs text-slate-500 mt-2">*Demo ukázka. V live režimu se zobrazí odkaz na inzerát, malé odkazy na katastr/mapy a 1–3 fotky.</div>
+  </section>
+
+  <!-- MARKET SCANNER (stejné demo jako dřív) -->
+  <section id="scanner" class="card p-5">
+    <div class="flex items-center justify-between">
+      <h2 class="text-xl font-bold">Market Scanner</h2>
+      <div class="flex gap-2">
+        <input id="symSearch" class="border rounded-lg px-3 py-2 w-56" placeholder="AAPL, BTC…"/>
+        <select id="assetType" class="border rounded-lg px-3 py-2">
+          <option value="all">Vše</option><option value="stock">Akcie</option>
+          <option value="crypto">Krypto</option><option value="etf">ETF</option>
+        </select>
+        <select id="signal" class="border rounded-lg px-3 py-2">
+          <option value="all">Signál: vše</option><option value="bull">Býčí</option>
+          <option value="bear">Medvědí</option><option value="neutral">Neutrální</option>
+        </select>
+        <button class="btn btn-brand" onclick="applyFilters()">Filtrovat</button>
+      </div>
+    </div>
+    <div class="mt-4 overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead><tr class="border-b bg-slate-50">
+          <th class="p-2 text-left">Symbol</th><th class="p-2 text-left">Typ</th>
+          <th class="p-2 text-left">Cena</th><th class="p-2 text-left">24h</th>
+          <th class="p-2 text-left">Predikce (7d)</th><th class="p-2 text-left">Poznámka AI</th>
+        </tr></thead>
+        <tbody id="scannerRows"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- CHAT ANALYTIK -->
+  <section id="chat" class="card p-5">
+    <h2 class="text-xl font-bold">Chat analytik</h2>
+    <div class="mt-3 flex gap-2">
+      <input id="chatInput" class="border rounded-lg px-3 py-2 w-full" placeholder="Zeptej se na trh/symbol/nemovitost…"/>
+      <button class="btn btn-brand" onclick="sendChat()">Zeptat se</button>
+    </div>
+    <div id="chatLog" class="mt-4 space-y-3 text-sm">
+      <div class="text-slate-500">Demo odpovědi lokálně. Po nastavení CHAT_API_URL + tokenu se použije server.</div>
+    </div>
+  </section>
+</main>
+
+<footer class="border-t bg-white">
+  <div class="mx-auto max-w-7xl px-5 py-6 text-sm flex items-center justify-between">
+    <span>© 2025 StrategyMind</span>
+    <a href="/" class="hover:text-brand">Veřejný web</a>
+  </div>
+</footer>
+
+<script>
+  // ------- KONFIG (snadná aktivace live API) -------
+  const RE_API_URL   = document.querySelector('meta[name="re-api-url"]')?.content || null;
+  const CHAT_API_URL = document.querySelector('meta[name="chat-api-url"]')?.content || null;
+  const API_TOKEN    = localStorage.getItem('RE_API_TOKEN')
+                    || document.querySelector('meta[name="api-token"]')?.content
+                    || null;
+
+  // ------- DEMO FEED (Reality) -------
+  const DEMO_FEED = [
+    { id:"eu-prg-001", title:"Praha 9 — stavební pozemek (3.2k m²)",
+      loc:"Praha, CZ", type:"land", roi:"12.5%", teaser:"Self-storage / parkování, rychlá návratnost",
+      price:"22.9M CZK", photo:"https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?w=800",
+      link:"https://example.com/listing/praha9-land",
+      sources:[{name:"Katastr",url:"#"}, {name:"Mapy",url:"#"}]
+    },
+    { id:"us-aus-221", title:"Austin — retail strip mall (7 jednotek)",
+      loc:"Texas, USA", type:"retail", roi:"10.8%", teaser:"Stabilní nájemci + upside z úprav",
+      price:"$3.2M", photo:"https://images.unsplash.com/photo-1501183638710-841dd1904471?w=800",
+      link:"https://example.com/listing/austin-retail",
+      sources:[{name:"County records",url:"#"}]
+    },
+    { id:"eu-bcn-114", title:"Barcelona — 6x apartmán (short-stay)",
+      loc:"Barcelona, ES", type:"res", roi:"13.1%", teaser:"Obsazenost 78–85 %, turistická zóna",
+      price:"€1.95M", photo:"https://images.unsplash.com/photo-1505764706515-aa95265c5abc?w=800",
+      link:"https://example.com/listing/barcelona-apts",
+      sources:[{name:"Katastr ES",url:"#"}]
+    },
+    { id:"eu-de-778", title:"Berlín — brownfield k přestavbě",
+      loc:"Berlin, DE", type:"other", roi:"8.2%", teaser:"Mixed-use potenciál, nutný due-diligence",
+      price:"€4.1M", photo:"https://images.unsplash.com/photo-1600585154526-990dced4db0d?w=800",
+      link:"https://example.com/listing/berlin-brownfield", sources:[]
+    },
+    { id:"ap-tky-541", title:"Tokyo — mikro byty (8 jednotek)",
+      loc:"Tokyo, JP", type:"res", roi:"12.0%", teaser:"Silná poptávka po single units",
+      price:"¥210M", photo:"https://images.unsplash.com/photo-1503891450247-ee5f8ec46dc3?w=800",
+      link:"https://example.com/listing/tokyo-micro", sources:[]
+    }
+  ];
+
+  let oppPage = 0, oppPageSize = 6, oppPreset = '';
+  function setOppPreset(p){ oppPreset = p; reloadOpps(true); }
+
+  async function fetchOppsFromAPI(q, type, roi, page, size){
+    if(!RE_API_URL || !API_TOKEN) return null; // bez konfigurace použijeme demo
+    const params = new URLSearchParams({
+      q:q||'', type:type||'', roi:roi||'', page:String(page), size:String(size)
+    });
+    const res = await fetch(`${RE_API_URL}?${params.toString()}`,{
+      headers:{'Authorization':`Bearer ${API_TOKEN}`}
+    });
+    if(!res.ok) throw new Error('RE API error');
+    return await res.json(); // očekáváme {items:[{title,loc,type,roi,photo,link,sources:[]},...]}
+  }
+
+  function cardHTML(it){
+    const srcs = (it.sources||[]).map(s=>`<a class="text-slate-500 hover:text-brand" href="${s.url}" target="_blank">${s.name}</a>`).join(" · ");
+    return `
+      <article class="card overflow-hidden">
+        <a href="${it.link||'#'}" target="_blank" class="block">
+          <div class="aspect-[16/10] w-full imgph overflow-hidden">
+            <img src="${it.photo||''}" alt="" class="w-full h-full object-cover" loading="lazy" onerror="this.style.display='none'">
+          </div>
+        </a>
+        <div class="p-4">
+          <div class="text-xs text-slate-500">${it.loc} · ${it.type?.toUpperCase()||''}</div>
+          <h3 class="mt-1 font-semibold leading-snug">${it.title}</h3>
+          <div class="mt-1 text-sm text-slate-700">${it.teaser||''}</div>
+          <div class="mt-2 flex items-center gap-3 text-sm">
+            <span class="pill">${it.price||'—'}</span>
+            <span class="pill">ROI ${it.roi||'—'}</span>
+          </div>
+          <div class="mt-3 flex items-center justify-between">
+            <a href="${it.link||'#'}" target="_blank" class="btn btn-ghost">Detail &raquo;</a>
+            <div class="text-xs">${srcs}</div>
+          </div>
+        </div>
+      </article>
+    `;
+  }
+
+  async function reloadOpps(reset){
+    const grid = document.getElementById('oppsGrid');
+    const q   = document.getElementById('qOpp').value.trim();
+    const type= document.getElementById('typeOpp').value;
+    const roi = document.getElementById('roiOpp').value;
+    if(reset){ oppPage=0; grid.innerHTML=''; }
+    try{
+      const live = await fetchOppsFromAPI(q || oppPreset, type, roi, oppPage, oppPageSize);
+      const items = live?.items?.length ? live.items : DEMO_FEED
+        .filter(x => (!type||x.type===type) && (!q|| (x.loc+x.title).toLowerCase().includes(q.toLowerCase())))
+        .slice(oppPage*oppPageSize, (oppPage+1)*oppPageSize);
+      if(items.length===0 && oppPage===0){ grid.innerHTML = '<div class="text-sm text-slate-500">Nic nenalezeno.</div>'; return; }
+      grid.insertAdjacentHTML('beforeend', items.map(cardHTML).join(''));
+      oppPage++;
+    }catch(e){
+      console.warn(e); // fallback na demo
+      const items = DEMO_FEED.slice(oppPage*oppPageSize, (oppPage+1)*oppPageSize);
+      grid.insertAdjacentHTML('beforeend', items.map(cardHTML).join(''));
+      oppPage++;
+    }
+  }
+  function loadMoreOpps(){ reloadOpps(false); }
+
+  // Auto-refresh (demo 60 s)
+  setInterval(()=>{ oppPage=0; document.getElementById('oppsGrid').innerHTML=''; reloadOpps(false); }, 60000);
+
+  // Nekonečný scroll (jednoduchý)
+  window.addEventListener('scroll', () => {
+    const more = document.getElementById('oppsMore');
+    if(!more) return;
+    const rect = more.getBoundingClientRect();
+    if(rect.top < window.innerHeight + 200){ loadMoreOpps(); }
+  });
+
+  // start
+  reloadOpps(true);
+
+  // ------- Market Scanner (demo) -------
+  const demo = [
+    {sym:"AAPL", type:"stock", price:219.85, chg:"+1.2%", pred:"↑ 7d (72%)", note:"Býčí nad 50/200SMA"},
+    {sym:"NVDA", type:"stock", price:108.20, chg:"-0.8%", pred:"→ 7d (58%)", note:"Konsolidace"},
+    {sym:"SPY",  type:"etf",   price:520.10, chg:"+0.4%", pred:"↑ 7d (65%)", note:"Stabilní momentum"},
+    {sym:"BTC",  type:"crypto",price:67200,  chg:"+2.3%", pred:"↑ 7d (69%)", note:"Volatilní růst"}
+  ];
+  function renderRows(rows){
+    const el = document.getElementById('scannerRows');
+    el.innerHTML = rows.map(r=>`
+      <tr class="border-b">
+        <td class="p-2 font-medium">${r.sym}</td><td class="p-2">${r.type}</td>
+        <td class="p-2">${r.price}</td><td class="p-2">${r.chg}</td>
+        <td class="p-2">${r.pred}</td><td class="p-2">${r.note}</td>
+      </tr>`).join('');
+  }
+  function applyFilters(){
+    const q = document.getElementById('symSearch').value.trim().toUpperCase();
+    const t = document.getElementById('assetType').value;
+    const s = document.getElementById('signal').value;
+    let rows = demo.filter(r => (t==='all'||r.type===t) && (!q || r.sym.includes(q)));
+    if(s!=='all'){
+      rows = rows.filter(r =>
+        (s==='bull' && r.pred.includes('↑')) ||
+        (s==='bear' && r.pred.includes('↓')) ||
+        (s==='neutral' && r.pred.includes('→'))
+      );
+    }
+    renderRows(rows);
+  }
+  renderRows(demo);
+
+  // ------- Chat analytik -------
+  async function sendChat(){
+    const input = document.getElementById('chatInput');
+    const log = document.getElementById('chatLog');
+    const q = input.value.trim(); if(!q) return;
+    log.insertAdjacentHTML('beforeend', `<div><span class="font-semibold">Ty:</span> ${q}</div>`);
+    input.value='';
+    try{
+      if(CHAT_API_URL && API_TOKEN){
+        const res = await fetch(CHAT_API_URL,{method:'POST',headers:{
+          'Content-Type':'application/json','Authorization':`Bearer ${API_TOKEN}`
+        },body:JSON.stringify({message:q})});
+        const j = await res.json();
+        log.insertAdjacentHTML('beforeend', `<div><span class="font-semibold">Analytik:</span> ${j.reply||'(bez odpovědi)'}</div>`);
+      }else{
+        // demo odpověď
+        log.insertAdjacentHTML('beforeend', `<div><span class="font-semibold">Analytik:</span> Demo: k "${q}" bych sledoval momentum, supporty a rizika. Live chat zapneme po přidání API.</div>`);
+      }
+    }catch(e){
+      log.insertAdjacentHTML('beforeend', `<div class="text-rose-600">Chyba chatu: ${e.message}</div>`);
+    }
+  }
+</script>
+</body>
+</html>
