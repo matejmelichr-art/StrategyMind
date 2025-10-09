@@ -12,81 +12,30 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Create folders & files if missing
+      - name: Create folders & placeholder files
         run: |
-          set -euo pipefail
-
-          mkdir -p assets/css assets/js assets/img data
-
+          mkdir -p public assets/css assets/js src/pages/trading src/pages/nemovitosti src/pages/investice
+          touch public/.keep assets/css/.keep assets/js/.keep
+          # vytvoř minimální index.html pokud chybí
           if [ ! -f index.html ]; then
-            cat > index.html <<'HTML'
-<!doctype html>
-<html lang="cs">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>StrategyMind</title>
-  <meta name="description" content="StrategyMind – nápady → plán → realizace">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="icon" href="StrategyMind_App_Icon.jpg">
-  <link rel="apple-touch-icon" href="StrategyMind_App_Icon.jpg">
-  <link rel="stylesheet" href="assets/css/style.css" />
-</head>
-<body class="bg-slate-50 text-slate-900">
-  <header class="border-b bg-white/80 backdrop-blur sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-5 py-3 flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <img src="StrategyMind_App_Icon.jpg" alt="StrategyMind" class="h-8 w-8 rounded-lg object-cover"/>
-        <span class="font-semibold">StrategyMind</span>
-      </div>
-      <nav class="hidden md:flex items-center gap-6 text-[15px]">
-        <a href="#trading" class="hover:text-emerald-700">Trading</a>
-        <a href="#realestate" class="hover:text-emerald-700">Nemovitosti</a>
-        <a href="#finance" class="hover:text-emerald-700">Finance</a>
-        <a href="#faq" class="hover:text-emerald-700">FAQ</a>
-      </nav>
-    </div>
-  </header>
-
-  <main class="max-w-7xl mx-auto px-5 py-10 space-y-16">
-    <section id="hero" class="grid md:grid-cols-2 gap-10 items-center">
-      <div>
-        <h1 class="text-4xl sm:text-5xl font-extrabold leading-tight">
-          Proměňte nápady v <span class="text-emerald-600">ziskovou strategii</span>
-        </h1>
-        <p class="mt-4 text-slate-600">Nápady → plán → realizace. Vše v jedné appce.</p>
-      </div>
-    </section>
-  </main>
-
-  <footer class="border-t bg-white">
-    <div class="max-w-7xl mx-auto px-5 py-8 flex items-center justify-between">
-      <span class="text-sm">© 2025 StrategyMind</span>
-    </div>
-  </footer>
-</body>
-</html>
-HTML
+            cat > index.html <<'EOF'
+            <!doctype html>
+            <html lang="cs"><head><meta charset="utf-8"><title>StrategyMind</title></head>
+            <body>Projekt připraven. 👋</body></html>
+            EOF
           fi
 
-          if [ ! -f assets/css/style.css ]; then
-            cat > assets/css/style.css <<'CSS'
-/* StrategyMind base */
-:root { color-scheme: light dark; }
-html { scroll-behavior:smooth; }
-a { text-underline-offset: 2px; }
-CSS
-          fi
-
-      - name: Commit scaffold (if changed)
+      - name: Commit & push if changed
         run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           if [ -n "$(git status --porcelain)" ]; then
-            git config user.name "github-actions"
-            git config user.email "github-actions@users.noreply.github.com"
             git add -A
-            git commit -m "chore: scaffold web app structure"
+            git commit -m "Scaffold project structure"
             git push
           else
-            echo "No changes – scaffold already present."
+            echo "No changes to commit"
           fi
