@@ -19,7 +19,6 @@ jobs:
 
           mkdir -p assets/css assets/js assets/img data
 
-          # index.html (jen když chybí)
           if [ ! -f index.html ]; then
             cat > index.html <<'HTML'
 <!doctype html>
@@ -57,57 +56,20 @@ jobs:
           Proměňte nápady v <span class="text-emerald-600">ziskovou strategii</span>
         </h1>
         <p class="mt-4 text-slate-600">Nápady → plán → realizace. Vše v jedné appce.</p>
-        <div class="mt-6 flex gap-3">
-          <a href="#trading" class="px-4 py-2 rounded-xl bg-emerald-600 text-white font-semibold">Otevřít Trading</a>
-          <a href="#realestate" class="px-4 py-2 rounded-xl border">Otevřít Nemovitosti</a>
-        </div>
       </div>
-      <img src="StrategyMind_App_Icon.jpg" alt="" class="justify-self-center w-40 h-40 rounded-2xl shadow object-cover">
-    </section>
-
-    <section id="trading">
-      <h2 class="text-2xl font-bold">Trading – Stock Analyzer</h2>
-      <p class="text-slate-600 mt-1">Ukázková tabulka tickrů a týdenních predikcí.</p>
-      <div id="stocks" class="mt-4 overflow-x-auto"></div>
-    </section>
-
-    <section id="realestate">
-      <h2 class="text-2xl font-bold">Nemovitosti – Real-Estate Analyzer</h2>
-      <p class="text-slate-600 mt-1">Prostor pro AI analýzy, fotky a odkazy na katastr.</p>
-      <div id="estates" class="mt-4 grid sm:grid-cols-2 gap-4"></div>
-    </section>
-
-    <section id="finance">
-      <h2 class="text-2xl font-bold">Finance</h2>
-      <p class="text-slate-600 mt-1">Rozpočet 50/30/20 a kalkulačky – brzy.</p>
-    </section>
-
-    <section id="faq">
-      <h2 class="text-2xl font-bold">FAQ</h2>
-      <ul class="mt-2 text-slate-600 list-disc pl-6">
-        <li>Nejde o investiční poradenství.</li>
-        <li>Data mohou být zpožděná, slouží pro vzdělávací účely.</li>
-      </ul>
     </section>
   </main>
 
   <footer class="border-t bg-white">
     <div class="max-w-7xl mx-auto px-5 py-8 flex items-center justify-between">
       <span class="text-sm">© 2025 StrategyMind</span>
-      <div class="text-sm flex gap-4">
-        <a href="#faq" class="hover:text-emerald-700">Podmínky</a>
-        <a href="#faq" class="hover:text-emerald-700">Soukromí</a>
-      </div>
     </div>
   </footer>
-
-  <script src="assets/js/main.js"></script>
 </body>
 </html>
 HTML
           fi
 
-          # CSS (jen když chybí)
           if [ ! -f assets/css/style.css ]; then
             cat > assets/css/style.css <<'CSS'
 /* StrategyMind base */
@@ -116,64 +78,6 @@ html { scroll-behavior:smooth; }
 a { text-underline-offset: 2px; }
 CSS
           fi
-
-          # JS (jen když chybí) – demo tabulky a karet
-          if [ ! -f assets/js/main.js ]; then
-            cat > assets/js/main.js <<'JS'
-// Demo data – nahradíme napojením na API
-const stocks = [
-  { symbol:'AAPL', price:219.85, change:+1.26, weeklyForecast:'+2.4%' },
-  { symbol:'NVDA', price:108.20, change:-0.82, weeklyForecast:'+1.1%' },
-  { symbol:'SPY',  price:520.10, change:+0.41, weeklyForecast:'+0.6%' },
-  { symbol:'BTC',  price:67200,  change:+2.30, weeklyForecast:'+3.5%' },
-];
-
-const estates = [
-  { name:'Pozemek u OC', yield:'~14%', note:'Parking – ROI 5Y ≈ +45 %' },
-  { name:'Byt 2+kk',     yield:'~7%',  note:'Krátkodobý nájem – obsazenost 80 %' },
-];
-
-function renderStocks() {
-  const el = document.getElementById('stocks');
-  const rows = stocks.map(s => `
-    <tr class="border-b">
-      <td class="px-3 py-2 font-mono">${s.symbol}</td>
-      <td class="px-3 py-2">${s.price}</td>
-      <td class="px-3 py-2 ${s.change>=0?'text-emerald-600':'text-rose-600'}">${s.change}%</td>
-      <td class="px-3 py-2">${s.weeklyForecast}</td>
-    </tr>`).join('');
-  el.innerHTML = `
-    <table class="min-w-[520px] w-full bg-white border rounded-2xl overflow-hidden">
-      <thead class="bg-slate-50 text-left text-sm">
-        <tr>
-          <th class="px-3 py-2">Symbol</th>
-          <th class="px-3 py-2">Cena</th>
-          <th class="px-3 py-2">Změna</th>
-          <th class="px-3 py-2">Týdenní predikce</th>
-        </tr>
-      </thead>
-      <tbody class="text-sm">${rows}</tbody>
-    </table>`;
-}
-
-function renderEstates() {
-  const el = document.getElementById('estates');
-  el.innerHTML = estates.map(e => `
-    <div class="border rounded-2xl p-4 bg-white">
-      <div class="font-semibold">${e.name}</div>
-      <div class="text-slate-600 text-sm mt-1">${e.note}</div>
-      <div class="mt-2 text-emerald-700 text-sm">Yield ${e.yield}</div>
-    </div>`).join('');
-}
-
-renderStocks();
-renderEstates();
-JS
-          fi
-
-          # .gitkeep pro prázdné složky
-          [ -f assets/img/.gitkeep ] || touch assets/img/.gitkeep
-          [ -f data/.gitkeep ] || touch data/.gitkeep
 
       - name: Commit scaffold (if changed)
         run: |
