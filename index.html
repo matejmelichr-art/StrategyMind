@@ -7,20 +7,21 @@
   <meta name="description" content="StrategyMind spojuje chytré otázky, AI doporučení a přehledné formuláře. Od nápadu k akčním krokům s měřitelnými výsledky.">
 
   <!-- Tailwind -->
+  <link rel="preconnect" href="https://cdn.tailwindcss.com">
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
       theme: {
         extend: {
           colors: { brand:"#0A2342", mint:"#2bd4a9", ink:"#0f172a" },
-          boxShadow: { sweet:"0 24px 70px -24px rgba(2,6,23,.15)" },
+          boxShadow: { sweet: "0 24px 70px -24px rgba(2,6,23,.15)" },
           borderRadius: { "2xl":"1.25rem" }
         }
       }
     }
   </script>
 
-  <!-- Ikony / favicon -->
+  <!-- ICONS -->
   <link rel="preload" href="StrategyMind_App_Icon.jpg" as="image" fetchpriority="high">
   <link rel="icon" href="StrategyMind_App_Icon.jpg">
   <link rel="apple-touch-icon" href="StrategyMind_App_Icon.jpg">
@@ -35,17 +36,13 @@
     .badge{font-size:.7rem;border:1px solid #e5e7eb;border-radius:999px;padding:.25rem .6rem;background:#fff}
     .blur-blob{filter:blur(46px);opacity:.16}
     html{scroll-behavior:smooth}
-    .logo-float{
-      width:140px;height:140px;border-radius:1.2rem;object-fit:cover;background:#fff;border:1px solid rgba(229,231,235,.9);
-      box-shadow:0 28px 54px -24px rgba(2,6,23,.28),0 2px 6px rgba(2,6,23,.06),inset 0 1px 0 rgba(255,255,255,.65);
-    }
-    @media (min-width:768px){.logo-float{width:180px;height:180px;border-radius:1.35rem}}
-    @media (min-width:1024px){.logo-float{width:200px;height:200px;border-radius:1.45rem}}
+    .logo-float{width:160px;height:160px;border-radius:1.35rem;object-fit:cover;background:#fff;border:1px solid rgba(229,231,235,.9);box-shadow:0 28px 54px -24px rgba(2,6,23,.28),0 2px 6px rgba(2,6,23,.06),inset 0 1px 0 rgba(255,255,255,.65)}
+    @media (min-width:768px){.logo-float{width:200px;height:200px}}
   </style>
 </head>
 <body class="bg-slate-50 text-slate-900 selection:bg-mint/20 selection:text-ink">
 
-<!-- Fallback SVG (kdyby JPG chybělo) -->
+<!-- Fallback logo -->
 <template id="fallback-logo">
   <svg class="h-full w-full" viewBox="0 0 100 100" aria-label="StrategyMind logo">
     <rect width="100" height="100" rx="16" fill="#0A2342"/>
@@ -67,15 +64,14 @@
     </a>
     <nav class="hidden md:flex items-center gap-7 text-[15px]">
       <a href="#funkce" class="hover:text-brand">Funkce</a>
-      <a href="#trhy" class="hover:text-brand">Trhy</a>
-      <a href="#nemovitosti" class="hover:text-brand">Nemovitosti</a>
-      <a href="#money" class="hover:text-brand">Finance</a>
-      <a href="#cenik" class="hover:text-brand">Ceník</a>
+      <a href="#scanner" class="hover:text-brand">Market&nbsp;Scanner</a>
+      <a href="#realestate" class="hover:text-brand">Nemovitosti</a>
+      <a href="#client" class="hover:text-brand">Klientská sekce</a>
       <a href="#faq" class="hover:text-brand">FAQ</a>
     </nav>
     <div class="flex items-center gap-2">
       <button id="dlBtn" class="pill hidden sm:inline-flex">Stáhnout aplikaci</button>
-      <a href="#funkce" class="btn btn-brand">Vyzkoušet zdarma</a>
+      <a href="#client" class="btn btn-brand">Vyzkoušet zdarma</a>
     </div>
   </div>
 </header>
@@ -101,232 +97,169 @@
         <div class="mt-6 flex flex-col sm:flex-row gap-3 sm:items-center">
           <button id="dlBtn2" class="btn btn-ghost">Stáhnout aplikaci</button>
           <div class="flex items-stretch gap-2">
-            <input class="w-64 rounded-xl border px-3" placeholder="email@domain.com" />
-            <button class="btn btn-brand">Zaslat demo</button>
+            <input id="leadEmail" class="w-64 rounded-xl border px-3" placeholder="email@domain.com" />
+            <button id="sendDemo" class="btn btn-brand">Zaslat demo</button>
           </div>
         </div>
         <div class="mt-4 flex gap-2">
           <span class="badge">GDPR</span><span class="badge">AI</span><span class="badge">iOS &amp; Android</span>
         </div>
       </div>
-
-      <!-- Pravý sloupec: plovoucí ikona -->
       <div class="relative flex items-center justify-center">
         <div class="absolute inset-0 blur-blob bg-mint rounded-full"></div>
         <img src="StrategyMind_App_Icon.jpg" alt="StrategyMind App"
-             class="relative logo-float"
-             width="200" height="200" loading="eager" decoding="async" fetchpriority="high"
+             class="relative logo-float" width="200" height="200"
+             loading="eager" decoding="async" fetchpriority="high"
              onerror="this.replaceWith(document.getElementById('fallback-logo').content.cloneNode(true));"/>
       </div>
     </div>
   </div>
 </section>
 
-<!-- Funkce -->
+<!-- Funkce přehled -->
 <section id="funkce" class="mx-auto max-w-7xl px-5 py-10">
   <h2 class="text-2xl font-bold">Funkce</h2>
-  <p class="mt-2 text-slate-600 max-w-[60ch]">Jednoduše scrollni níž a projdi si vše, co StrategyMind umí. Dlaždice níže tě přenesou na detaily sekcí.</p>
+  <p class="mt-2 text-slate-600 max-w-[60ch]">Níže ochutnávka klíčových modulů. Plná verze je v Klientské sekci.</p>
 
   <div class="mt-6 grid gap-5 md:grid-cols-2">
-    <a href="#trhy" class="card p-5 hover:shadow-sweet transition">
-      <span class="badge">Trading Analyzer</span>
-      <h3 class="mt-2 text-xl font-semibold">Trhy a indexy — živé tickery s predikcí</h3>
-      <p class="mt-1 text-slate-600">Screener (gainers/losers/RSI/volatilita), korelace, TA indikátory, rychlý backtest a zprávy ovlivňující trh.</p>
+    <a href="#scanner" class="card p-5 hover:shadow-sweet transition">
+      <span class="badge">Market Scanner</span>
+      <h3 class="mt-2 text-xl font-semibold">Trhy a indexy — živá tabulka s predikcí</h3>
+      <p class="mt-1 text-slate-600">Filtry (Akcie/Krypto/Indexy), vyhledávání, ilustrační predikce a možnost exportu CSV.</p>
       <div class="mt-4 flex items-center gap-2 text-sm">
-        <span class="pill">1m zpoždění max</span><span class="pill">TA indikátory</span><span class="pill">Backtest SMA</span>
+        <span class="pill">Screener</span><span class="pill">Predikce</span><span class="pill">Export</span>
       </div>
     </a>
 
-    <a href="#nemovitosti" class="card p-5 hover:shadow-sweet transition">
-      <span class="badge">Real-Estate Lab</span>
-      <h3 class="mt-2 text-xl font-semibold">Nemovitosti — nápady, ROI a katastr</h3>
-      <p class="mt-1 text-slate-600">Heuristiky pro využití pozemků/bytů, srovnávací ceny (comps), odhady výnosu a napojení na veřejné registry.</p>
+    <a href="#realestate" class="card p-5 hover:shadow-sweet transition">
+      <span class="badge">Real-Estate Analyzer</span>
+      <h3 class="mt-2 text-xl font-semibold">Nemovitosti — „Reality check“ a nápady</h3>
+      <p class="mt-1 text-slate-600">Rychlé zhodnocení, možné využití, poznámky AI a drobné odkazy na zdroje.</p>
       <div class="mt-4 flex items-center gap-2 text-sm">
-        <span class="pill">Scénáře využití</span><span class="pill">ROI 3/5/10 let</span><span class="pill">Registry</span>
-      </div>
-    </a>
-
-    <a href="#money" class="card p-5 hover:shadow-sweet transition">
-      <span class="badge">Money Management</span>
-      <h3 class="mt-2 text-xl font-semibold">Osobní finance — 50/30/20 a kalkulačky</h3>
-      <p class="mt-1 text-slate-600">Rozpočet podle profilu, koláč rozdělení, složené úročení a další chytré kalkulačky.</p>
-      <div class="mt-4 flex items-center gap-2 text-sm">
-        <span class="pill">50/30/20</span><span class="pill">Compound</span><span class="pill">AI poradce</span>
-      </div>
-    </a>
-
-    <a href="#idealab" class="card p-5 hover:shadow-sweet transition">
-      <span class="badge">Idea Lab</span>
-      <h3 class="mt-2 text-xl font-semibold">Nápady a produkty — plán krok za krokem</h3>
-      <p class="mt-1 text-slate-600">AI generuje MVP, akviziční kanály, monetizaci, KPI a timeline. Export do Markdownu pro rychlou realizaci.</p>
-      <div class="mt-4 flex items-center gap-2 text-sm">
-        <span class="pill">MVP &amp; KPI</span><span class="pill">Monetizace</span><span class="pill">Export .md</span>
+        <span class="pill">ROI nápady</span><span class="pill">Due-diligence</span><span class="pill">Odkazy</span>
       </div>
     </a>
   </div>
 </section>
 
-<!-- Trhy -->
-<section id="trhy" class="mx-auto max-w-7xl px-5 py-12">
-  <div class="grid md:grid-cols-2 gap-8 items-start">
-    <div>
-      <span class="badge">Trading Analyzer</span>
-      <h2 class="mt-2 text-2xl font-bold">Trhy, akcie a indexy</h2>
-      <p class="mt-2 text-slate-600">Živé tickery (max. ~1 min zpoždění), predikce pro intraday/swing/long-term, TA indikátory (SMA/EMA/RSI/BB), korelace a rychlý backtest. Po kliknutí na symbol otevřeme detail s grafem, zprávami a odhadem pohybu.</p>
-      <ul class="mt-4 space-y-2 text-sm">
-        <li>• Filtry: gainers/losers/flat, RSI overbought/oversold, volatilita</li>
-        <li>• Korelace mezi páry symbolů</li>
-        <li>• Backtest SMA crossover</li>
-      </ul>
-      <div class="mt-5 flex gap-3">
-        <a class="btn btn-brand" href="#funkce">Zpět na přehled</a>
-        <a class="pill" href="#idealab">AI nápady pro trading</a>
+<!-- MARKET SCANNER -->
+<section id="scanner" class="bg-white border-y">
+  <div class="mx-auto max-w-7xl px-5 py-12">
+    <div class="flex items-center justify-between gap-4 flex-wrap">
+      <div>
+        <span class="badge">Preview modulu</span>
+        <h2 class="mt-2 text-2xl font-bold">Market Scanner (ukázka)</h2>
+        <p class="text-slate-600 max-w-[60ch]">Vyzkoušej filtry a vyhledávání. Data jsou ukázková. V plné verzi běží týdenní auto-update a AI komentáře.</p>
+      </div>
+      <div class="flex gap-2">
+        <button id="dlCsv" class="pill">Stáhnout CSV</button>
+        <a href="#client" class="btn btn-brand">Odemknout plnou verzi</a>
       </div>
     </div>
-    <div class="card p-5">
-      <div class="text-sm text-slate-500 mb-2">Ukázka dlaždic (preview)</div>
-      <div class="grid sm:grid-cols-2 gap-3">
-        <div class="border rounded-2xl p-4">
-          <div class="text-xs text-slate-500">AAPL</div>
-          <div class="font-semibold text-lg">219.85 <span class="text-emerald-600 text-sm">+1.26%</span></div>
-          <div class="text-xs mt-1">Intraday ▲ 227.3 (74%)</div>
-        </div>
-        <div class="border rounded-2xl p-4">
-          <div class="text-xs text-slate-500">NVDA</div>
-          <div class="font-semibold text-lg">108.20 <span class="text-rose-600 text-sm">-0.82%</span></div>
-          <div class="text-xs mt-1">Swing ▲ 121.0 (68%)</div>
-        </div>
-        <div class="border rounded-2xl p-4">
-          <div class="text-xs text-slate-500">SPY</div>
-          <div class="font-semibold text-lg">520.10 <span class="text-emerald-600 text-sm">+0.41%</span></div>
-          <div class="text-xs mt-1">Long ▲ 585.0 (72%)</div>
-        </div>
-        <div class="border rounded-2xl p-4">
-          <div class="text-xs text-slate-500">BTCUSD</div>
-          <div class="font-semibold text-lg">67 200 <span class="text-emerald-600 text-sm">+2.3%</span></div>
-          <div class="text-xs mt-1">Volatilita: 4.2%</div>
-        </div>
+
+    <div class="mt-5 flex items-center gap-2 flex-wrap">
+      <div class="pill">
+        <label class="mr-2 text-sm text-slate-600">Filtr:</label>
+        <select id="sector" class="outline-none">
+          <option value="all">Vše</option>
+          <option value="stock">Akcie</option>
+          <option value="crypto">Krypto</option>
+          <option value="index">Indexy</option>
+        </select>
       </div>
-      <div class="mt-4 text-xs text-slate-500">*Data jsou ilustrační. V ostré verzi nahradí živý screener a grafy.</div>
+      <input id="search" class="rounded-xl border px-3 py-2" placeholder="Hledat symbol / název…">
+      <span class="text-xs text-slate-500">*ilustrační data</span>
+    </div>
+
+    <div class="mt-4 overflow-x-auto card">
+      <table class="min-w-full text-sm">
+        <thead class="bg-slate-50 text-slate-600">
+          <tr>
+            <th class="text-left p-3">Symbol</th>
+            <th class="text-left p-3">Název</th>
+            <th class="text-left p-3">Typ</th>
+            <th class="text-right p-3">Cena</th>
+            <th class="text-right p-3">Změna</th>
+            <th class="text-left p-3">AI predikce (7D)</th>
+          </tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
     </div>
   </div>
 </section>
 
-<!-- Nemovitosti -->
-<section id="nemovitosti" class="mx-auto max-w-7xl px-5 pb-12">
+<!-- REAL ESTATE -->
+<section id="realestate" class="mx-auto max-w-7xl px-5 py-12">
   <div class="grid md:grid-cols-2 gap-8 items-start">
     <div>
-      <span class="badge">Real-Estate Lab</span>
-      <h2 class="mt-2 text-2xl font-bold">Nemovitosti &amp; nápady s ROI</h2>
-      <p class="mt-2 text-slate-600">Z popisu lokality a typu (pozemek/byt/komerce) navrhneme varianty využití s odhadem capex/opex a yieldu. Přidáme srovnání (comps) a odkazy do registrů/katastrů.</p>
-      <ul class="mt-4 space-y-2 text-sm">
-        <li>• Využití: rezidenční, parkoviště, self-storage, retail…</li>
-        <li>• ROI scénáře 3/5/10 let + první kroky due-diligence</li>
-        <li>• Doporučení pro financování a cash-flow</li>
-      </ul>
+      <span class="badge">Real-Estate Analyzer</span>
+      <h2 class="mt-2 text-2xl font-bold">Reality check (ukázka)</h2>
+      <p class="mt-2 text-slate-600">Zadej adresu / odkaz na inzerát a získáš hrubé teze: typ využití, body due-diligence a odhad rizik. V plné verzi přidáme náhledy, odkazy na registry a export.</p>
+
+      <div class="mt-4 flex gap-2">
+        <input id="reInput" class="flex-1 rounded-xl border px-3 py-2" placeholder="Adresa nebo URL inzerátu">
+        <button id="reCheck" class="btn btn-brand">Zhodnotit</button>
+      </div>
+
+      <ul id="reList" class="mt-5 space-y-2 text-sm"></ul>
+
+      <div class="mt-4 flex gap-2">
+        <button id="dlMd" class="pill">Exportovat poznámky (.md)</button>
+        <a href="#client" class="btn btn-ghost">Více v Klientské sekci</a>
+      </div>
     </div>
+
     <div class="card p-5">
-      <div class="text-sm text-slate-500">Preview nápadů</div>
+      <div class="text-sm text-slate-500">Ukázkové výstupy</div>
       <ul class="mt-3 space-y-2 text-sm">
-        <li>• Pozemek u OC: parkoviště (automat) — target yield ~14%, ROI 5Y ≈ +45 %</li>
-        <li>• Byt 2+kk: krátkodobý nájem — yield ~7 %, obsazenost 78–85 %</li>
-        <li>• Komerce: retail + služby — yield ~11 %, citlivost na nájemní mix</li>
+        <li>• Byt 2+kk — krátkodobý/ střednědobý nájem, obsazenost 80–85 %</li>
+        <li>• Pozemek u retailu — samoobslužné parkoviště, yield ~12–14 %</li>
+        <li>• Komerce přízemí — retail + služby, citlivost na mix nájemců</li>
       </ul>
     </div>
   </div>
 </section>
 
-<!-- Money -->
-<section id="money" class="mx-auto max-w-7xl px-5 pb-12">
-  <div class="grid md:grid-cols-2 gap-8 items-start">
-    <div>
-      <span class="badge">Money Management</span>
-      <h2 class="mt-2 text-2xl font-bold">Rozpočet 50/30/20 &amp; kalkulačky</h2>
-      <p class="mt-2 text-slate-600">Doporučené rozdělení rozpočtu podle profilu, koláčové zobrazení, složené úročení a další užitečné nástroje pro běžné i podnikatele.</p>
-      <ul class="mt-4 space-y-2 text-sm">
-        <li>• Rychlý přehled „Needs / Wants / Invest“</li>
-        <li>• Simulace složeného úročení (vklad, % p.a., čas)</li>
-        <li>• AI poradce pro specifické situace</li>
-      </ul>
-    </div>
-    <div class="card p-6">
-      <div class="text-sm text-slate-500">Ukázkový koláč</div>
-      <div class="mt-3 grid grid-cols-3 gap-2">
-        <div class="rounded-xl bg-sky-100 p-4 text-center">
-          <div class="text-xs">Needs</div><div class="text-lg font-semibold">50%</div>
+<!-- CHAT ANALYTIK (mini) -->
+<section class="bg-white border-y">
+  <div class="mx-auto max-w-7xl px-5 py-12">
+    <div class="grid md:grid-cols-2 gap-8 items-start">
+      <div>
+        <span class="badge">AI Chat analytik</span>
+        <h2 class="mt-2 text-2xl font-bold">Zeptej se na trh nebo nemovitost</h2>
+        <p class="mt-2 text-slate-600">Rychlý chat pro nápovědu. V plné verzi napojený na data a vlastní dokumenty.</p>
+        <div class="mt-4 card p-4">
+          <div id="chatLog" class="min-h-[160px] max-h-[240px] overflow-auto text-sm space-y-3"></div>
+          <div class="mt-3 flex gap-2">
+            <input id="chatInput" class="flex-1 rounded-xl border px-3 py-2" placeholder="Např. Co říkáš na AAPL příští týden?">
+            <button id="chatSend" class="btn btn-brand">Poslat</button>
+          </div>
         </div>
-        <div class="rounded-xl bg-emerald-100 p-4 text-center">
-          <div class="text-xs">Wants</div><div class="text-lg font-semibold">30%</div>
-        </div>
-        <div class="rounded-xl bg-amber-100 p-4 text-center">
-          <div class="text-xs">Invest</div><div class="text-lg font-semibold">20%</div>
-        </div>
+      </div>
+      <div class="card p-5">
+        <div class="text-sm text-slate-500">Proč účet?</div>
+        <ul class="mt-3 space-y-2 text-sm">
+          <li>• Uložení scénářů a projektů</li>
+          <li>• Týdenní AI shrnutí do mailu</li>
+          <li>• Exporty (.csv/.md/.pdf) a sdílení</li>
+        </ul>
+        <a href="#client" class="mt-4 inline-flex btn btn-brand">Vytvořit účet</a>
       </div>
     </div>
   </div>
 </section>
 
-<!-- Idea Lab -->
-<section id="idealab" class="mx-auto max-w-7xl px-5 pb-16">
-  <div class="grid md:grid-cols-2 gap-8 items-start">
+<!-- CLIENT CTA -->
+<section id="client" class="mx-auto max-w-7xl px-5 py-16">
+  <div class="card p-7 md:p-9 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
     <div>
-      <span class="badge">Idea Lab</span>
-      <h2 class="mt-2 text-2xl font-bold">Nápady → plán → realizace</h2>
-      <p class="mt-2 text-slate-600">AI pomocník navrhne MVP, akviziční kanály, monetizaci, KPI, timeline a rizika. Výstup snadno vyexportuješ do Markdownu či Notionu.</p>
-      <div class="mt-5 flex gap-3">
-        <a class="btn btn-brand" href="#funkce">Zpět na přehled</a>
-        <a class="pill" href="#faq">Jak funguje AI</a>
-      </div>
+      <h2 class="text-2xl font-bold">Klientská sekce</h2>
+      <p class="mt-2 text-slate-600 max-w-[70ch]">Plné moduly, týdenní aktualizace, exporty a vlastní AI workspace. Přístup během chvilky – bez karty.</p>
     </div>
-    <div class="card p-5">
-      <div class="text-sm text-slate-500">Ukázka osnovy</div>
-      <ol class="mt-3 space-y-2 text-sm list-decimal pl-5">
-        <li>MVP: minimální sada funkcí</li>
-        <li>Akvizice: SEO, partnerství, komunita</li>
-        <li>Monetizace: freemium + Pro</li>
-        <li>KPI: MAU, CAC, LTV, konverze</li>
-        <li>Timeline: sprinty po 2 týdnech</li>
-      </ol>
-    </div>
-  </div>
-</section>
-
-<!-- Ceník -->
-<section id="cenik" class="bg-white border-y">
-  <div class="mx-auto max-w-7xl px-5 py-16">
-    <h2 class="text-2xl font-bold">Ceník (preview)</h2>
-    <p class="mt-2 text-slate-600">Začneme zdarma, placené tarify přidáme brzy. Tvé nápady můžeš rozjet bez bariér.</p>
-    <div class="mt-6 grid md:grid-cols-3 gap-5">
-      <div class="card p-6">
-        <div class="font-semibold">Free</div>
-        <div class="text-3xl font-extrabold mt-1">0 Kč</div>
-        <ul class="mt-3 text-sm space-y-1">
-          <li>• Základní šablony &amp; poznámky</li>
-          <li>• 40+ UI komponent</li>
-          <li>• Základní podpora</li>
-        </ul>
-        <div class="mt-5"><a href="#funkce" class="btn btn-ghost w-full">Začít</a></div>
-      </div>
-      <div class="card p-6 border-brand/30">
-        <div class="font-semibold">Pro</div>
-        <div class="text-3xl font-extrabold mt-1">—</div>
-        <ul class="mt-3 text-sm space-y-1">
-          <li>• Trading/Real-Estate moduly</li>
-          <li>• AI chatboti pro každou sekci</li>
-          <li>• Exporty a sdílení</li>
-        </ul>
-        <div class="mt-5"><span class="pill">Již brzy</span></div>
-      </div>
-      <div class="card p-6">
-        <div class="font-semibold">Enterprise</div>
-        <div class="text-3xl font-extrabold mt-1">Custom</div>
-        <ul class="mt-3 text-sm space-y-1">
-          <li>• Single Sign-On</li>
-          <li>• SLA a onboarding</li>
-          <li>• Vlastní integrace</li>
-        </ul>
-        <div class="mt-5"><a href="#faq" class="btn btn-ghost w-full">Kontakt</a></div>
-      </div>
+    <div class="flex gap-2">
+      <a class="btn btn-brand" href="#">Založit účet</a>
+      <a class="btn btn-ghost" href="#">Přihlásit</a>
     </div>
   </div>
 </section>
@@ -337,19 +270,15 @@
   <div class="mt-6 grid md:grid-cols-2 gap-5">
     <div class="card p-5">
       <div class="font-semibold">Je to investiční poradenství?</div>
-      <p class="mt-1 text-slate-600 text-sm">Ne. StrategyMind slouží jako nástroj pro ideaci, vzdělávání a plánování. Data mohou být zpožděná a bez záruky.</p>
+      <p class="mt-1 text-slate-600 text-sm">Ne. StrategyMind je nástroj pro ideaci, vzdělávání a plánování. Data mohou být zpožděná a bez záruky.</p>
     </div>
     <div class="card p-5">
-      <div class="font-semibold">Kdy bude mobilní aplikace?</div>
-      <p class="mt-1 text-slate-600 text-sm">Brzy. Zatím můžeš používat webovou verzi na mobilu. Tlačítko „Stáhnout aplikaci“ zobrazuje „Coming soon“.</p>
+      <div class="font-semibold">Jak často se data aktualizují?</div>
+      <p class="mt-1 text-slate-600 text-sm">Preview: ručně/ukázkově. Plná verze: plánovaný update 1× týdně + manuální refresh.</p>
     </div>
     <div class="card p-5">
-      <div class="font-semibold">Jak funguje AI?</div>
-      <p class="mt-1 text-slate-600 text-sm">Každá sekce má vlastního „specialistu“ (trhy, reality, finance, nápady). Modely vrací přehledné odpovědi a kroky.</p>
-    </div>
-    <div class="card p-5">
-      <div class="font-semibold">Co bezpečnost a soukromí?</div>
-      <p class="mt-1 text-slate-600 text-sm">Respektujeme GDPR a ukládáme pouze to, co je nutné. Citlivé klíče zůstávají na serveru.</p>
+      <div class="font-semibold">Co soukromí?</div>
+      <p class="mt-1 text-slate-600 text-sm">Respektujeme GDPR a ukládáme pouze nezbytná data. Citlivé klíče zůstávají na serveru.</p>
     </div>
   </div>
 </section>
@@ -369,16 +298,16 @@
     <div class="flex gap-4 text-sm">
       <a href="#faq" class="hover:text-brand">Podmínky</a>
       <a href="#faq" class="hover:text-brand">Soukromí</a>
-      <a href="#funkce" class="hover:text-brand">Funkce</a>
+      <a href="#client" class="hover:text-brand">Klientská sekce</a>
     </div>
   </div>
 </footer>
 
-<!-- Coming soon modal -->
+<!-- Modal "brzy" -->
 <dialog id="soon" class="rounded-2xl p-0 w-[92%] max-w-md backdrop:bg-black/30">
   <div class="card p-5">
     <div class="text-lg font-semibold">Aplikace brzy!</div>
-    <p class="mt-1 text-slate-600 text-sm">Mobilní appku finišujeme. Nech nám email v hero sekci a pošleme ti přístup mezi prvními.</p>
+    <p class="mt-1 text-slate-600 text-sm">Nech nám email a pošleme ti přístup mezi prvními.</p>
     <div class="mt-4 flex justify-end">
       <button id="soonClose" class="pill">OK</button>
     </div>
@@ -386,11 +315,111 @@
 </dialog>
 
 <script>
-  // Coming soon modal
+  // --- modal ---
   const soon = document.getElementById('soon');
   document.getElementById('dlBtn')?.addEventListener('click', ()=>soon.showModal());
   document.getElementById('dlBtn2')?.addEventListener('click', ()=>soon.showModal());
   document.getElementById('soonClose')?.addEventListener('click', ()=>soon.close());
+
+  // --- demo email submit ---
+  document.getElementById('sendDemo')?.addEventListener('click', ()=>{
+    const v = document.getElementById('leadEmail').value.trim() || 'guest@example.com';
+    alert('Díky! Odešleme demo na: ' + v + ' (ukázka).');
+  });
+
+  // --- Market Scanner demo data ---
+  const data = [
+    {s:'AAPL', name:'Apple Inc.', type:'stock', price:219.85, chg:+1.26, ai:'↑ 227.3 (74%)'},
+    {s:'NVDA', name:'NVIDIA Corp.', type:'stock', price:108.20, chg:-0.82, ai:'↑ 121.0 (68%)'},
+    {s:'SPY',  name:'S&P 500 ETF', type:'index', price:520.10, chg:+0.41, ai:'↑ 585.0 (72%)'},
+    {s:'BTCUSD', name:'Bitcoin', type:'crypto', price:67200, chg:+2.3, ai:'Volatilita 4.2%'},
+    {s:'ETHUSD', name:'Ethereum', type:'crypto', price:3500, chg:+1.1, ai:'↑ 3620 (61%)'},
+  ];
+  const rows = document.getElementById('rows');
+  const sector = document.getElementById('sector');
+  const search = document.getElementById('search');
+
+  function render(){
+    const q = (search.value||'').toLowerCase();
+    const f = sector.value;
+    rows.innerHTML = '';
+    data.filter(d=>{
+      const okType = f==='all' ? true : d.type===f;
+      const okQ = !q || d.s.toLowerCase().includes(q) || d.name.toLowerCase().includes(q);
+      return okType && okQ;
+    }).forEach(d=>{
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td class="p-3 font-mono">${d.s}</td>
+        <td class="p-3">${d.name}</td>
+        <td class="p-3 capitalize">${d.type}</td>
+        <td class="p-3 text-right">${d.price.toLocaleString('cs-CZ')}</td>
+        <td class="p-3 text-right ${d.chg>=0?'text-emerald-600':'text-rose-600'}">${(d.chg>0?'+':'')+d.chg}%</td>
+        <td class="p-3">${d.ai}</td>`;
+      rows.appendChild(tr);
+    });
+  }
+  sector?.addEventListener('change', render);
+  search?.addEventListener('input', render);
+  render();
+
+  // Export CSV ukázka
+  document.getElementById('dlCsv')?.addEventListener('click', ()=>{
+    const header = 'symbol,name,type,price,change,ai\n';
+    const body = data.map(d=>[d.s,d.name,d.type,d.price,d.chg,d.ai].join(',')).join('\n');
+    const blob = new Blob([header+body], {type:'text/csv'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'market_scanner_demo.csv';
+    a.click();
+  });
+
+  // --- Real-Estate quick check (mock) ---
+  const reBtn = document.getElementById('reCheck');
+  const reInput = document.getElementById('reInput');
+  const reList = document.getElementById('reList');
+  reBtn?.addEventListener('click', ()=>{
+    const q = (reInput.value||'Nespecifikováno').trim();
+    reList.innerHTML = `
+      <li>• Lokalita: <b>${q}</b></li>
+      <li>• Využití (nápady): krátkodobý nájem / self-storage / retail doplňky</li>
+      <li>• První DD: hluková mapa, povolení, správa domu, SVJ</li>
+      <li>• Rizika: saturace nabídky, sezónnost, CAPEX eskalace</li>
+      <li class="text-xs text-slate-500">Zdroj: veřejné inzerce + registry (odkazy v plné verzi)</li>`;
+  });
+
+  // Export poznámek .md
+  document.getElementById('dlMd')?.addEventListener('click', ()=>{
+    const md = `# Real-Estate poznámky (demo)
+- Lokalita: ${(reInput.value||'—')}
+- Využití: krátkodobý/ střednědobý nájem, self-storage, retail doplňky
+- Due-diligence: hluk, povolení, SVJ, správa, utility
+- Rizika: sezónnost, CAPEX, saturace nabídky
+`;
+    const blob = new Blob([md], {type:'text/markdown'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'realestate_notes_demo.md';
+    a.click();
+  });
+
+  // --- Chat analytik (lokální echo) ---
+  const chatLog = document.getElementById('chatLog');
+  const chatInput = document.getElementById('chatInput');
+  document.getElementById('chatSend')?.addEventListener('click', ()=>{
+    const t = (chatInput.value||'').trim(); if(!t) return;
+    appendMsg('Ty', t);
+    // demo odpověď
+    setTimeout(()=>appendMsg('AI', 'Tohle je ukázková odpověď. V plné verzi napojíme data a týdenní komentář.'), 400);
+    chatInput.value='';
+  });
+  function appendMsg(who, msg){
+    const row = document.createElement('div');
+    row.className = 'flex gap-2';
+    row.innerHTML = `<span class="text-xs text-slate-500 w-12">${who}:</span><p class="flex-1">${msg}</p>`;
+    chatLog.appendChild(row);
+    chatLog.scrollTop = chatLog.scrollHeight;
+  }
 </script>
 </body>
 </html>
