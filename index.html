@@ -36,6 +36,17 @@
     .badge{font-size:.7rem;border:1px solid #e5e7eb;border-radius:999px;padding:.25rem .6rem;background:#fff}
     .blur-blob{filter:blur(40px);opacity:.14}
     html{scroll-behavior:smooth}
+
+    /* menší a elegantní “karta” pro ikonu v hero */
+    .logo-tile{
+      width:104px;height:104px;           /* mobil */
+      padding:.35rem;border-radius:1rem;
+      background:#fff;border:1px solid #e5e7eb;
+      box-shadow:0 12px 36px -18px rgba(2,6,23,.18);
+    }
+    @media (min-width:768px){
+      .logo-tile{width:128px;height:128px;padding:.45rem;border-radius:1.1rem}
+    }
   </style>
 </head>
 <body class="bg-slate-50 text-slate-900 selection:bg-mint/20 selection:text-ink">
@@ -52,7 +63,7 @@
 <header class="sticky top-0 z-[60] bg-white/80 backdrop-blur border-b">
   <div class="mx-auto max-w-7xl px-5 py-3 flex items-center justify-between">
     <a class="flex items-center gap-3" href="#">
-      <!-- LOGO (rychlé načtení, vysoká priorita, fallback na SVG) -->
+      <!-- LOGO v headeru (tvůj JPG, fallback na SVG) -->
       <picture class="h-9 w-9 block rounded-xl shadow overflow-hidden">
         <img
           src="StrategyMind_App_Icon.jpg"
@@ -116,15 +127,15 @@
         </div>
       </div>
 
-      <!-- Hero mockup s reálným logem -->
-      <div class="relative">
+      <!-- Hero mockup s reálným logem (ZMENŠENÝ BÍLÝ OBDÉLNÍK) -->
+      <div class="relative flex items-center justify-center">
         <div class="absolute inset-0 blur-blob bg-mint rounded-full"></div>
-        <div class="relative card shadow-sweet p-6 flex items-center justify-center">
-          <div class="rounded-2xl bg-slate-100 p-6">
+        <div class="relative card shadow-sweet p-5 md:p-6 flex items-center justify-center">
+          <div class="logo-tile flex items-center justify-center">
             <img
               src="StrategyMind_App_Icon.jpg"
               alt="StrategyMind App"
-              class="h-24 w-24 rounded-2xl object-cover"
+              class="h-full w-full rounded-[0.9rem] object-cover"
               width="192" height="192"
               loading="eager" decoding="async" fetchpriority="high"
               onerror="this.replaceWith(document.getElementById('fallback-logo').content.cloneNode(true));"
@@ -142,11 +153,8 @@
   <p class="mt-2 text-slate-600 max-w-[60ch]">Jednoduše scrollni níž a projdi si vše, co StrategyMind umí. Dlaždice níže tě přenesou na detaily sekcí.</p>
 
   <div class="mt-6 grid gap-5 md:grid-cols-2">
-    <!-- Trading -->
     <a href="#trhy" class="card p-5 hover:shadow-sweet transition">
-      <div class="flex items-start gap-3">
-        <span class="badge">Trading Analyzer</span>
-      </div>
+      <span class="badge">Trading Analyzer</span>
       <h3 class="mt-2 text-xl font-semibold">Trhy a indexy — živé tickery s predikcí</h3>
       <p class="mt-1 text-slate-600">Screener (gainers/losers/RSI/volatilita), korelace, TA indikátory, rychlý backtest a zprávy ovlivňující trh.</p>
       <div class="mt-4 flex items-center gap-2 text-sm">
@@ -156,7 +164,6 @@
       </div>
     </a>
 
-    <!-- Real Estate -->
     <a href="#nemovitosti" class="card p-5 hover:shadow-sweet transition">
       <span class="badge">Real-Estate Lab</span>
       <h3 class="mt-2 text-xl font-semibold">Nemovitosti — nápady, ROI a katastr</h3>
@@ -168,7 +175,6 @@
       </div>
     </a>
 
-    <!-- Money -->
     <a href="#money" class="card p-5 hover:shadow-sweet transition">
       <span class="badge">Money Management</span>
       <h3 class="mt-2 text-xl font-semibold">Osobní finance — 50/30/20 a kalkulačky</h3>
@@ -180,7 +186,6 @@
       </div>
     </a>
 
-    <!-- Idea Lab -->
     <a href="#idealab" class="card p-5 hover:shadow-sweet transition">
       <span class="badge">Idea Lab</span>
       <h3 class="mt-2 text-xl font-semibold">Nápady a produkty — plán krok za krokem</h3>
