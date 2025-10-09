@@ -1,0 +1,33 @@
+<!doctype html><html lang="cs"><head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Nemovitosti — Real-Estate Analyzer</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head><body class="bg-slate-50 text-slate-900">
+<header class="border-b bg-white">
+  <div class="max-w-7xl mx-auto px-5 py-3 flex justify-between">
+    <a href="./" class="font-semibold">← Zpět na StrategyMind</a>
+    <nav class="hidden md:flex gap-6"><a href="./trading.html">Trhy</a><a href="./nemovitosti.html">Nemovitosti</a><a href="./investice.html">Investice</a></nav>
+  </div>
+</header>
+
+<main class="max-w-7xl mx-auto px-5 py-8">
+  <h1 class="text-3xl font-extrabold">Real-Estate Analyzer</h1>
+  <p class="text-slate-600 mt-2">Vyhledávání parcel/bytu (AI návrhy ROI). Později napojíme „katastr“ + zdroj.</p>
+
+  <div class="mt-6 grid md:grid-cols-2 gap-4">
+    <div class="border rounded-2xl bg-white p-5">
+      <div class="text-sm text-slate-500 mb-2">Scénář</div>
+      <ul class="text-sm space-y-2">
+        <li>• Pozemek u OC → parkoviště — yield ~14 %, ROI 5Y ≈ +45 %</li>
+        <li>• Byt 2+kk → krátkodobý nájem — yield ~7 %, obsazenost 80 %</li>
+        <li>• Komerce → retail + služby — yield ~11 %</li>
+      </ul>
+    </div>
+    <div class="border rounded-2xl bg-white p-5">
+      <div class="text-sm text-slate-500 mb-2">Vyhledávání (placeholder)</div>
+      <input class="w-full border rounded-xl px-3 py-2" placeholder="Adresa, parcela, město…">
+      <div class="text-xs text-slate-500 mt-3">Zdroj: katastr (odkaz přidáme).</div>
+    </div>
+  </div>
+</main>
+</body></html>
