@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>StrategyMind — Stock Analyzer</title>
+  <link rel="preconnect" href="https://cdn.tailwindcss.com">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme:{extend:{colors:{brand:"#0A2342",mint:"#2bd4a9"}}}
+    }
+  </script>
+</head>
+<body class="bg-slate-50 text-slate-900">
+  <!-- Header -->
+  <header class="sticky top-0 z-50 bg-white/80 backdrop-blur border-b">
+    <div class="mx-auto max-w-7xl px-5 py-3 flex items-center justify-between">
+      <a href="index.html" class="flex items-center gap-3">
+        <img src="StrategyMind_App_Icon.jpg" class="h-9 w-9 rounded-xl object-cover" alt="SM">
+        <span class="font-semibold">StrategyMind</span>
+      </a>
+      <nav class="hidden md:flex items-center gap-7 text-[15px]">
+        <a href="trading.html" class="text-brand font-semibold">Trhy</a>
+        <a href="nemovitosti.html" class="hover:text-brand">Nemovitosti</a>
+        <a href="investice.html" class="hover:text-brand">Investice</a>
+      </nav>
+      <a href="index.html#funkce" class="rounded-lg px-4 py-2 bg-brand text-white">Vyzkoušet zdarma</a>
+    </div>
+  </header>
+
+  <main class="mx-auto max-w-7xl px-5 py-10">
+    <h1 class="text-3xl font-extrabold">Stock Analyzer</h1>
+    <p class="mt-2 text-slate-600">Přehled akcií, signálů a týdenní AI predikce (auto-update 1× týdně).</p>
+
+    <!-- Filtry -->
+    <div class="mt-6 grid gap-3 sm:grid-cols-4">
+      <input class="border rounded-xl px-3 py-2" placeholder="Hledat ticker (AAPL, NVDA…)">
+      <select class="border rounded-xl px-3 py-2"><option>Vše</option><option>Gainers</option><option>Losers</option><option>High Volatility</option></select>
+      <select class="border rounded-xl px-3 py-2"><option>Intraday</option><option>Swing</option><option>Long-term</option></select>
+      <button class="rounded-xl px-4 py-2 border">Reset</button>
+    </div>
+
+    <!-- Tabulka -->
+    <div class="mt-6 overflow-x-auto">
+      <table class="min-w-full text-sm bg-white rounded-2xl overflow-hidden shadow">
+        <thead class="bg-slate-100 text-slate-600">
+          <tr>
+            <th class="text-left px-4 py-3">Ticker</th>
+            <th class="text-left px-4 py-3">Cena</th>
+            <th class="text-left px-4 py-3">Změna</th>
+            <th class="text-left px-4 py-3">Signal</th>
+            <th class="text-left px-4 py-3">AI predikce (7D)</th>
+            <th class="text-left px-4 py-3">Důvěra</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="border-t">
+            <td class="px-4 py-3 font-semibold">AAPL</td>
+            <td class="px-4 py-3">219.85</td>
+            <td class="px-4 py-3 text-emerald-600">+1.2%</td>
+            <td class="px-4 py-3">SMA↑ / RSI 58</td>
+            <td class="px-4 py-3">▲ 227.3</td>
+            <td class="px-4 py-3">74 %</td>
+          </tr>
+          <tr class="border-t">
+            <td class="px-4 py-3 font-semibold">NVDA</td>
+            <td class="px-4 py-3">108.20</td>
+            <td class="px-4 py-3 text-rose-600">-0.8%</td>
+            <td class="px-4 py-3">BBW / RSI 52</td>
+            <td class="px-4 py-3">▲ 121.0</td>
+            <td class="px-4 py-3">68 %</td>
+          </tr>
+          <tr class="border-t">
+            <td class="px-4 py-3 font-semibold">SPY</td>
+            <td class="px-4 py-3">520.10</td>
+            <td class="px-4 py-3 text-emerald-600">+0.4%</td>
+            <td class="px-4 py-3">EMA↑</td>
+            <td class="px-4 py-3">▲ 585.0</td>
+            <td class="px-4 py-3">72 %</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="text-xs text-slate-500 mt-2">*Data ukázková. AI predikce se bude aktualizovat 1× týdně.</div>
+    </div>
+  </main>
+</body>
+</html>
