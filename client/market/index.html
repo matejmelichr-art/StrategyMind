@@ -16,62 +16,31 @@
     .pill{padding:.375rem .625rem;border-radius:9999px;border:1px solid rgba(15,23,42,.08)}
     .kbd{background:#f3f4f6;padding:.125rem .375rem;border-radius:.25rem;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Courier New",monospace;font-size:.75rem}
 
-    /* mini-graf (ponecháno pro případné rozšíření detailu) */
-    .spark path.avg{stroke:#2563eb;stroke-width:2;fill:none}
-    .spark path.min,.spark path.max{stroke-width:2;fill:none;stroke-dasharray:4 4}
-    .spark path.min{stroke:#ef4444}.spark path.max{stroke:#22c55e}
-    .spark line.guide{stroke:#94a3b8;stroke-dasharray:4 4;opacity:.6}
-    .spark-wrap{display:flex;align-items:center;gap:.75rem}
-    .target-badges{display:flex;flex-direction:column;gap:.2rem;font-size:.75rem;line-height:1.1}
-    .target-badges .b{display:flex;align-items:center;gap:.4rem;white-space:nowrap}
-    .dot{width:.5rem;height:.5rem;border-radius:9999px;display:inline-block}
-    .dot.max{background:#22c55e}.dot.avg{background:#2563eb}.dot.min{background:#ef4444}
-
-    /* tabulka – fix sloupce, ať se nic nepřetéká */
+    /* tabulka – fix sloupce */
     .table-grid{
-      display:grid;
-      grid-template-columns: 100px 1fr 120px 100px 100px 250px 80px 180px;
-      align-items:center;
+      display:grid; grid-template-columns: 90px 1fr 120px 100px 100px 250px 80px 220px; align-items:center;
     }
     .cell-nowrap{white-space:nowrap}
     .actions{display:flex;justify-content:flex-end;gap:.5rem}
-    @media (max-width: 1180px){
-      .table-grid{ grid-template-columns: 90px 1fr 110px 95px 95px 260px 80px 150px; }
-    }
+    @media (max-width: 1180px){ .table-grid{grid-template-columns: 80px 1fr 110px 95px 95px 240px 70px 200px} }
 
-    /* Insights */
-    .badge{display:inline-flex;align-items:center;gap:.4rem;border:1px solid rgba(15,23,42,.12);border-radius:9999px;padding:.25rem .55rem;font-size:.75rem}
+    /* badge/insights */
+    .badge{display:inline-flex;align-items:center;gap:.35rem;border:1px solid rgba(15,23,42,.12);border-radius:9999px;padding:.25rem .55rem;font-size:.75rem}
     .impact-up{background:#ecfdf5;border-color:#a7f3d0;color:#065f46}
     .impact-down{background:#fef2f2;border-color:#fecaca;color:#7f1d1d}
     .impact-flat{background:#f1f5f9;border-color:#cbd5e1;color:#334155}
     .tag{display:inline-block;padding:.15rem .5rem;border:1px solid #e2e8f0;border-radius:9999px;font-size:.7rem;color:#475569;background:#fff}
     .ins-card{border:1px solid #e2e8f0;border-radius:1rem;background:white}
 
-    /* ====== FIX caretů v <select> (Safari/iOS) ====== */
-    .select-wrap{ position:relative; display:inline-block; }
-    .select-reset{
-      -webkit-appearance:none; appearance:none;
-      background:#fff;
-      border:1px solid #e2e8f0; border-radius:0.75rem;
-      padding:.5rem .75rem;
-      /* prostor vpravo pro naši šipku */
-      padding-right:2.75rem;
-      line-height:1.35;
-      outline:none;
-    }
-    .select-reset:focus{
-      box-shadow:0 0 0 3px rgba(59,130,246,.6);
-      border-color:#3b82f6;
-    }
-    .select-caret{
-      position:absolute; top:50%; right:.95rem; transform:translateY(-50%);
-      width:16px; height:16px; pointer-events:none; opacity:.75;
-    }
-    /* jemné doladění pro iPad/iOS */
-    @supports (-webkit-touch-callout: none){
-      .select-caret{ right:1.1rem; }
-      .select-reset{ padding-right:3rem; }
-    }
+    /* modal */
+    .overlay{background:rgba(2,6,23,.45)}
+    .fade-enter{opacity:0;transform:translateY(6px)} .fade-enter-active{opacity:1;transform:none;transition:all .18s ease}
+    .btn{display:inline-flex;align-items:center;gap:.5rem;border-radius:.75rem;padding:.5rem .9rem}
+    .btn-primary{background:#06b6d4;color:#fff} .btn-primary:hover{background:#0891b2}
+    .btn-ghost{border:1px solid #e2e8f0;background:#fff} .btn-ghost:hover{background:#f8fafc}
+
+    /* hvězda */
+    .star{width:18px;height:18px;color:#94a3b8} .star.active{color:#f59e0b}
   </style>
 </head>
 <body class="bg-slate-50 text-slate-900">
@@ -96,22 +65,38 @@
       <div>
         <h1 class="text-3xl font-semibold tracking-tight">Market Scanner</h1>
         <p class="mt-2 text-slate-600 max-w-3xl">
-          Vyhledej a filtruj akcie, indexy, forex, krypto a komodity.
-          Řádek <strong>rozklikni</strong> pro tezi, podmínky neplatnosti a <strong>mini-graf</strong>
-          s 1Y rozmezím (<em>min / avg / max</em>) + štítky cílových hodnot.
+          Vyhledej a filtruj akcie, indexy, forex, krypto a komodity. Řádek rozklikni pro tezi, podmínky neplatnosti a mini-graf s 1Y rozmezím.
         </p>
       </div>
-
       <div class="w-full md:w-auto">
-        <button id="openAIEdgeTop" class="w-full md:w-auto inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-cyan-600 text-white shadow-sm hover:bg-cyan-700">
-          ⚡ AI Edge — Osobní predikce
-        </button>
-        <div class="text-xs text-slate-500 mt-1 md:text-right">Nahrát screenshot nebo zadat symbol. Okamžitý směr + úrovně + důvody.</div>
+        <button id="openAIEdgeTop" class="w-full md:w-auto inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-cyan-600 text-white shadow-sm hover:bg-cyan-700">⚡ AI Edge — Osobní predikce</button>
+        <div class="text-xs text-slate-500 mt-1 md:text-right">Screenshot nebo symbol → směr + úrovně + důvody.</div>
       </div>
     </div>
 
+    <!-- Watchlist / Presety -->
+    <div class="mt-4 flex items-center gap-2 flex-wrap">
+      <div id="watchlistBar" class="hidden items-center gap-2 flex-wrap">
+        <span class="text-sm text-slate-600">Watchlist:</span>
+        <div id="watchlistChips" class="flex items-center gap-2 flex-wrap"></div>
+      </div>
+      <label class="ml-auto inline-flex items-center gap-2 text-sm text-slate-600">
+        <input id="wlOnly" type="checkbox" class="rounded text-cyan-600 border-slate-300"> Filtrovat na watchlist
+      </label>
+    </div>
+
+    <!-- Hot set-upy -->
+    <div class="mt-3 flex items-center gap-2 flex-wrap">
+      <span class="text-sm text-slate-600">Hot set-upy:</span>
+      <button class="pill bg-white hover:bg-slate-50 text-sm" data-setup="breakout">Breakout</button>
+      <button class="pill bg-white hover:bg-slate-50 text-sm" data-setup="mean">Mean-reversion</button>
+      <button class="pill bg-white hover:bg-slate-50 text-sm" data-setup="earn">Earnings soon</button>
+      <button class="pill bg-white hover:bg-slate-50 text-sm" data-setup="vol">Objem ↑</button>
+      <button class="pill bg-slate-100 text-sm" data-setup="">Reset</button>
+    </div>
+
     <!-- Toolbar -->
-    <div class="mt-6 grid grid-cols-1 md:grid-cols-4 gap-3">
+    <div class="mt-4 grid grid-cols-1 md:grid-cols-4 gap-3">
       <div class="relative md:col-span-2">
         <input id="q" class="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white outline-none focus:ring-2 focus:ring-slate-200" placeholder="Hledej symbol / název…" />
         <div class="absolute inset-y-0 right-2 flex items-center text-slate-400 pointer-events-none"><span class="kbd">/</span></div>
@@ -127,82 +112,86 @@
     <!-- Table -->
     <div class="mt-5 overflow-x-auto">
       <div class="min-w-[980px] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-        <!-- head -->
         <div class="table-grid px-4 py-2 text-sm font-medium text-slate-500 bg-slate-50">
-          <div>Symbol</div>
-          <div>Název</div>
-          <div class="text-right">Cena</div>
-          <div class="text-right">1D %</div>
-          <div class="text-right">1W %</div>
-          <div class="text-center">1Y predikce <span class="text-slate-400">(min / avg / max)</span></div>
-          <div class="text-right">Conf.</div>
-          <div class="text-right">Akce</div>
+          <div>Symbol</div><div>Název</div><div class="text-right">Cena</div><div class="text-right">1D %</div><div class="text-right">1W %</div><div class="text-center">1Y predikce <span class="text-slate-400">(min / avg / max)</span></div><div class="text-right">Conf.</div><div class="text-right">Akce</div>
         </div>
         <div id="rows"></div>
       </div>
-
-      <!-- More / Less -->
       <div class="flex items-center justify-between mt-3">
         <div id="countLabel" class="text-xs text-slate-500"></div>
-        <button id="moreBtn" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-300 bg-white hover:bg-slate-50">
-          Zobrazit vše
-        </button>
+        <button id="moreBtn" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-300 bg-white hover:bg-slate-50">Zobrazit vše</button>
       </div>
     </div>
 
-    <!-- Insights / News-driven explanation -->
+    <!-- Insights -->
     <section class="mt-8">
       <div class="flex items-center justify-between gap-3 flex-wrap">
         <h2 class="text-xl font-semibold">Rychlé výkazy ze zpráv (Insights)</h2>
         <div class="flex items-center gap-2">
           <input id="insSearch" class="px-3 py-2 rounded-lg border border-slate-200 bg-white outline-none w-56" placeholder="Hledej v titulcích…" />
-
           <select id="insType" class="px-3 py-2 rounded-lg border border-slate-200 bg-white">
-            <option value="">Všechna aktiva</option>
-            <option value="stock">Akcie</option>
-            <option value="index">Indexy</option>
-            <option value="forex">Forex</option>
-            <option value="crypto">Krypto</option>
-            <option value="commodity">Komodity</option>
-            <option value="macro">Makro</option>
+            <option value="">Všechna aktiva</option><option value="stock">Akcie</option><option value="index">Indexy</option><option value="forex">Forex</option><option value="crypto">Krypto</option><option value="commodity">Komodity</option><option value="macro">Makro</option>
           </select>
-
-          <!-- Všechen sentiment – vlastní caret -->
-          <div class="select-wrap">
-            <select id="insSent" class="select-reset">
-              <option value="">Všechen sentiment</option>
-              <option value="up">Pozitivní (↑)</option>
-              <option value="down">Negativní (↓)</option>
-              <option value="flat">Neutrální (↔)</option>
-            </select>
-            <svg class="select-caret" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-              <path d="M6 8l4 4 4-4" stroke="#6b7280" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </div>
-
-          <!-- Horizon – vlastní caret -->
-          <div class="select-wrap">
-            <select id="insHorizon" class="select-reset">
-              <option value="D">Horizon: Dny</option>
-              <option value="W" selected>Horizon: Týdny</option>
-              <option value="M">Horizon: Měsíce</option>
-            </select>
-            <svg class="select-caret" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-              <path d="M6 8l4 4 4-4" stroke="#6b7280" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </div>
-
+          <select id="insSent" class="px-3 py-2 rounded-lg border border-slate-200 bg-white">
+            <option value="">Všechen sentiment</option><option value="up">Pozitivní (↑)</option><option value="down">Negativní (↓)</option><option value="flat">Neutrální (↔)</option>
+          </select>
+          <select id="insHorizon" class="px-3 py-2 rounded-lg border border-slate-200 bg-white">
+            <option value="D">Horizon: Dny</option><option value="W" selected>Horizon: Týdny</option><option value="M">Horizon: Měsíce</option>
+          </select>
           <button id="insRefresh" class="px-4 py-2 rounded-xl border border-slate-300 bg-white hover:bg-slate-50">Aktualizovat</button>
         </div>
       </div>
-      <p class="text-xs text-slate-500 mt-1">Zde shrnujeme, co poslední zprávy <em>znamenají pro investory</em>, a jak mohou krátkodobě ovlivnit chování akcií, indexů a dalších tříd aktiv.</p>
-
+      <p class="text-xs text-slate-500 mt-1">Zde shrnujeme, co poslední zprávy <em>znamenají pro investory</em>, a jak mohou krátkodobě ovlivnit chování akcií a dalších aktiv.</p>
       <div id="insights" class="mt-4 grid md:grid-cols-2 gap-3"></div>
       <div id="insEmpty" class="hidden mt-6 text-sm text-slate-500 text-center">Nic nenalezeno pro dané filtry.</div>
     </section>
 
-    <p class="mt-6 text-xs text-slate-500">* Demo verze se statickými daty. V ostré verzi připojíme AI teze + zprávy + živé ceny.</p>
+    <p class="mt-6 text-xs text-slate-500">* Demo data. V ostré verzi: AI teze + zprávy + živé ceny + alerty serverem.</p>
   </main>
+
+  <!-- ALERT MODAL -->
+  <div id="alertOverlay" class="hidden fixed inset-0 z-50 overlay"></div>
+  <section id="alertModal" class="hidden fixed inset-0 z-50 p-4 md:p-8 overflow-y-auto">
+    <div class="fade-enter max-w-lg mx-auto rounded-2xl border border-slate-200 bg-white shadow-lg overflow-hidden">
+      <div class="px-5 py-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+        <h3 class="font-semibold">Vytvořit alert</h3>
+        <button id="alertClose" class="btn btn-ghost">Zavřít</button>
+      </div>
+      <div class="p-5 space-y-3">
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="text-sm text-slate-600">Symbol</label>
+            <input id="alertSymbol" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" readonly>
+          </div>
+          <div>
+            <label class="text-sm text-slate-600">Akt. cena (demo)</label>
+            <input id="alertPriceNow" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" readonly>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="text-sm text-slate-600">Cílová cena</label>
+            <input id="alertTarget" type="number" step="0.01" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" placeholder="např. 250">
+          </div>
+          <div>
+            <label class="text-sm text-slate-600">Podmínka</label>
+            <select id="alertCond" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2">
+              <option value="above">Když cena > cílová</option>
+              <option value="below">Když cena < cílová</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label class="text-sm text-slate-600">Poznámka (volitelné)</label>
+          <input id="alertNote" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" placeholder="např. vstup/exit…">
+        </div>
+        <div class="flex justify-end gap-2 pt-2">
+          <button id="alertSave" class="btn btn-primary">Uložit alert</button>
+        </div>
+        <p class="text-xs text-slate-500">* Demo ukládá do localStorage. Pro napojení na TradingView/TV alerts použijeme jejich webhook/API.</p>
+      </div>
+    </div>
+  </section>
 
   <noscript><div class="max-w-6xl mx-auto px-4 py-6 text-rose-700">Pro zobrazení dat povol JavaScript.</div></noscript>
 
@@ -210,41 +199,71 @@
   window.addEventListener('DOMContentLoaded', function(){
     // ===== helpers =====
     var fmt = new Intl.NumberFormat('cs-CZ',{maximumFractionDigits:2});
+    var i18n = new Intl.NumberFormat('cs-CZ');
     function pct(v){ return (v>=0?'+':'') + v.toFixed(2) + '%'; }
+    function el(q){ return document.querySelector(q); }
+    function saveLS(k,v){ localStorage.setItem(k, JSON.stringify(v)); }
+    function loadLS(k,def){ try{ return JSON.parse(localStorage.getItem(k)) ?? def }catch(e){ return def } }
 
-    // Základní 3 řádky (krátký výpis)
+    // ===== data (base + extra + signály) =====
     var baseRows = [
-      {type:'stock',symbol:'AAPL',name:'Apple Inc.',price:219.85,d1:1.26,w1:2.10,forecast:{min:165,avg:245,max:310,conf:72}},
-      {type:'crypto',symbol:'BTCUSD',name:'Bitcoin',price:67200,d1:2.30,w1:6.80,forecast:{min:42000,avg:88000,max:120000,conf:58}},
-      {type:'stock',symbol:'NVDA',name:'NVIDIA Corporation',price:241.80,d1:1.85,w1:4.10,forecast:{min:128,avg:281,max:498,conf:72}}
+      {type:'stock',symbol:'AAPL',name:'Apple Inc.',price:219.85,d1:1.26,w1:2.10,signals:['breakout','vol'],forecast:{min:165,avg:245,max:310,conf:72}},
+      {type:'crypto',symbol:'BTCUSD',name:'Bitcoin',price:67200,d1:2.30,w1:6.80,signals:['breakout','vol'],forecast:{min:42000,avg:88000,max:120000,conf:58}},
+      {type:'stock',symbol:'NVDA',name:'NVIDIA Corporation',price:241.80,d1:1.85,w1:4.10,signals:['earn','vol'],forecast:{min:128,avg:281,max:498,conf:72}}
     ];
-
-    // Rozšířený seznam
     var extraRows = [
-      {type:'stock',symbol:'MSFT',name:'Microsoft Corp.',price:432.2,d1:0.8,w1:2.5,forecast:{min:360,avg:480,max:560,conf:69}},
-      {type:'stock',symbol:'AMZN',name:'Amazon.com, Inc.',price:176.8,d1:1.1,w1:3.2,forecast:{min:140,avg:210,max:260,conf:65}},
-      {type:'stock',symbol:'GOOGL',name:'Alphabet Inc. (Class A)',price:162.4,d1:-0.3,w1:1.7,forecast:{min:130,avg:190,max:240,conf:63}},
-      {type:'stock',symbol:'META',name:'Meta Platforms, Inc.',price:506.5,d1:1.9,w1:5.1,forecast:{min:380,avg:560,max:720,conf:66}},
-      {type:'stock',symbol:'TSLA',name:'Tesla, Inc.',price:214.3,d1:-1.2,w1:4.4,forecast:{min:150,avg:260,max:340,conf:55}},
-      {type:'index',symbol:'SPX',name:'S&P 500 Index',price:5518,d1:0.30,w1:1.2,forecast:{min:5100,avg:5800,max:6300,conf:59}},
-      {type:'index',symbol:'NDX',name:'NASDAQ 100',price:19980,d1:0.45,w1:1.6,forecast:{min:17500,avg:21000,max:23500,conf:60}},
-      {type:'forex',symbol:'EURUSD',name:'Euro / US Dollar',price:1.086,d1:-0.12,w1:0.30,forecast:{min:1.04,avg:1.10,max:1.14,conf:52}},
-      {type:'forex',symbol:'USDJPY',name:'US Dollar / Japanese Yen',price:152.2,d1:0.05,w1:-0.20,forecast:{min:146,avg:151,max:157,conf:50}},
-      {type:'crypto',symbol:'ETHUSD',name:'Ethereum',price:3360,d1:1.9,w1:7.2,forecast:{min:2200,avg:4200,max:5600,conf:56}},
-      {type:'commodity',symbol:'XAUUSD',name:'Gold (Spot)',price:2368,d1:-0.2,w1:0.5,forecast:{min:2100,avg:2400,max:2650,conf:58}},
-      {type:'commodity',symbol:'WTI',name:'Crude Oil WTI',price:81.4,d1:0.6,w1:1.8,forecast:{min:70,avg:86,max:98,conf:55}}
+      {type:'stock',symbol:'MSFT',name:'Microsoft Corp.',price:432.2,d1:0.8,w1:2.5,signals:['mean'],forecast:{min:360,avg:480,max:560,conf:69}},
+      {type:'stock',symbol:'AMZN',name:'Amazon.com, Inc.',price:176.8,d1:1.1,w1:3.2,signals:['breakout'],forecast:{min:140,avg:210,max:260,conf:65}},
+      {type:'stock',symbol:'GOOGL',name:'Alphabet Inc. (Class A)',price:162.4,d1:-0.3,w1:1.7,signals:['mean'],forecast:{min:130,avg:190,max:240,conf:63}},
+      {type:'stock',symbol:'META',name:'Meta Platforms, Inc.',price:506.5,d1:1.9,w1:5.1,signals:['vol'],forecast:{min:380,avg:560,max:720,conf:66}},
+      {type:'stock',symbol:'TSLA',name:'Tesla, Inc.',price:214.3,d1:-1.2,w1:4.4,signals:['mean','vol'],forecast:{min:150,avg:260,max:340,conf:55}},
+      {type:'index',symbol:'SPX',name:'S&P 500 Index',price:5518,d1:0.30,w1:1.2,signals:['breakout'],forecast:{min:5100,avg:5800,max:6300,conf:59}},
+      {type:'index',symbol:'NDX',name:'NASDAQ 100',price:19980,d1:0.45,w1:1.6,signals:['breakout','vol'],forecast:{min:17500,avg:21000,max:23500,conf:60}},
+      {type:'forex',symbol:'EURUSD',name:'Euro / US Dollar',price:1.086,d1:-0.12,w1:0.30,signals:['mean'],forecast:{min:1.04,avg:1.10,max:1.14,conf:52}},
+      {type:'forex',symbol:'USDJPY',name:'US Dollar / Japanese Yen',price:152.2,d1:0.05,w1:-0.20,signals:['mean'],forecast:{min:146,avg:151,max:157,conf:50}},
+      {type:'crypto',symbol:'ETHUSD',name:'Ethereum',price:3360,d1:1.9,w1:7.2,signals:['breakout','vol'],forecast:{min:2200,avg:4200,max:5600,conf:56}},
+      {type:'commodity',symbol:'XAUUSD',name:'Gold (Spot)',price:2368,d1:-0.2,w1:0.5,signals:['mean'],forecast:{min:2100,avg:2400,max:2650,conf:58}},
+      {type:'commodity',symbol:'WTI',name:'Crude Oil WTI',price:81.4,d1:0.6,w1:1.8,signals:['vol'],forecast:{min:70,avg:86,max:98,conf:55}}
     ];
 
     var showingAll = false;
+    var currentSetup = '';
     var dataSource = baseRows.slice();
 
+    // ===== watchlist =====
+    var watchlist = loadLS('sm_watchlist', []); // [symbols]
+    function toggleWatch(symbol){
+      var i = watchlist.indexOf(symbol);
+      if(i>=0) watchlist.splice(i,1); else watchlist.push(symbol);
+      saveLS('sm_watchlist', watchlist); renderWatchlist(); apply();
+    }
+    function renderWatchlist(){
+      var bar = document.getElementById('watchlistBar');
+      var chips = document.getElementById('watchlistChips');
+      chips.innerHTML = '';
+      watchlist.forEach(function(s){
+        var b=document.createElement('button');
+        b.className='pill bg-white hover:bg-slate-50 text-sm';
+        b.textContent=s;
+        b.title='Klik pro vyhledání, doppř. pro odebrání';
+        b.addEventListener('click', function(){ q.value=s; apply(); });
+        b.addEventListener('contextmenu', function(e){ e.preventDefault(); toggleWatch(s); });
+        chips.appendChild(b);
+      });
+      bar.classList.toggle('hidden', watchlist.length===0);
+    }
+
+    // ===== tabulka =====
     var container = document.getElementById('rows');
     var countLabel = document.getElementById('countLabel');
     var moreBtn = document.getElementById('moreBtn');
 
+    function starSVG(active){ return '<svg class="star '+(active?'active':'')+'" viewBox="0 0 24 24" fill="currentColor"><path d="M12 17.3l-5.6 3 1.1-6.4L3 9.8l6.4-.9L12 3l2.6 5.9 6.4.9-4.5 4.1 1.1 6.4z"/></svg>'; }
+
     function render(list){
       container.innerHTML='';
       list.forEach(function(r){
+        var inWL = watchlist.includes(r.symbol);
         var row=document.createElement('div'); row.className="row border-t border-slate-100";
         row.innerHTML =
           '<div class="table-grid px-4 py-3">'
@@ -253,32 +272,56 @@
           +  '<div class="text-right tabular-nums cell-nowrap">'+fmt.format(r.price)+'</div>'
           +  '<div class="text-right tabular-nums cell-nowrap '+(r.d1>=0?'text-emerald-600':'text-rose-600')+'">'+pct(r.d1)+'</div>'
           +  '<div class="text-right tabular-nums cell-nowrap '+(r.w1>=0?'text-emerald-600':'text-rose-600')+'">'+pct(r.w1)+'</div>'
-          +  '<div class="text-center tabular-nums cell-nowrap text-[15px]">'
-          +    (new Intl.NumberFormat('cs-CZ')).format(r.forecast.min)+' / '
-          +    '<span class="font-semibold">'+(new Intl.NumberFormat('cs-CZ')).format(r.forecast.avg)+'</span> / '
-          +    (new Intl.NumberFormat('cs-CZ')).format(r.forecast.max)
-          +  '</div>'
+          +  '<div class="text-center tabular-nums cell-nowrap text-[15px]">'+i18n.format(r.forecast.min)+' / <span class="font-semibold">'+i18n.format(r.forecast.avg)+'</span> / '+i18n.format(r.forecast.max)+'</div>'
           +  '<div class="text-right tabular-nums cell-nowrap">'+r.forecast.conf+'%</div>'
           +  '<div class="actions cell-nowrap">'
-          +    '<button class="px-3 py-1.5 text-sm rounded-lg bg-cyan-600 text-white hover:bg-cyan-700 min-w-[120px]" data-ai>AI predikce</button>'
+          +    '<button class="btn btn-ghost" data-watch="'+r.symbol+'" title="'+(inWL?'Odebrat z watchlistu':'Přidat do watchlistu')+'">'+starSVG(inWL)+'</button>'
+          +    '<button class="btn btn-ghost" data-alert="'+r.symbol+'">🔔 Alert</button>'
+          +    '<button class="btn btn-primary" data-ai="'+r.symbol+'">AI predikce</button>'
           +  '</div>'
           +'</div>';
         container.appendChild(row);
       });
+      // listeners
+      container.querySelectorAll('[data-watch]').forEach(function(b){
+        b.addEventListener('click', function(){ toggleWatch(this.getAttribute('data-watch')); });
+      });
+      container.querySelectorAll('[data-alert]').forEach(function(b){
+        b.addEventListener('click', function(){
+          var s = this.getAttribute('data-alert');
+          var found = allRows().find(x=>x.symbol===s);
+          openAlert(found.symbol, found.price);
+        });
+      });
       countLabel.textContent = 'Zobrazeno: ' + list.length + (showingAll ? ' / ' + (baseRows.length + extraRows.length) : '');
     }
 
-    var q=document.getElementById('q'),
-        typeFilter=document.getElementById('typeFilter'),
-        sortBy=document.getElementById('sortBy');
+    function allRows(){ return showingAll ? baseRows.concat(extraRows) : baseRows.slice(); }
+
+    var q=el('#q'), typeFilter=el('#typeFilter'), sortBy=el('#sortBy'), wlOnly=el('#wlOnly');
 
     function apply(){
       var term=(q.value||'').trim().toLowerCase();
-      var out = dataSource.filter(function(r){
+      var pool = showingAll ? baseRows.concat(extraRows) : baseRows.slice();
+
+      // set-up filter
+      if(currentSetup){
+        pool = pool.filter(function(r){
+          if(currentSetup==='earn') return r.signals && r.signals.includes('earn');
+          if(currentSetup==='mean') return r.signals && r.signals.includes('mean');
+          if(currentSetup==='vol')  return r.signals && r.signals.includes('vol');
+          return r.signals && r.signals.includes('breakout');
+        });
+      }
+
+      // type filter + search
+      var out = pool.filter(function(r){
         var okType = !typeFilter.value || r.type===typeFilter.value;
-        var okSearch = !term || r.symbol.toLowerCase().indexOf(term)>=0 || r.name.toLowerCase().indexOf(term)>=0;
-        return okType && okSearch;
+        var okSearch = !term || r.symbol.toLowerCase().includes(term) || r.name.toLowerCase().includes(term);
+        var okWL = !wlOnly.checked || watchlist.includes(r.symbol);
+        return okType && okSearch && okWL;
       });
+
       switch(sortBy.value){
         case 'price': out.sort(function(a,b){return b.price-a.price}); break;
         case 'w1':    out.sort(function(a,b){return b.w1-a.w1});     break;
@@ -289,18 +332,21 @@
     }
 
     q.addEventListener('input',apply);
-    typeFilter.addEventListener('change',apply);
+    typeFilter.addEventListener('change',function(){ syncTypeFromTable(); apply(); });
     sortBy.addEventListener('change',apply);
+    wlOnly.addEventListener('change',apply);
+    document.querySelectorAll('[data-setup]').forEach(function(b){
+      b.addEventListener('click', function(){ currentSetup=this.getAttribute('data-setup'); apply(); });
+    });
 
     moreBtn.addEventListener('click', function(){
       showingAll = !showingAll;
-      dataSource = showingAll ? baseRows.concat(extraRows) : baseRows.slice();
       moreBtn.textContent = showingAll ? 'Zobrazit méně' : 'Zobrazit vše';
       apply();
     });
 
-    // ===== Insights (news → co to znamená) =====
-    var insData = []; // bude naplněno z backendu nebo z mocku
+    // ===== Insights =====
+    var insData = [];
     var insContainer = document.getElementById('insights');
     var insEmpty = document.getElementById('insEmpty');
     var insSearch = document.getElementById('insSearch');
@@ -323,23 +369,23 @@
       list.forEach(function(n){
         var card = document.createElement('article');
         card.className = 'ins-card p-4';
+        var tickers = (n.tickers||[]).map(function(t){
+          return '<button class="pill text-sm bg-white hover:bg-slate-50" data-jump="'+t+'">'+t+'</button>';
+        }).join(' ');
         card.innerHTML =
           '<div class="flex items-start justify-between gap-3">'
-          +  '<div>'
-          +    '<div class="text-sm text-slate-500">'+n.source+' • '+n.time+'</div>'
-          +    '<h3 class="mt-0.5 font-semibold">'+n.title+'</h3>'
-          +  '</div>'
-          +  '<div class="text-right shrink-0">'
-          +    impactBadge(n.sentiment)
-          +    '<div class="text-xs text-slate-500 mt-1">Pravděpodobnost: <b>'+n.prob+'%</b></div>'
-          +  '</div>'
+          +  '<div><div class="text-sm text-slate-500">'+n.source+' • '+n.time+'</div><h3 class="mt-0.5 font-semibold">'+n.title+'</h3></div>'
+          +  '<div class="text-right shrink-0">'+impactBadge(n.sentiment)+'<div class="text-xs text-slate-500 mt-1">Pravděpodobnost: <b>'+n.prob+'%</b></div></div>'
           +'</div>'
           +'<p class="mt-2 text-sm">'+n.explainer+'</p>'
           + (n.take?('<ul class="mt-2 text-sm list-disc pl-5">'+n.take.map(function(t){return '<li>'+t+'</li>'}).join('')+'</ul>'):'')
-          +'<div class="mt-3 flex flex-wrap gap-2">'
-          +  (n.tags||[]).map(function(t){return '<span class="tag">'+t+'</span>'}).join('')
-          +'</div>';
+          +'<div class="mt-3 flex flex-wrap gap-2">'+(n.tags||[]).map(function(t){return '<span class="tag">'+t+'</span>'}).join('')+'</div>'
+          + (tickers?('<div class="mt-3 flex flex-wrap gap-2 items-center"><span class="text-xs text-slate-500">Vztahuje se k:</span>'+tickers+'</div>'):'');
         insContainer.appendChild(card);
+      });
+      // jump-to-ticker
+      insContainer.querySelectorAll('[data-jump]').forEach(function(b){
+        b.addEventListener('click', function(){ q.value=this.getAttribute('data-jump'); apply(); window.scrollTo({top:0,behavior:'smooth'}); });
       });
     }
 
@@ -348,10 +394,12 @@
       var list = insData.filter(function(n){
         var okType = !insType.value || n.type===insType.value;
         var okSent = !insSent.value || n.sentiment===insSent.value;
-        var okText = !term || n.title.toLowerCase().indexOf(term)>=0;
+        var okText = !term || n.title.toLowerCase().includes(term);
         return okType && okSent && okText;
       });
-      renderInsights(list);
+      // sync: když se změní typ v Insights → přepiš tabulkový select
+      if(insType.value !== typeFilter.value){ typeFilter.value = insType.value; }
+      renderInsights(list); apply();
     }
 
     function mockInsights(){
@@ -360,31 +408,31 @@
           title:'Nižší než očekávaná inflace (CPI) – ochlazení jádrové složky',
           explainer:'Slabší CPI zvyšuje šanci na dřívější uvolnění měnové politiky. Diskontní sazby klesají → vyšší valuace růstových titulů.',
           take:['Pozitivní skew pro SPX/NDX v horizontu týdnů','Duration-sensitive: tech/AI outperform','USD může oslabit; zlato drží bid'],
-          tags:['Inflace','Sazby','Růstové akcie']
+          tags:['Inflace','Sazby','Růstové akcie'], tickers:['SPX','NDX','AAPL','NVDA']
         },
         { type:'stock', source:'Earnings • NVDA', time:'včera', sentiment:'up', prob:70,
           title:'NVDA beat + zvýšený výhled DC/AI',
           explainer:'Objednávky v datacentrech přetrvávají, backlog je robustní. Pravděpodobnost pokračování trendu je vyšší.',
           take:['Pozitivní přelev pro polovodiče (AMD, TSM)','Index NDX citlivý na mega-cap tech'],
-          tags:['Earnings','AI','Semiconductors']
+          tags:['Earnings','AI','Semiconductors'], tickers:['NVDA','AMD','NDX']
         },
         { type:'crypto', source:'Regulace • USA', time:'dnes', sentiment:'down', prob:55,
           title:'Přísnější rámec pro krypto burzy',
           explainer:'Krátkodobě tlak na altcoiny kvůli compliance nákladům; BTC/ETH relativně odolnější díky institucionálním tokům.',
           take:['Defenzivní rotace: BTC>ALT','Sledovat odliv z risk-on tokenů'],
-          tags:['Krypto','Regulace']
+          tags:['Krypto','Regulace'], tickers:['BTCUSD','ETHUSD']
         },
         { type:'commodity', source:'OPEC+', time:'tento týden', sentiment:'up', prob:58,
           title:'Prodlužení dobrovolných škrtů těžby ropy',
           explainer:'Tighter supply → vyšší podlaha cen WTI/Brent. Energetický sektor má zlepšený R:R.',
           take:['XLE a servisní firmy profitují','Pozor na citlivost SPX na dražší energii'],
-          tags:['Ropa','OPEC','Energie']
+          tags:['Ropa','OPEC','Energie'], tickers:['WTI','SPX']
         },
         { type:'forex', source:'Fed speakers', time:'dnes', sentiment:'flat', prob:52,
           title:'Smíšené komentáře členů Fedu',
           explainer:'Krátkodobě vyšší volatilita USD. Bez jasného směru – range trading na EURUSD pravděpodobný.',
           take:['Preferovat mean-reversion set-upy na hlavních párech'],
-          tags:['USD','Volatilita']
+          tags:['USD','Volatilita'], tickers:['EURUSD','USDJPY']
         }
       ];
     }
@@ -409,21 +457,50 @@
             title: n.title || n.headline || '—',
             explainer: n.explainer || n.summary || '',
             take: n.take || n.actions || [],
-            tags: n.tags || []
+            tags: n.tags || [],
+            tickers: n.tickers || []
           };
         });
         filterInsights();
-      }).finally(function(){
-        insRefresh.disabled = false; insRefresh.textContent = 'Aktualizovat';
-      });
+      }).finally(function(){ insRefresh.disabled = false; insRefresh.textContent = 'Aktualizovat'; });
     });
 
     insSearch.addEventListener('input', filterInsights);
     insType.addEventListener('change', filterInsights);
     insSent.addEventListener('change', filterInsights);
-    insHorizon.addEventListener('change', function(){ /* jen pro backend */ });
+    insHorizon.addEventListener('change', function(){ /* pro backend */ });
 
-    // init
+    // sync z tabulky → insights (jen typ)
+    function syncTypeFromTable(){ if(insType.value !== typeFilter.value){ insType.value = typeFilter.value; } }
+
+    // ===== Alert modal (demo) =====
+    var alertOverlay=el('#alertOverlay'), alertModal=el('#alertModal'), alertClose=el('#alertClose'), alertSave=el('#alertSave');
+    function openAlert(symbol, priceNow){
+      el('#alertSymbol').value = symbol;
+      el('#alertPriceNow').value = fmt.format(priceNow);
+      el('#alertTarget').value = ''; el('#alertCond').value='above'; el('#alertNote').value='';
+      alertOverlay.classList.remove('hidden'); alertModal.classList.remove('hidden');
+      requestAnimationFrame(function(){ alertModal.querySelector('.fade-enter').classList.add('fade-enter-active'); });
+    }
+    function closeAlert(){ alertOverlay.classList.add('hidden'); alertModal.classList.add('hidden'); }
+    alertOverlay.addEventListener('click', closeAlert); alertClose.addEventListener('click', closeAlert);
+
+    alertSave.addEventListener('click', function(){
+      var alerts = loadLS('sm_alerts', []);
+      var rec = {
+        symbol: el('#alertSymbol').value,
+        cond: el('#alertCond').value,
+        target: parseFloat(el('#alertTarget').value),
+        note: el('#alertNote').value || '',
+        created_at: Date.now()
+      };
+      if(!isFinite(rec.target)){ alert('Zadej platnou cílovou cenu.'); return; }
+      alerts.push(rec); saveLS('sm_alerts', alerts);
+      closeAlert(); alert('Alert uložen (demo).');
+    });
+
+    // ===== init =====
+    renderWatchlist();
     apply();
     insData = mockInsights();
     filterInsights();
