@@ -1,0 +1,23 @@
+[
+  {
+    "type": "stock",         // "stock" | "etf" | "index" | "commodity" | "futures" | "crypto" | "forex"
+    "region": "US",
+    "exchange": "NASDAQ",
+    "symbol": "AAPL",
+    "name": "Apple Inc.",
+    "isin": "US0378331005",
+    "price": 219.85,
+    "d1": 1.26,
+    "w1": 2.10,
+    "forecast": {"min":165,"avg":245,"max":310,"conf":72},
+    "path": {"avg":[0,1,1.8,1.4,2.1,2.0,2.5],"min":[0,-0.5,-0.2,-0.7,-0.4,-0.8,-1.1],"max":[0,1.6,2.3,1.9,2.7,2.5,3.1]},
+    "thesis": "Růst služeb a ekosystému...",
+    "invalid": "Breakdown pod 195..."
+  },
+  {
+    "type": "index", "region":"US", "symbol":"SPX", "name":"S&P 500 Index"
+  },
+  {
+    "type": "futures", "region":"US", "exchange":"CME", "symbol":"ESZ4", "name":"E-mini S&P 500 Dec 2024"
+  }
+]
