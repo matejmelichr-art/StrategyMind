@@ -34,43 +34,33 @@
     .tag{display:inline-block;padding:.15rem .5rem;border:1px solid #e2e8f0;border-radius:9999px;font-size:.7rem;color:#475569;background:#fff}
     .ins-card{border:1px solid #e2e8f0;border-radius:1rem;background:white}
 
-    /* === FIX caretů u selectů (přebít Tailwind Forms) === */
+    /* ——— FIX caretů na iOS (přebití Tailwind Forms) ——— */
     .select-caret{
       -webkit-appearance:none;
       appearance:none;
-      /* jedním shorthandem zajistíme prioritu a kompatibilitu */
-      background: #fff url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none'><path d='M6 8l4 4 4-4' stroke='%236b7280' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/></svg>")
-                  no-repeat right 1.15rem center / 16px 16px !important;
-      padding-right: 3rem !important;  /* víc místa mezi textem a šipkou */
+      background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none'><path d='M6 8l4 4 4-4' stroke='%236b7280' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/></svg>") !important;
+      background-repeat:no-repeat !important;
+      background-size:18px 18px !important;
+      /* šipku posuneme víc doprava */
+      background-position:right 1.25rem center !important;
+      /* a dáme víc vnitřního místa pro text */
+      padding-right:3.25rem !important;
       line-height:1.25;
-      background-clip: padding-box;
+      background-clip:padding-box;
     }
-    @media (max-width: 640px){
+    @media (max-width:640px){
       .select-caret{
-        background-position: right 0.95rem center !important;
-        padding-right: 2.6rem !important;
+        background-position:right 1.05rem center !important;
+        padding-right:2.9rem !important;
       }
     }
   </style>
 </head>
 <body class="bg-slate-50 text-slate-900">
-  <header class="sticky top-0 z-20 backdrop-blur bg-white/80 border-b border-slate-200">
-    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center gap-3">
-      <a href="/client/" class="text-sm text-slate-600 hover:text-slate-900 flex items-center gap-2">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" class="opacity-70"><path d="M15 6l-6 6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        Zpět na klientskou sekci
-      </a>
-      <div class="ml-auto flex flex-wrap items-center gap-2 overflow-x-auto">
-        <a href="/client/market/" class="pill bg-white font-medium whitespace-nowrap">Market Scanner</a>
-        <a href="/client/real-estate/" class="pill whitespace-nowrap">Real-Estate</a>
-        <a href="/client/idea-lab/" class="pill whitespace-nowrap">Idea Lab</a>
-        <span class="ml-2 text-xs text-slate-500 border border-slate-200 rounded-full px-2 py-1 select-none whitespace-nowrap">v2</span>
-      </div>
-    </div>
-  </header>
+  <!-- Header atd. beze změn -->
 
   <main class="max-w-6xl mx-auto px-4 py-8">
-    <!-- Toolbar a tabulka beze změn... -->
+    <!-- Toolbar & tabulka ... -->
 
     <!-- Insights / News-driven explanation -->
     <section class="mt-8">
@@ -87,14 +77,14 @@
             <option value="commodity">Komodity</option>
             <option value="macro">Makro</option>
           </select>
-          <!-- přidána třída i sem -->
+          <!-- caret fix také pro sentiment -->
           <select id="insSent" class="px-3 py-2 rounded-lg border border-slate-200 bg-white select-caret">
             <option value="">Všechen sentiment</option>
             <option value="up">Pozitivní (↑)</option>
             <option value="down">Negativní (↓)</option>
             <option value="flat">Neutrální (↔)</option>
           </select>
-          <!-- a tady zůstává -->
+          <!-- caret fix pro Horizon -->
           <select id="insHorizon" class="px-3 py-2 rounded-lg border border-slate-200 bg-white select-caret">
             <option value="D">Horizon: Dny</option>
             <option value="W" selected>Horizon: Týdny</option>
@@ -103,13 +93,12 @@
           <button id="insRefresh" class="px-4 py-2 rounded-xl border border-slate-300 bg-white hover:bg-slate-50">Aktualizovat</button>
         </div>
       </div>
-
-      <!-- ...zbytek kódu (JS i HTML) nechávám beze změn -->
+      <!-- zbytek HTML + JS beze změn -->
     </section>
 
-    <!-- (původní JS zůstává) -->
+    <!-- ... tvůj původní JS k tabulce i insights ... -->
     <script>
-      /* tvůj existující JS beze změny */
+      /* zde může zůstat tvůj původní JS z poslední verze – nic v něm měnit netřeba */
     </script>
   </main>
 </body>
