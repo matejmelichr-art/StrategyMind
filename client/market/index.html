@@ -33,14 +33,20 @@
     .fade-enter-active{opacity:1;transform:none;transition:all .18s ease}
     .drop-active{border-color:#0ea5e9 !important;background:rgba(14,165,233,.05)}
 
-    /* jednotná definice sloupců tabulky – širší, ať se nic nepřekrývá */
+    /* tabulka – širší fixní sloupce pro Conf. a Akce + nowrap */
     .table-grid{
       display:grid;
-      grid-template-columns: 100px 1fr 120px 110px 110px 260px 90px 130px;
+      grid-template-columns: 100px 1fr 120px 100px 100px 250px 80px 180px; /* poslední dva sloupce širší */
       align-items:center;
     }
-    @media (max-width: 1024px){
-      .table-grid{ grid-template-columns: 90px 1fr 110px 100px 100px 280px 80px 140px; }
+    .cell-nowrap{white-space:nowrap}
+    .actions{display:flex;justify-content:flex-end;gap:.5rem}
+    @media (max-width: 1180px){
+      /* na tabletech: místo „Detail“ necháme jen AI predikce, Akce rozšíříme */
+      .table-grid{
+        grid-template-columns: 90px 1fr 110px 95px 95px 260px 80px 190px;
+      }
+      .btn-detail{display:none}             /* skryj detail, ať nic nevadí */
     }
   </style>
 </head>
@@ -219,18 +225,16 @@
       var row=document.createElement('div'); row.className="row border-t border-slate-100";
       row.innerHTML =
         '<div class="table-grid px-4 py-3 cursor-pointer">'
-        +  '<div class="font-semibold whitespace-nowrap">'+r.symbol+'</div>'
+        +  '<div class="font-semibold cell-nowrap">'+r.symbol+'</div>'
         +  '<div class="text-slate-700 truncate">'+r.name+'</div>'
-        +  '<div class="text-right tabular-nums whitespace-nowrap">'+fmt.format(r.price)+'</div>'
-        +  '<div class="text-right tabular-nums whitespace-nowrap '+(r.d1>=0?'text-emerald-600':'text-rose-600')+'">'+pct(r.d1)+'</div>'
-        +  '<div class="text-right tabular-nums whitespace-nowrap '+(r.w1>=0?'text-emerald-600':'text-rose-600')+'">'+pct(r.w1)+'</div>'
-        +  '<div class="text-center tabular-nums whitespace-nowrap text-[15px]">'
-        +    fmt.format(r.forecast.min)+' / <span class="font-semibold">'+fmt.format(r.forecast.avg)+'</span> / '+fmt.format(r.forecast.max)
-        +  '</div>'
-        +  '<div class="text-right tabular-nums whitespace-nowrap">'+r.forecast.conf+'%</div>'
-        +  '<div class="text-right flex justify-end gap-2 shrink-0">'
-        +    '<button class="px-3 py-1.5 text-sm rounded-lg border border-slate-200 hover:bg-slate-50 shrink-0">Detail</button>'
-        +    '<button class="px-3 py-1.5 text-sm rounded-lg bg-cyan-600 text-white hover:bg-cyan-700 shrink-0 min-w-[110px]" data-ai-edge>AI predikce</button>'
+        +  '<div class="text-right tabular-nums cell-nowrap">'+fmt.format(r.price)+'</div>'
+        +  '<div class="text-right tabular-nums cell-nowrap '+(r.d1>=0?'text-emerald-600':'text-rose-600')+'">'+pct(r.d1)+'</div>'
+        +  '<div class="text-right tabular-nums cell-nowrap '+(r.w1>=0?'text-emerald-600':'text-rose-600')+'">'+pct(r.w1)+'</div>'
+        +  '<div class="text-center tabular-nums cell-nowrap text-[15px]">'+fmt.format(r.forecast.min)+' / <span class="font-semibold">'+fmt.format(r.forecast.avg)+'</span> / '+fmt.format(r.forecast.max)+'</div>'
+        +  '<div class="text-right tabular-nums cell-nowrap">'+r.forecast.conf+'%</div>'
+        +  '<div class="actions cell-nowrap">'
+        +    '<button class="btn-detail px-3 py-1.5 text-sm rounded-lg border border-slate-200 hover:bg-slate-50">Detail</button>'
+        +    '<button class="px-3 py-1.5 text-sm rounded-lg bg-cyan-600 text-white hover:bg-cyan-700 min-w-[120px]">AI predikce</button>'
         +  '</div>'
         +'</div>'
         +'<div class="hidden px-4 pb-4">'
@@ -246,13 +250,11 @@
         +'</div>';
 
       var head=row.querySelector('.table-grid');
-      var detailBtn=row.querySelector('button');
-      var aiBtn=row.querySelector('[data-ai-edge]');
+      var detailBtn=row.querySelector('.btn-detail');
       var panel=row.children[1];
       function toggle(){ panel.classList.toggle('hidden'); }
       head.addEventListener('click', function(e){ if(e.target.tagName.toLowerCase()==='button') return; toggle(); });
-      detailBtn.addEventListener('click', function(e){ e.stopPropagation(); toggle(); });
-      aiBtn.addEventListener('click', function(e){ e.stopPropagation(); openEdge(r.symbol); });
+      if(detailBtn){ detailBtn.addEventListener('click', function(e){ e.stopPropagation(); toggle(); }); }
       container.appendChild(row);
     }
 
@@ -280,199 +282,6 @@
     sortBy.addEventListener('change',apply);
     document.addEventListener('keydown',function(e){ if(e.key==='/'){ e.preventDefault(); q.focus(); }});
     apply();
-
-    // ===== AI Edge panel =====
-    var edgeOverlay=document.getElementById('edgeOverlay'),
-        edgePanel=document.getElementById('edgePanel'),
-        edgeClose=document.getElementById('edgeClose'),
-        edgeTopBtn=document.getElementById('openAIEdgeTop');
-
-    var edgeSymbolLabel=document.getElementById('edgeSymbolLabel'),
-        edgeSymbol=document.getElementById('edgeSymbol');
-
-    var edgeDrop=document.getElementById('edgeDrop'),
-        edgeFile=document.getElementById('edgeFile'),
-        edgePreview=document.getElementById('edgePreview'),
-        edgeCanvas=document.getElementById('edgeCanvas');
-
-    var edgeRun=document.getElementById('edgeRun'),
-        edgeClear=document.getElementById('edgeClear'),
-        edgeResult=document.getElementById('edgeResult'),
-        edgeNote=document.getElementById('edgeNote');
-
-    var edgeUseWeb=document.getElementById('edgeUseWeb'),
-        edgeExplain=document.getElementById('edgeExplain'),
-        edgeSave=document.getElementById('edgeSave'),
-        edgeHistory=document.getElementById('edgeHistory');
-
-    function openEdge(symbol){
-      edgeOverlay.classList.remove('hidden');
-      edgePanel.classList.remove('hidden');
-      var fe = edgePanel.querySelector('.fade-enter');
-      if (fe) fe.classList.add('fade-enter-active');
-      edgeSymbol.value = symbol || '';
-      edgeSymbolLabel.textContent = symbol || '—';
-    }
-    function closeEdge(){
-      edgeOverlay.classList.add('hidden');
-      edgePanel.classList.add('hidden');
-    }
-    edgeTopBtn.addEventListener('click', function(){ openEdge(''); });
-    edgeClose.addEventListener('click', closeEdge);
-    edgeOverlay.addEventListener('click', closeEdge);
-    document.addEventListener('keydown', function(e){ if(e.key==='Escape' && !edgePanel.classList.contains('hidden')) closeEdge(); });
-
-    ['dragenter','dragover'].forEach(function(ev){
-      edgeDrop.addEventListener(ev, function(e){ e.preventDefault(); e.stopPropagation(); edgeDrop.classList.add('drop-active'); });
-    });
-    ['dragleave','drop'].forEach(function(ev){
-      edgeDrop.addEventListener(ev, function(e){ e.preventDefault(); e.stopPropagation(); edgeDrop.classList.remove('drop-active'); });
-    });
-    edgeDrop.addEventListener('click', function(){ edgeFile.click(); });
-    edgeDrop.addEventListener('drop', function(e){ var f=e.dataTransfer.files && e.dataTransfer.files[0]; if (f) loadEdgeFile(f); });
-    edgeFile.addEventListener('change', function(e){ var f=e.target.files && e.target.files[0]; if (f) loadEdgeFile(f); });
-
-    function loadEdgeFile(f){
-      if(!f) return;
-      if(!/image\/|pdf$/.test(f.type)){ alert('Podporujeme obrázky (PNG/JPG) a PDF.'); return; }
-      var url = URL.createObjectURL(f);
-      if(f.type==='application/pdf'){
-        edgePreview.classList.add('hidden'); edgeCanvas.classList.remove('hidden');
-        var ctx = edgeCanvas.getContext('2d'); edgeCanvas.width=600; edgeCanvas.height=80;
-        ctx.fillStyle='#0f172a'; ctx.fillRect(0,0,600,80);
-        ctx.fillStyle='#e2e8f0'; ctx.font='16px Inter, sans-serif';
-        ctx.fillText('PDF přiloženo:',12,30);
-        ctx.fillText(f.name + ' ('+Math.round(f.size/1024)+' kB)', 12,55);
-        edgeFile._file = f;
-      } else {
-        edgeCanvas.classList.add('hidden'); edgePreview.classList.remove('hidden');
-        edgePreview.src = url; edgeFile._file = f;
-      }
-      edgeSave.disabled = true;
-      edgeResult.innerHTML = '<p class="text-sm text-slate-500">Soubor připraven. Klikni <b>Spustit AI predikci</b>.</p>';
-    }
-
-    function renderEdgeOutput(p){
-      var direction=p.direction, confidence=p.confidence, reasons=p.reasons||[], levels=p.levels||{}, risk=p.risk||{}, summary=p.summary;
-      edgeResult.innerHTML =
-        '<div class="space-y-3">'
-        + '<div class="flex items-center gap-3">'
-        +   '<span class="px-2 py-1 rounded-lg text-xs border '+(direction==='long'?'border-emerald-300 text-emerald-700 bg-emerald-50':(direction==='short'?'border-rose-300 text-rose-700 bg-rose-50':'border-slate-300 text-slate-700 bg-slate-50'))+'">'+(direction==='long'?'LONG 📈':(direction==='short'?'SHORT 📉':'SIDEWAYS ⚖️'))+'</span>'
-        +   '<span class="text-sm text-slate-500">Confidence: <b>'+confidence+'%</b></span>'
-        + '</div>'
-        + (summary?('<p class="text-sm">'+summary+'</p>'):'')
-        + '<div class="grid sm:grid-cols-2 gap-3">'
-        +   '<div class="rounded-lg border border-slate-200 p-3"><div class="text-xs font-medium text-slate-500 mb-1">Klíčové úrovně</div>'
-        +     '<ul class="text-sm space-y-1">'
-        +       (levels.entry?('<li>Entry: <b>'+levels.entry+'</b></li>'):'')
-        +       (levels.target?('<li>Target: <b>'+levels.target+'</b></li>'):'')
-        +       (levels.stop?('<li>Stop: <b>'+levels.stop+'</b></li>'):'')
-        +     '</ul></div>'
-        +   '<div class="rounded-lg border border-slate-200 p-3"><div class="text-xs font-medium text-slate-500 mb-1">Risk & Management</div>'
-        +     '<ul class="text-sm space-y-1">'
-        +       (risk.rr?('<li>R:R: <b>'+risk.rr+'</b></li>'):'')
-        +       (risk.pos?('<li>Velikost pozice: <b>'+risk.pos+'</b></li>'):'')
-        +       (risk.note?('<li>'+risk.note+'</li>'):'')
-        +     '</ul></div>'
-        + '</div>'
-        + (reasons.length?('<div class="rounded-lg border border-slate-200 p-3"><div class="text-xs font-medium text-slate-500 mb-2">Důvody</div><ul class="list-disc pl-5 space-y-1 text-sm">'+reasons.map(function(r){return '<li>'+r+'</li>'}).join('')+'</ul></div>'):'')
-        + '</div>';
-      edgeSave.disabled = false;
-    }
-
-    function mockAnalyze(input){
-      var symbol=input.symbol, note=(input.note||'').toLowerCase();
-      var direction='long';
-      if(note.indexOf('short')>=0 || note.indexOf('breakdown')>=0) direction='short';
-      else if(note.indexOf('range')>=0 || note.indexOf('side')>=0) direction='sideways';
-      var confidence = direction==='sideways'?58:(direction==='long'?68:62);
-      var levels = direction==='long'
-        ? { entry: symbol+': nad lokálním HH ~ +0.5%', target:'+3–5%', stop:'-1% pod swingem' }
-        : direction==='short'
-          ? { entry: symbol+': pod lokálním LL ~ -0.5%', target:'-3–5%', stop:'+1% nad swingem' }
-          : { entry:'uprostřed range', target:'horní/spodní hrana', stop:'mimo range' };
-      var reasons = [
-        direction==='long'?'Vyšší minima + odraz od MA':'Odmítnutí rezistence + slabý objem',
-        'Konfluence horizontálních úrovní',
-        edgeExplain.checked ? 'R:R dává smysl při navržených úrovních' : null
-      ].filter(Boolean);
-      var risk = { rr: direction==='sideways'?'~1.0':'~2.0', pos:'1–2% účtu', note:'Nejedná se o investiční doporučení.' };
-      var summary = 'Demo výstup (bez backendu). V live verzi se použije CV + TA + zprávy.';
-      return { direction:direction, confidence:confidence, reasons:reasons, levels:levels, risk:risk, summary:summary };
-    }
-
-    function callBackend(file,note,symbol){
-      var form=new FormData(); if(file) form.append('file',file);
-      form.append('note',note||''); form.append('symbol',symbol||'');
-      form.append('use_web',edgeUseWeb.checked?'true':'false');
-      form.append('explain_levels',edgeExplain.checked?'true':'false');
-      return fetch('/api/trader-ai/analyze',{method:'POST',body:form}).then(function(res){
-        if(!res.ok) throw new Error('API returned '+res.status);
-        return res.json();
-      });
-    }
-
-    edgeRun.addEventListener('click', function(){
-      var symbol=(edgeSymbol.value||'').trim().toUpperCase();
-      if(!symbol){ alert('Zadej prosím symbol (např. AAPL, NVDA, BTCUSD).'); return; }
-      edgeRun.disabled=true; edgeRun.textContent='Analyzuji…';
-      edgeResult.innerHTML='<div class="text-sm text-slate-500">Probíhá analýza…</div>';
-      (callBackend(edgeFile._file, edgeNote.value, symbol)
-        .catch(function(){ return mockAnalyze({symbol:symbol, note:edgeNote.value}); }))
-        .then(renderEdgeOutput)
-        .catch(function(){ edgeResult.innerHTML='<p class="text-rose-600 text-sm">Analýza selhala. Zkus to znovu.</p>'; })
-        .finally(function(){ edgeRun.disabled=false; edgeRun.textContent='Spustit AI predikci'; });
-    });
-
-    edgeClear.addEventListener('click', function(){
-      edgeFile.value=''; edgeFile._file=null;
-      edgePreview.src=''; edgePreview.classList.add('hidden');
-      edgeCanvas.classList.add('hidden');
-      edgeNote.value='';
-      edgeResult.innerHTML='<p class="text-slate-500 text-sm">Zatím nic. Zadej symbol nebo nahraj graf a spusť AI.</p>';
-      edgeSave.disabled=true;
-    });
-
-    function loadEdgeHistory(){
-      var items = JSON.parse(localStorage.getItem('sm-edge-history')||'[]');
-      edgeHistory.innerHTML = items.length ? '' : '<p class="text-slate-500">Prázdné.</p>';
-      items.slice().reverse().forEach(function(it, idx){
-        var div=document.createElement('div');
-        div.className='rounded-lg border border-slate-200 p-3 flex items-start justify-between gap-3';
-        div.innerHTML =
-          '<div>'
-          + '<div class="text-xs text-slate-500">'+new Date(it.ts).toLocaleString()+'</div>'
-          + '<div class="text-sm"><b>'+it.symbol+'</b> — '+it.direction.toUpperCase()+' ('+it.confidence+'%)</div>'
-          + (it.summary?'<div class="text-xs mt-1">'+it.summary+'</div>':'')
-          + '</div>'
-          + '<button data-idx="'+idx+'" class="rm text-xs px-2 py-1 rounded border border-slate-300 hover:bg-slate-100">Smazat</button>';
-        edgeHistory.appendChild(div);
-      });
-      var btns=edgeHistory.querySelectorAll('.rm');
-      for(var i=0;i<btns.length;i++){
-        btns[i].addEventListener('click', function(){
-          var items = JSON.parse(localStorage.getItem('sm-edge-history')||'[]');
-          var realIndex = items.length - 1 - parseInt(this.dataset.idx,10);
-          items.splice(realIndex,1);
-          localStorage.setItem('sm-edge-history', JSON.stringify(items));
-          loadEdgeHistory();
-        });
-      }
-    }
-    edgeSave.addEventListener('click', function(){
-      if(edgeResult.textContent.indexOf('Zatím nic')>=0) return;
-      var mConf = /Confidence: <b>(\d+)%<\/b>/.exec(edgeResult.innerHTML);
-      var conf = mConf ? mConf[1] : '0';
-      var mDir = /LONG|SHORT|SIDEWAYS/.exec(edgeResult.innerHTML);
-      var dir = mDir ? mDir[0].toLowerCase() : '';
-      var mSum = edgeResult.innerHTML.match(/<p class="text-sm">(.*?)<\/p>/);
-      var summary = mSum ? mSum[1] : '';
-      var items = JSON.parse(localStorage.getItem('sm-edge-history')||'[]');
-      items.push({ ts:Date.now(), symbol:(edgeSymbol.value||'').trim().toUpperCase(), direction:dir, confidence:parseInt(conf,10), summary:summary });
-      localStorage.setItem('sm-edge-history', JSON.stringify(items));
-      loadEdgeHistory();
-    });
-    loadEdgeHistory();
   });
   </script>
 </body>
