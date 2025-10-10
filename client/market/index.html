@@ -3,315 +3,238 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>StrategyMind — Market Forecast (demo)</title>
-
-  <!-- Tailwind přes CDN (kvůli rychlému layoutu) -->
+  <title>StrategyMind — Market Scanner (demo)</title>
   <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-
-  <style>
-    /* jemný gradient pozadí jako TradingView mood */
-    body { background: radial-gradient(1200px 600px at 70% 10%, #f8fafc 0, #ffffff 60%); }
-    .chip { @apply inline-flex items-center rounded-full border border-slate-200 px-2 py-0.5 text-xs text-slate-600; }
-    .legend-dot{ width:.65rem;height:.65rem;border-radius:50%;display:inline-block;margin-right:.35rem; }
-  </style>
 </head>
-<body class="min-h-screen text-slate-900">
-  <header class="sticky top-0 z-10 backdrop-blur bg-white/70 border-b border-slate-200">
-    <div class="mx-auto max-w-6xl px-4 py-3 flex items-center gap-3">
-      <a href="/" class="text-sm text-slate-600 hover:text-slate-900">← Zpět na homepage</a>
-      <div class="ml-auto flex gap-2">
-        <a href="/client/" class="chip">Klientská sekce</a>
-        <span class="chip">Market Scanner</span>
-      </div>
+<body class="bg-slate-50 text-slate-800">
+  <header class="sticky top-0 z-10 bg-white/90 backdrop-blur border-b">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center gap-3">
+      <a href="/client/" class="text-sm px-3 py-1.5 rounded-lg border hover:bg-slate-50">← Zpět na klientskou sekci</a>
+      <nav class="ml-auto flex gap-2">
+        <a class="px-3 py-1.5 rounded-full text-sm bg-slate-900 text-white">Market Scanner</a>
+        <a class="px-3 py-1.5 rounded-full text-sm bg-slate-100 hover:bg-slate-200" href="/client/">Real-Estate</a>
+        <a class="px-3 py-1.5 rounded-full text-sm bg-slate-100 hover:bg-slate-200" href="/client/">Idea Lab</a>
+      </nav>
     </div>
   </header>
 
-  <main class="mx-auto max-w-6xl px-4 py-8">
-    <div class="mb-6">
-      <h1 class="text-2xl md:text-3xl font-semibold tracking-tight">NVDA — 1Y forecast (demo)</h1>
-      <p class="text-slate-600 mt-1">Historie ceny + predikce (min / avg / max) s vyznačením současné ceny. V ostré verzi sem napojíme AI a živá data.</p>
+  <main class="max-w-6xl mx-auto px-4 py-8">
+    <div class="flex items-start gap-4 mb-6">
+      <h1 class="text-2xl md:text-3xl font-semibold">Market Scanner</h1>
+      <span class="text-slate-500 mt-1">— rozklikni řádek pro detail predikce</span>
+      <a href="#" class="ml-auto inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-900 text-white text-sm hover:bg-slate-800">
+        Stáhnout report (MD)
+      </a>
     </div>
 
-    <section class="grid gap-6 md:grid-cols-12">
-      <!-- Graf -->
-      <div class="md:col-span-9 rounded-2xl border border-slate-200 bg-white shadow-sm p-4 md:p-6">
-        <div class="flex items-center justify-between mb-4">
-          <div class="flex items-center gap-2">
-            <span class="chip">Předpověď 1Y</span>
-            <span class="chip">Past 2Y</span>
-          </div>
-          <div class="text-sm text-slate-500">*Demo data</div>
-        </div>
-        <canvas id="forecastChart" height="110"></canvas>
-      </div>
+    <!-- Filtřík (demo) -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-5">
+      <input id="q" placeholder="Hledat symbol / název…" class="w-full px-3 py-2 rounded-lg border outline-none focus:ring-2 focus:ring-slate-300" />
+      <select class="w-full px-3 py-2 rounded-lg border">
+        <option>Všechny typy</option>
+        <option>Akcie</option><option>Krypto</option><option>Indexy</option>
+      </select>
+      <select class="w-full px-3 py-2 rounded-lg border">
+        <option>Seřadit: Symbol</option>
+        <option>Seřadit: 1Y avg</option>
+        <option>Seřadit: Confidence</option>
+      </select>
+    </div>
 
-      <!-- Info panel vpravo (etikety jako na screenu) -->
-      <aside class="md:col-span-3 rounded-2xl border border-slate-200 bg-white shadow-sm p-4 md:p-6">
-        <h3 class="font-semibold mb-4">Etikety &amp; hodnoty</h3>
-        <ul class="space-y-2 text-sm">
-          <li class="flex items-center justify-between">
-            <span><span class="legend-dot" style="background:#0ea5e9"></span>Current</span>
-            <span id="lab-current" class="font-medium">—</span>
-          </li>
-          <li class="flex items-center justify-between">
-            <span><span class="legend-dot" style="background:#14b8a6"></span>Avg (1Y)</span>
-            <span id="lab-avg" class="font-medium text-emerald-600">—</span>
-          </li>
-          <li class="flex items-center justify-between">
-            <span><span class="legend-dot" style="background:#22c55e"></span>Max (1Y)</span>
-            <span id="lab-max" class="font-medium">—</span>
-          </li>
-          <li class="flex items-center justify-between">
-            <span><span class="legend-dot" style="background:#ef4444"></span>Min (1Y)</span>
-            <span id="lab-min" class="font-medium">—</span>
-          </li>
-        </ul>
-        <hr class="my-5">
-        <div class="space-y-2 text-sm">
-          <div class="flex items-center justify-between">
-            <span>Confidence</span><span id="lab-conf" class="font-medium">—</span>
-          </div>
-          <div class="flex items-center justify-between">
-            <span>Analyst stance</span><span id="lab-stance" class="font-medium">Strong buy</span>
-          </div>
-        </div>
-      </aside>
-    </section>
-
-    <!-- Poznámky k predikci -->
-    <section class="mt-8 grid gap-6 md:grid-cols-2">
-      <div class="rounded-2xl border border-slate-200 bg-white shadow-sm p-4 md:p-6">
-        <h3 class="font-semibold mb-3">Teze</h3>
-        <p id="lab-thesis" class="text-slate-700">
-          Růst AI segmentu, silný pipeline, rozšiřující se marže. Re-rating po nové produktové linii.
-        </p>
-      </div>
-      <div class="rounded-2xl border border-slate-200 bg-white shadow-sm p-4 md:p-6">
-        <h3 class="font-semibold mb-3">Neplatí, pokud</h3>
-        <p id="lab-invalid" class="text-slate-700">
-          Breakdown pod klíčovým supportem a prudká komprese marží / poptávky.
-        </p>
-      </div>
-    </section>
+    <!-- Tabulka -->
+    <div class="overflow-hidden rounded-2xl border bg-white">
+      <table class="w-full text-sm">
+        <thead class="bg-slate-50 border-b">
+          <tr class="text-left">
+            <th class="px-4 py-3">Symbol</th>
+            <th class="px-4 py-3">Název</th>
+            <th class="px-4 py-3">Cena</th>
+            <th class="px-4 py-3">1D %</th>
+            <th class="px-4 py-3">1W %</th>
+            <th class="px-4 py-3">1Y predikce (min/avg/max)</th>
+            <th class="px-4 py-3">Conf.</th>
+            <th class="px-4 py-3"></th>
+          </tr>
+        </thead>
+        <tbody id="rows" class="divide-y">
+          <!-- Řádky se doplní JS níže -->
+        </tbody>
+      </table>
+    </div>
   </main>
 
   <script>
     /**
-     * Jednoduchý renderer forecast grafu ve stylu „fan chart“.
-     * Vstupní data můžeš nahradit AI/živými daty.
+     * Vykreslí „vějíř“ predikce do zadaného kontejneru pomocí čistého SVG.
+     * - history: [čísla] — historické hodnoty (poslední bod = start predikce)
+     * - forecast: {min:[…], avg:[…], max:[…]} — 3 trajektorie o stejné délce
      */
-    function renderForecast({
-      symbol = "NVDA",
-      history = [],           // [{t: '2024-01', v: 120}, ...]
-      current,                // číslo
-      forecastMonths = 12,    // kolik bodů dopředu
-      minTarget, avgTarget, maxTarget, // cílové hodnoty po 12 měsících
-      confidence = 0.72,      // 0–1
-      thesis = "", invalidation = ""
-    }) {
-      // Etikety
-      document.querySelector('#lab-current').textContent = formatUSD(current);
-      document.querySelector('#lab-avg').textContent     = formatUSD(avgTarget);
-      document.querySelector('#lab-max').textContent     = formatUSD(maxTarget);
-      document.querySelector('#lab-min').textContent     = formatUSD(minTarget);
-      document.querySelector('#lab-conf').textContent    = Math.round(confidence * 100) + "%";
-      if (thesis)      document.querySelector('#lab-thesis').textContent  = thesis;
-      if (invalidation)document.querySelector('#lab-invalid').textContent = invalidation;
+    function renderForecastSparkline(container, history, forecast, opts = {}) {
+      const width  = opts.width  ?? 430;
+      const height = opts.height ?? 200;
+      const pad    = 22;
 
-      // Připrav osy/etikety
-      const histLabels = history.map(p => p.t);
-      const histData   = history.map(p => p.v);
+      const allVals = [...history, ...forecast.min, ...forecast.avg, ...forecast.max];
+      const minV = Math.min(...allVals);
+      const maxV = Math.max(...allVals);
 
-      // generuj 12 budoucích měsíců
-      const futureLabels = [];
-      const now = new Date();
-      for (let i = 1; i <= forecastMonths; i++) {
-        const d = new Date(now.getFullYear(), now.getMonth() + i, 1);
-        futureLabels.push(d.toLocaleString('en', {month:'short'}));
-      }
+      const nHist = history.length;
+      const nFor  = forecast.avg.length;
+      const total = nHist + nFor;
 
-      // Interpolace min/avg/max od current -> target
-      const interp = (to) => {
-        const arr = [];
-        for (let i = 1; i <= forecastMonths; i++) {
-          const v = current + (to - current) * (i / forecastMonths);
-          arr.push(v);
-        }
-        return arr;
-      };
-      const futMin = interp(minTarget);
-      const futAvg = interp(avgTarget);
-      const futMax = interp(maxTarget);
+      // škálování
+      const x = i => pad + (i/(total-1)) * (width - 2*pad);
+      const y = v => pad + (1 - (v - minV)/(maxV - minV || 1)) * (height - 2*pad);
 
-      const labels = [...histLabels, ...futureLabels];
+      // pomůcky
+      const linePath = (arr, xOffset=0) =>
+        arr.map((v,i)=>`${i?'L':'M'}${x(i+xOffset).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
 
-      // Dataset historie
-      const historyDataset = {
-        type: 'line',
-        label: symbol + ' (historie)',
-        data: [...histData, null], // null v bodě přechodu
-        borderColor: '#0ea5e9',
-        borderWidth: 2,
-        tension: 0.3,
-        pointRadius: 0
-      };
+      // polygon pásma min-max
+      const bandPoints = [
+        ...forecast.min.map((v,i)=>`${x(nHist+i).toFixed(1)},${y(v).toFixed(1)}`),
+        ...forecast.max.map((v,i)=>`${x(nHist + (nFor-1-i)).toFixed(1)},${y(forecast.max[nFor-1-i]).toFixed(1)}`)
+      ].join(' ');
 
-      // „Fan“ – min/max vyplněný kužel
-      const minDataset = {
-        type: 'line',
-        label: 'Min (1Y)',
-        data: [...Array(histData.length).fill(null), ...futMin],
-        borderColor: '#ef4444',
-        borderWidth: 1.5,
-        pointRadius: 0,
-        tension: 0.3,
-        fill: false
-      };
-      const maxDataset = {
-        type: 'line',
-        label: 'Max (1Y)',
-        data: [...Array(histData.length).fill(null), ...futMax],
-        borderColor: '#22c55e',
-        borderWidth: 1.5,
-        pointRadius: 0,
-        tension: 0.3,
-        fill: '-1' // vyplní prostor mezi max a předešlým datasetem (min)
-      };
-      // poloprůhledná výplň kužele
-      const fillPlugin = {
-        id: 'fanFill',
-        beforeDatasetsDraw(chart, args, opts) {
-          const {ctx, chartArea, scales} = chart;
-          const y = scales.y;
-          const x = scales.x;
-          ctx.save();
-          ctx.globalAlpha = 0.12;
-          ctx.fillStyle = '#10b981';
-          ctx.beginPath();
-          // pro jednoduchost spojíme oba budoucí průběhy
-          const n = futMin.length;
-          // horní hrana (max) zleva doprava
-          for (let i = 0; i < n; i++) {
-            const xi = x.getPixelForValue(histLabels.length + i);
-            const yi = y.getPixelForValue(futMax[i]);
-            if (i === 0) ctx.moveTo(xi, yi); else ctx.lineTo(xi, yi);
-          }
-          // spodní hrana (min) zprava doleva
-          for (let i = n - 1; i >= 0; i--) {
-            const xi = x.getPixelForValue(histLabels.length + i);
-            const yi = y.getPixelForValue(futMin[i]);
-            ctx.lineTo(xi, yi);
-          }
-          ctx.closePath();
-          ctx.fill();
-          ctx.restore();
-        }
-      };
+      // SVG
+      container.innerHTML = `
+        <svg viewBox="0 0 ${width} ${height}" width="${width}" height="${height}" class="w-full h-auto">
+          <!-- pozadí -->
+          <rect x="0" y="0" width="${width}" height="${height}" rx="18" class="fill-white"/>
+          <rect x="${pad-10}" y="${pad-10}" width="${width-2*(pad-10)}" height="${height-2*(pad-10)}" rx="14" class="fill-slate-50"/>
 
-      // Avg předpověď – zvýrazněná
-      const avgDataset = {
-        type: 'line',
-        label: 'Avg (1Y)',
-        data: [...Array(histData.length).fill(null), ...futAvg],
-        borderColor: '#14b8a6',
-        borderWidth: 2.5,
-        pointRadius: 0,
-        tension: 0.35
-      };
+          <!-- pásmo min-max (vějíř) -->
+          <polygon points="${bandPoints}" fill="rgba(16,185,129,0.12)"></polygon>
 
-      // Čárkovaná „current“ baseline (vodorovná od splitu)
-      const currentLine = {
-        id: 'currentLine',
-        afterDatasetsDraw(chart, args, pluginOptions) {
-          const {ctx, scales} = chart;
-          const y = scales.y.getPixelForValue(current);
-          const xLeft  = scales.x.getPixelForValue(histLabels.length - 0.1);
-          const xRight = scales.x.getPixelForValue(labels.length - 1);
-          ctx.save();
-          ctx.setLineDash([6,6]);
-          ctx.strokeStyle = '#0ea5e9';
-          ctx.lineWidth = 1.5;
-          ctx.beginPath();
-          ctx.moveTo(xLeft, y);
-          ctx.lineTo(xRight, y);
-          ctx.stroke();
-          ctx.restore();
-        }
-      };
+          <!-- čárkovaná svislice = start predikce -->
+          <line x1="${x(nHist)}" y1="${pad}" x2="${x(nHist)}" y2="${height-pad}"
+                stroke="#94a3b8" stroke-dasharray="4 4" stroke-width="1"/>
 
-      // Vertikální oddělovač (konec historie)
-      const splitLine = {
-        id: 'splitLine',
-        afterDatasetsDraw(chart) {
-          const {ctx, scales, chartArea} = chart;
-          const x = scales.x.getPixelForValue(histLabels.length - 0.02);
-          ctx.save();
-          ctx.strokeStyle = '#94a3b8';
-          ctx.setLineDash([3,4]);
-          ctx.beginPath();
-          ctx.moveTo(x, chartArea.top);
-          ctx.lineTo(x, chartArea.bottom);
-          ctx.stroke();
-          ctx.restore();
-        }
-      };
+          <!-- historie (plná modrá) -->
+          <path d="${linePath(history,0)}" fill="none" stroke="#2563eb" stroke-width="2.5"/>
 
-      // vykreslení grafu
-      const ctx = document.getElementById('forecastChart').getContext('2d');
-      if (window._forecastChart) window._forecastChart.destroy();
-      window._forecastChart = new Chart(ctx, {
-        data: { labels, datasets: [historyDataset, minDataset, maxDataset, avgDataset] },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          interaction: { mode: 'index', intersect: false },
-          plugins: {
-            legend: { display: false },
-            tooltip: {
-              callbacks: {
-                label: (context) => `${context.dataset.label}: ${formatUSD(context.parsed.y)}`
-              }
-            }
-          },
-          scales: {
-            x: { grid: { display: false } },
-            y: { grid: { color: 'rgba(148,163,184,.2)' } }
-          }
-        },
-        plugins: [fillPlugin, currentLine, splitLine]
-      });
+          <!-- predikce avg (plná tmavě zelená) -->
+          <path d="M${x(nHist).toFixed(1)},${y(history[nHist-1]).toFixed(1)} ${linePath(forecast.avg,0)}"
+                fill="none" stroke="#059669" stroke-width="2.5"/>
+
+          <!-- predikce min/max (čárkované) -->
+          <path d="M${x(nHist).toFixed(1)},${y(history[nHist-1]).toFixed(1)} ${linePath(forecast.min,0)}"
+                fill="none" stroke="#ef4444" stroke-width="2" stroke-dasharray="6 4"/>
+          <path d="M${x(nHist).toFixed(1)},${y(history[nHist-1]).toFixed(1)} ${linePath(forecast.max,0)}"
+                fill="none" stroke="#10b981" stroke-width="2" stroke-dasharray="6 4"/>
+
+          <!-- štuplíky na konci a štítky -->
+          ${(() => {
+            const lx = x(total-1);
+            const lyMin = y(forecast.min[nFor-1]);
+            const lyAvg = y(forecast.avg[nFor-1]);
+            const lyMax = y(forecast.max[nFor-1]);
+            return `
+              <circle cx="${lx}" cy="${lyAvg}" r="3.5" fill="#059669"/>
+              <circle cx="${lx}" cy="${lyMin}" r="3" fill="#ef4444"/>
+              <circle cx="${lx}" cy="${lyMax}" r="3" fill="#10b981"/>
+
+              <g font-size="10" font-family="ui-sans-serif,system-ui">
+                <text x="${lx+8}" y="${lyAvg+3}" fill="#065f46">Avg</text>
+                <text x="${lx+8}" y="${lyMax+3}" fill="#065f46">Max</text>
+                <text x="${lx+8}" y="${lyMin+3}" fill="#991b1b">Min</text>
+              </g>
+            `;
+          })()}
+        </svg>
+      `;
     }
 
-    // Pomocné formátování
-    function formatUSD(v){ return Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:2}).format(v); }
+    // --- DEMO DATA ----------------------------------------------------------
+    const demoRows = [
+      {
+        symbol: "AAPL", name: "Apple Inc.", price: "219,85", d1:"+1.26%", w1:"+2.10%",
+        forecast: {min:165, avg:245, max:310}, conf:"72%",
+        history: [180,186,191,188,195,201,198,205,208,215,212,220],
+        fan: {
+          min:[190,185,180,175,170,165],
+          avg:[222,228,232,238,241,245],
+          max:[230,245,262,280,296,310],
+        },
+        bull:"Růst služeb a ekosystému, stabilní marže. Re-rating po nové produktové linii.",
+        bear:"Neplatí pokud: breakdown pod 195 s objemy a slabý guidance."
+      },
+      {
+        symbol:"BTCUSD", name:"Bitcoin", price:"67 200", d1:"+2.30%", w1:"+6.80%",
+        forecast:{min:42000, avg:88000, max:120000}, conf:"58%",
+        history:[52000,56000,58000,54000,57000,62000,60000,64000,63000,65000,66000,67200],
+        fan:{
+          min:[60000,56000,52000,48000,45000,42000],
+          avg:[70000,76000,80000,84000,86000,88000],
+          max:[82000,90000,98000,106000,113000,120000]
+        },
+        bull:"Poptávka přes ETF, halving + omezená nabídka, sílící narativ digitálního zlata.",
+        bear:"Neplatí pokud: regulační tlak, silný risk-off, útok na síť."
+      }
+    ];
 
-    // ------- DEMO DATA (můžeš zahodit a napojit AI/živá data) -------
-    (function runDemo(){
-      // 24 měsíců historie (umělé čísla kvůli ukázce)
-      const start = 24, seed = 120;
-      const history = Array.from({length: start}, (_,i)=>{
-        const d = new Date(); d.setMonth(d.getMonth()-(start-i));
-        const v = seed + i*4 + (Math.sin(i/2)*8) + (i>16? i*1.6 : 0);
-        return { t: d.toLocaleString('en',{month:'short'})+' '+d.getFullYear().toString().slice(2), v: Math.max(40, Math.round(v*100)/100) };
-      });
-      const current = history[history.length-1].v;
+    // --- Sestavení řádků ----------------------------------------------------
+    const tbody = document.getElementById('rows');
 
-      renderForecast({
-        symbol: "NVDA",
-        history,
-        current,
-        forecastMonths: 12,
-        minTarget: current*0.53,   // ~ -47%
-        avgTarget: current*1.1626,  // +16.26% jako ve screenu
-        maxTarget: current*2.06,    // ~ +106%
-        confidence: 0.72,
-        thesis: "Růst AI poptávky, rozšíření produktové řady, stabilní marže — prostor pro re-rating.",
-        invalidation: "Ztráta klíčového supportu a dlouhodobý útlum poptávky by predikci negoval."
+    demoRows.forEach((r, idx) => {
+      const tr = document.createElement('tr');
+      tr.className = "align-top hover:bg-slate-50/80";
+      tr.innerHTML = `
+        <td class="px-4 py-3 font-semibold">${r.symbol}</td>
+        <td class="px-4 py-3">${r.name}</td>
+        <td class="px-4 py-3">${r.price}</td>
+        <td class="px-4 py-3 text-emerald-600">${r.d1}</td>
+        <td class="px-4 py-3 text-emerald-600">${r.w1}</td>
+        <td class="px-4 py-3">
+          <div class="text-slate-500 text-[13px] mb-2">
+            ${r.forecast.min} / <span class="font-semibold text-slate-800">${r.forecast.avg}</span> / ${r.forecast.max}
+          </div>
+          <div id="spark-${idx}" class="rounded-2xl border overflow-hidden bg-white"></div>
+          <div class="mt-2 text-[11px] text-slate-400">* Čárkovaně min/max, plná čára průměr. Vertikální čára = start predikce (demo).</div>
+        </td>
+        <td class="px-4 py-3">${r.conf}</td>
+        <td class="px-4 py-3">
+          <button class="px-3 py-1.5 rounded-lg border hover:bg-slate-100 text-slate-700">Detail</button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+
+      // „podřádek“ s tezí/bear podmínkou
+      const tr2 = document.createElement('tr');
+      tr2.className = "bg-white";
+      tr2.innerHTML = `
+        <td></td>
+        <td colspan="6" class="px-4 pb-5">
+          <div class="mt-3 flex flex-col gap-1 text-[13px]">
+            <div><span class="inline-block px-2 py-0.5 rounded-full bg-slate-100 border mr-2">Teze</span>${r.bull}</div>
+            <div class="text-slate-500"><span class="inline-block px-2 py-0.5 rounded-full bg-slate-100 border mr-2">Neplatí pokud</span>${r.bear}</div>
+          </div>
+        </td>
+        <td></td>
+      `;
+      tbody.appendChild(tr2);
+
+      // vykresli SVG vějíř
+      renderForecastSparkline(
+        document.getElementById(`spark-${idx}`),
+        r.history,
+        r.fan,
+        { width: 450, height: 220 }
+      );
+    });
+
+    // jednoduché vyhledávání (demo)
+    document.getElementById('q').addEventListener('input', (e)=>{
+      const q = e.target.value.toLowerCase();
+      [...tbody.querySelectorAll('tr')].forEach(tr=>{
+        if (tr.children.length < 8) return; // přeskoč „podřádky“
+        const sym = tr.children[0].textContent.toLowerCase();
+        const name= tr.children[1].textContent.toLowerCase();
+        tr.style.display = (sym.includes(q) || name.includes(q)) ? '' : 'none';
+        const next = tr.nextElementSibling;
+        if (next) next.style.display = tr.style.display;
       });
-    })();
+    });
   </script>
 </body>
 </html>
