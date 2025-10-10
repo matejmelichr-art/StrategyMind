@@ -3,318 +3,313 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>StrategyMind — Market Scanner (univerzum)</title>
+  <title>StrategyMind — Market Scanner (demo v2)</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
   <style>
     html,body{ font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial; }
-    .row:hover { background:#f8fafc; }
-    .pill{ padding:.375rem .625rem; border-radius:9999px; border:1px solid rgba(15,23,42,.08); }
-    .kbd{ background:#f3f4f6; padding:.125rem .375rem; border-radius:.25rem; font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,"Courier New",monospace; font-size:.75rem; }
-    /* mini-graf */
-    .spark path.avg{ stroke:#2563eb; stroke-width:2; fill:none; }
-    .spark path.min,.spark path.max{ stroke-width:2; fill:none; stroke-dasharray:4 4; }
-    .spark path.min{ stroke:#ef4444; } .spark path.max{ stroke:#22c55e; }
-    .spark line.guide{ stroke:#94a3b8; stroke-dasharray:4 4; opacity:.6; }
-    .spark-wrap{ display:flex; align-items:center; gap:.75rem; }
-    .target-badges{ display:flex; flex-direction:column; gap:.2rem; font-size:.75rem; line-height:1.1; }
-    .target-badges .b{ display:flex; align-items:center; gap:.4rem; white-space:nowrap; }
-    .dot{ width:.5rem; height:.5rem; border-radius:9999px; display:inline-block; }
-    .dot.max{ background:#22c55e; } .dot.avg{ background:#2563eb; } .dot.min{ background:#ef4444; }
-    /* virtualizace */
-    #listViewport{ max-height:70vh; overflow:auto; }
-    .tabular-nums{ font-variant-numeric: tabular-nums; }
+    .row:hover { background: #f8fafc; }
+    .pill { padding:.375rem .625rem; border-radius:9999px; border:1px solid rgba(15,23,42,.08); }
+    .kbd { background:#f3f4f6; padding:.125rem .375rem; border-radius:.25rem; font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Courier New", monospace; font-size:.75rem; }
+    /* Mini-graf */
+    .spark path.avg   { stroke:#2563eb; stroke-width: 2; fill: none; }
+    .spark path.min,
+    .spark path.max   { stroke-width: 2; fill: none; stroke-dasharray: 4 4; }
+    .spark path.min   { stroke:#ef4444; }
+    .spark path.max   { stroke:#22c55e; }
+    .spark line.guide { stroke:#94a3b8; stroke-dasharray:4 4; opacity:.6; }
+    .spark-wrap { display:flex; align-items:center; gap:.75rem; }
+    .target-badges { display:flex; flex-direction:column; gap:.2rem; font-size:.75rem; line-height:1.1; }
+    .target-badges .b { display:flex; align-items:center; gap:.4rem; white-space:nowrap; }
+    .dot { width:.5rem; height:.5rem; border-radius:9999px; display:inline-block; }
+    .dot.max { background:#22c55e; } .dot.avg { background:#2563eb; } .dot.min { background:#ef4444; }
+    .skeleton { background:linear-gradient(90deg,#f3f4f6 25%,#e5e7eb 37%,#f3f4f6 63%); background-size:400% 100%; animation:sh 1.2s ease-in-out infinite; }
+    @keyframes sh{0%{background-position:100% 0}100%{background-position:0 0}}
   </style>
 </head>
 <body class="bg-slate-50 text-slate-900">
-<header class="sticky top-0 z-20 backdrop-blur bg-white/80 border-b border-slate-200">
-  <div class="max-w-7xl mx-auto px-4 py-3 flex items-center gap-3">
-    <a href="/client/" class="text-sm text-slate-600 hover:text-slate-900 flex items-center gap-2">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" class="opacity-70"><path d="M15 6l-6 6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      Zpět na klientskou sekci
-    </a>
-    <div class="ml-auto flex items-center gap-2">
-      <a href="/client/market/" class="pill bg-white font-medium">Market Scanner</a>
-      <a href="/client/real-estate/" class="pill">Real-Estate</a>
-      <a href="/client/idea-lab/" class="pill">Idea Lab</a>
-      <span class="ml-2 text-xs text-slate-500 border border-slate-200 rounded-full px-2 py-1 select-none">universe</span>
+  <header class="sticky top-0 z-20 backdrop-blur bg-white/80 border-b border-slate-200">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center gap-3">
+      <a href="/client/" class="text-sm text-slate-600 hover:text-slate-900 flex items-center gap-2">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" class="opacity-70"><path d="M15 6l-6 6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Zpět na klientskou sekci
+      </a>
+      <div class="ml-auto flex items-center gap-2">
+        <a href="/client/market/" class="pill bg-white font-medium">Market Scanner</a>
+        <a href="/client/real-estate/" class="pill">Real-Estate</a>
+        <a href="/client/idea-lab/" class="pill">Idea Lab</a>
+        <span class="ml-2 text-xs text-slate-500 border border-slate-200 rounded-full px-2 py-1 select-none">v2</span>
+      </div>
     </div>
-  </div>
-</header>
+  </header>
 
-<main class="max-w-7xl mx-auto px-4 py-6">
-  <h1 class="text-3xl font-semibold tracking-tight">Market Scanner</h1>
-  <p class="mt-2 text-slate-600 max-w-3xl">
-    Kompletní univerzum tradovatelných symbolů (akcie, indexy, ETF, komodity, futures, krypto; opce načítáme kontextově).
-    Vyhledej, filtruj, seřaď. Řádek <b>rozklikni</b> pro tezi, podmínky neplatnosti a mini-graf s 1Y rozmezím
-    (<i>min / avg / max</i>). V demu jsou statická data; live napojíš níže označenou funkcí.
-  </p>
+  <main class="max-w-6xl mx-auto px-4 py-8">
+    <h1 class="text-3xl font-semibold tracking-tight">Market Scanner</h1>
+    <p class="mt-2 text-slate-600 max-w-3xl">
+      Vyhledej a filtruj akcie, indexy, forex, krypto a komodity. Řádek <strong>rozklikni</strong> pro tezi predikce,
+      podmínky neplatnosti a <strong>mini-graf</strong> s 1Y rozmezím (<em>min / avg / max</em>) + štítky cílových hodnot.
+      V demu jsou statická data, ale tickery se načítají z <code>assets/universe-lite.json</code>.
+    </p>
 
-  <!-- Toolbar -->
-  <div class="mt-6 grid grid-cols-1 md:grid-cols-5 gap-3">
-    <div class="relative md:col-span-2">
-      <input id="q" class="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white outline-none focus:ring-2 focus:ring-slate-200"
-             placeholder="Hledej: symbol / název / ISIN / exchange…" />
-      <div class="absolute inset-y-0 right-2 flex items-center text-slate-400 pointer-events-none"><span class="kbd">/</span></div>
-    </div>
-    <select id="assetFilter" class="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white outline-none focus:ring-2 focus:ring-slate-200">
-      <option value="">Všechny třídy aktiv</option>
-      <option value="stock">Akcie/ETF</option>
-      <option value="index">Index</option>
-      <option value="commodity">Komodita</option>
-      <option value="futures">Futures</option>
-      <option value="crypto">Krypto</option>
-      <option value="forex">FX</option>
-    </select>
-    <select id="regionFilter" class="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white outline-none focus:ring-2 focus:ring-slate-200">
-      <option value="">Všechny regiony</option>
-      <option value="US">US</option><option value="EU">EU</option><option value="UK">UK</option>
-      <option value="APAC">APAC</option><option value="Global">Global</option>
-    </select>
-    <select id="sortBy" class="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white outline-none focus:ring-2 focus:ring-slate-200">
-      <option value="symbol">Seřadit: Symbol</option>
-      <option value="name">Seřadit: Název</option>
-      <option value="price">Seřadit: Cena</option>
-      <option value="w1">Seřadit: 1W %</option>
-      <option value="conf">Seřadit: Confidence</option>
-    </select>
-  </div>
-
-  <!-- Head row -->
-  <div class="mt-5 rounded-2xl border border-slate-200 bg-white shadow-sm">
-    <div class="grid grid-cols-[110px,1fr,120px,110px,110px,230px,90px,90px] px-4 py-2 text-sm font-medium text-slate-500 bg-slate-50">
-      <div>Symbol</div><div>Název</div>
-      <div class="text-right">Cena</div><div class="text-right">1D %</div><div class="text-right">1W %</div>
-      <div class="text-center">1Y predikce <span class="text-slate-400">(min / avg / max)</span></div>
-      <div class="text-right">Conf.</div><div></div>
+    <!-- Toolbar -->
+    <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-3">
+      <div class="relative">
+        <input id="q" class="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white outline-none focus:ring-2 focus:ring-slate-200"
+               placeholder="Hledej symbol / název…" />
+        <div class="absolute inset-y-0 right-2 flex items-center text-slate-400 pointer-events-none">
+          <span class="kbd">/</span>
+        </div>
+      </div>
+      <select id="typeFilter" class="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white outline-none focus:ring-2 focus:ring-slate-200">
+        <option value="">Všechny typy</option>
+        <option value="stock">Akcie</option>
+        <option value="index">Index</option>
+        <option value="forex">Forex</option>
+        <option value="crypto">Krypto</option>
+        <option value="commodity">Komodita</option>
+      </select>
+      <select id="sortBy" class="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white outline-none focus:ring-2 focus:ring-slate-200">
+        <option value="symbol">Seřadit: Symbol</option>
+        <option value="price">Seřadit: Cena</option>
+        <option value="w1">Seřadit: 1W %</option>
+        <option value="conf">Seřadit: Confidence</option>
+      </select>
     </div>
 
-    <!-- Virtualized viewport -->
-    <div id="listViewport">
+    <!-- Table -->
+    <div class="mt-5 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+      <div class="grid grid-cols-[110px,1fr,120px,110px,110px,230px,90px,90px] px-4 py-2 text-sm font-medium text-slate-500 bg-slate-50">
+        <div>Symbol</div>
+        <div>Název</div>
+        <div class="text-right">Cena</div>
+        <div class="text-right">1D %</div>
+        <div class="text-right">1W %</div>
+        <div class="text-center">1Y predikce <span class="text-slate-400">(min / avg / max)</span></div>
+        <div class="text-right">Conf.</div>
+        <div></div>
+      </div>
       <div id="rows"></div>
-    </div>
-
-    <!-- Pagination -->
-    <div class="flex items-center justify-between px-4 py-3 border-t border-slate-200 text-sm">
-      <div class="text-slate-500">Zobrazeno <span id="shown">0</span> z <span id="total">0</span> symbolů</div>
-      <div class="flex items-center gap-2">
-        <button id="prev" class="px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50">« Předchozí</button>
-        <span id="page" class="min-w-[4rem] text-center"></span>
-        <button id="next" class="px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50">Další »</button>
-        <select id="pageSize" class="ml-2 px-2 py-1.5 rounded-lg border border-slate-200">
-          <option>25</option><option selected>50</option><option>100</option><option>200</option>
-        </select>
+      <div id="loading" class="px-4 py-6 hidden">
+        <div class="h-6 w-2/3 rounded skeleton mb-3"></div>
+        <div class="h-6 w-full rounded skeleton mb-2"></div>
+        <div class="h-6 w-full rounded skeleton mb-2"></div>
+        <div class="h-6 w-3/4 rounded skeleton"></div>
       </div>
     </div>
-  </div>
 
-  <p class="mt-3 text-xs text-slate-500">
-    * Opce: kvůli velikosti načítáme až v detailu podkladového aktiva (strike/expiry filtry).  
-    * Live data/API: připoj funkci <code>hydrateLiveData()</code> níže.
-  </p>
-</main>
+    <p class="mt-3 text-xs text-slate-500">* Demo verze se statickými daty. V ostré verzi připojíme AI teze + zprávy + živé ceny.</p>
+  </main>
 
-<script>
-  // ===== Konfigurace zdroje dat ============================================
-  // Umísti JSON se symboly sem (viz instrukce pod kódem):
-  const UNIVERSE_URL = '/assets/universe-lite.json';
+  <script>
+    // ===== Helpers =====
+    const fmt = new Intl.NumberFormat('cs-CZ', { maximumFractionDigits: 2 });
+    const pct = v => (v >= 0 ? '+' : '') + v.toFixed(2) + '%';
+    const rowsEl = document.getElementById('rows');
+    const loadingEl = document.getElementById('loading');
 
-  // ===== Pomocné formátování ==============================================
-  const fmt = new Intl.NumberFormat('cs-CZ',{ maximumFractionDigits: 2 });
-  const pct = v => (v>=0?'+':'') + (Math.round(v*100)/100).toFixed(2) + '%';
+    // převod bodů do SVG path
+    function pathFrom(points, width=180, height=64, pad=4){
+      const max = Math.max(...points.map(v=>Math.abs(v))) || 1;
+      const step = (width - pad*2) / (points.length-1);
+      const scaleY = (v)=> (height/2 - (v/max)*(height/2 - pad));
+      const scaleX = (i)=> pad + i*step;
+      let d = '';
+      points.forEach((v,i)=>{
+        const x = scaleX(i), y = scaleY(v);
+        d += (i===0?`M${x},${y}`:` L${x},${y}`);
+      });
+      return d;
+    }
 
-  // ===== Demo fallback (když JSON ještě nemáš) ============================
-  const DEMO = [
-    {type:'stock', region:'US', symbol:'AAPL', name:'Apple Inc.', price:219.85, d1:1.26, w1:2.10,
-     forecast:{min:165,avg:245,max:310,conf:72}, thesis:'Růst služeb a ekosystému, stabilní marže. Re-rating po nové produktové linii.',
-     invalid:'Breakdown pod 195 s objemy a slabá guidance.',
-     path:{avg:[0,1,1.8,1.4,2.1,2.0,2.5], min:[0,-0.5,-0.2,-0.7,-0.4,-0.8,-1.1], max:[0,1.6,2.3,1.9,2.7,2.5,3.1]}},
-    {type:'crypto', region:'Global', symbol:'BTCUSD', name:'Bitcoin', price:67200, d1:2.30, w1:6.80,
-     forecast:{min:42000,avg:88000,max:120000,conf:58}, thesis:'ETF poptávka, halving, omezená nabídka, „digitální zlato“.',
-     invalid:'Regulační tlak, risk-off, útok na síť.',
-     path:{avg:[0,1.1,1.0,1.3,1.45,1.42,1.55], min:[0,0.2,0.1,0.15,0.1,0.05,0], max:[0,1.7,1.9,2.2,2.4,2.5,2.8]}},
-    {type:'stock', region:'US', symbol:'NVDA', name:'NVIDIA Corporation', price:241.8, d1:1.85, w1:4.10,
-     forecast:{min:128,avg:281,max:498,conf:72}, thesis:'Udržitelná poptávka po AI akcelerátorech, expanze do DC a softwaru.',
-     invalid:'Zpomalení investičního cyklu DC, regulace vývozu.',
-     path:{avg:[0,0.6,0.9,0.7,1.2,1.6,1.9], min:[0,-0.3,-0.4,-0.5,-0.7,-0.8,-1.0], max:[0,1.2,1.6,1.5,2.0,2.6,3.0]}}
-  ];
+    // mini-graf s „dnes“ čárou a štítky napravo
+    function sparkSVG(series, forecast){
+      const w=220,h=72,pad=4;
+      const dAvg = pathFrom(series.avg, w, h, pad);
+      const dMin = pathFrom(series.min, w, h, pad);
+      const dMax = pathFrom(series.max, w, h, pad);
+      const step = (w - pad*2) / (series.avg.length-1);
+      const guideX = pad + step*(series.avg.length-1);
+      return `
+        <div class="spark-wrap">
+          <svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" class="spark">
+            <line class="guide" x1="${guideX}" y1="0" x2="${guideX}" y2="${h}"></line>
+            <path class="min" d="${dMin}"></path>
+            <path class="max" d="${dMax}"></path>
+            <path class="avg" d="${dAvg}"></path>
+          </svg>
+          <div class="target-badges">
+            <div class="b"><span class="dot max"></span><span>Max</span><strong>${fmt.format(forecast.max)}</strong></div>
+            <div class="b"><span class="dot avg"></span><span>Avg</span><strong>${fmt.format(forecast.avg)}</strong></div>
+            <div class="b"><span class="dot min"></span><span>Min</span><strong>${fmt.format(forecast.min)}</strong></div>
+          </div>
+        </div>`;
+    }
 
-  // ===== Mini-graf =========================================================
-  function pathFrom(points, width=180, height=64, pad=4){
-    const max = Math.max(...points.map(v=>Math.abs(v))) || 1;
-    const step = (width - pad*2) / (points.length-1);
-    const scaleY = v => (height/2 - (v/max)*(height/2 - pad));
-    const scaleX = i => pad + i*step;
-    let d = '';
-    points.forEach((v,i)=>{ const x=scaleX(i), y=scaleY(v); d += (i===0?`M${x},${y}`:` L${x},${y}`); });
-    return d;
-  }
-  function sparkSVG(series, forecast){
-    const w=220,h=80,pad=4;
-    const dAvg = pathFrom(series.avg, w, h, pad);
-    const dMin = pathFrom(series.min, w, h, pad);
-    const dMax = pathFrom(series.max, w, h, pad);
-    const step = (w - pad*2)/(series.avg.length-1);
-    const guideX = pad + step*(series.avg.length-1);
-    return `
-      <div class="spark-wrap">
-        <svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" class="spark">
-          <line class="guide" x1="${guideX}" y1="0" x2="${guideX}" y2="${h}"></line>
-          <path class="min" d="${dMin}"></path>
-          <path class="max" d="${dMax}"></path>
-          <path class="avg" d="${dAvg}"></path>
-        </svg>
-        <div class="target-badges">
-          <div class="b"><span class="dot max"></span><span>Max</span><strong>${fmt.format(forecast.max)}</strong></div>
-          <div class="b"><span class="dot avg"></span><span>Avg</span><strong>${fmt.format(forecast.avg)}</strong></div>
-          <div class="b"><span class="dot min"></span><span>Min</span><strong>${fmt.format(forecast.min)}</strong></div>
+    // ===== Demo generátor pro tickery z JSONu =====
+    function rand(a,b){ return a + Math.random()*(b-a); }
+    function choice(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
+    function demoFromUniverseItem(u){
+      // základní cena podle typu, jen aby to působilo realisticky
+      const basePriceByType = { stock: rand(10,400), index: rand(1000,6000), forex: rand(0.5,1.5), crypto: rand(0.02,90000), commodity: rand(20,250) };
+      const price = basePriceByType[u.type] || rand(10,500);
+      const d1 = rand(-3,3);
+      const w1 = rand(-8,8);
+
+      // forecast vychází z price ± rozpětí
+      const spread = Math.max(0.15*price, 0.05*price + Math.abs(w1)*0.01*price);
+      const avg = price * (1 + rand(-0.05, 0.20));
+      const min = Math.max( avg - spread, avg*0.2 );
+      const max = avg + spread;
+      const conf = Math.round(rand(50,85));
+
+      // mini-graf – avg mezi min a max, závěr blízko ‚avg‘
+      const steps = 8, avgSeries=[], minSeries=[], maxSeries=[];
+      let curAvg=0, curMin=0, curMax=0;
+      for(let i=0;i<steps;i++){
+        curAvg += rand(-0.3,0.5);
+        curMin  = curAvg - rand(0.6,1.2);
+        curMax  = curAvg + rand(0.6,1.2);
+        avgSeries.push(curAvg);
+        minSeries.push(curMin);
+        maxSeries.push(curMax);
+      }
+      // posuň poslední bod avg tak, aby vizuálně odpovídal „mezi“ min/max
+      avgSeries[steps-1] = (minSeries[steps-1] + maxSeries[steps-1]) / 2;
+
+      // jednoduché teze podle typu
+      const thesisByType = {
+        stock: 'Růst služeb/produktů, stabilní marže, expanze.',
+        index: 'Makro trend, earnings sezóna, riziková prémie.',
+        forex: 'Úrokový diferenciál, inflace, risk-on/off flow.',
+        crypto:'ETF/přítok kapitálu, narativ digitálního aktiva.',
+        commodity:'Nabídka/poptávka, zásoby, geopolitika.'
+      };
+      const invalidByType = {
+        stock: 'Breakdown pod klíčovou úroveň s objemy a slabá guidance.',
+        index: 'Silný risk-off, geopolitický šok, slabé earnings.',
+        forex: 'Nečekaný obrat politiky CB, intervence, recese.',
+        crypto:'Regulační tlak, útok na síť, risk-off panika.',
+        commodity:'Nadprůměrné zásoby, vyšší nabídka, slabá poptávka.'
+      };
+
+      return {
+        type: u.type,
+        symbol: u.symbol,
+        name: u.name,
+        price, d1, w1,
+        forecast: { min, avg, max, conf },
+        thesis: thesisByType[u.type] || 'Tržní teze (demo).',
+        invalid: invalidByType[u.type] || 'Podmínky neplatnosti (demo).',
+        path: { avg: avgSeries, min: minSeries, max: maxSeries }
+      };
+    }
+
+    // ===== UI rendering =====
+    function renderRow(r){
+      const row = document.createElement('div');
+      row.className = "row";
+      row.innerHTML = `
+        <div class="grid grid-cols-[110px,1fr,120px,110px,110px,230px,90px,90px] items-center px-4 py-3 border-t border-slate-100 cursor-pointer">
+          <div class="font-semibold">${r.symbol}</div>
+          <div class="text-slate-700">${r.name}</div>
+          <div class="text-right tabular-nums">${fmt.format(r.price)}</div>
+          <div class="text-right tabular-nums ${r.d1>=0?'text-emerald-600':'text-rose-600'}">${pct(r.d1)}</div>
+          <div class="text-right tabular-nums ${r.w1>=0?'text-emerald-600':'text-rose-600'}">${pct(r.w1)}</div>
+          <div class="text-center tabular-nums">
+            ${fmt.format(r.forecast.min)} / <span class="font-semibold">${fmt.format(r.forecast.avg)}</span> / ${fmt.format(r.forecast.max)}
+          </div>
+          <div class="text-right tabular-nums">${r.forecast.conf}%</div>
+          <div class="text-right">
+            <button class="px-3 py-1.5 text-sm rounded-lg border border-slate-200 hover:bg-slate-50">Detail</button>
+          </div>
         </div>
-      </div>
-    `;
-  }
-
-  // ===== Render jedné položky =============================================
-  const rowsEl = document.getElementById('rows');
-  function renderRow(r){
-    const row = document.createElement('div');
-    row.className = 'row';
-    row.innerHTML = `
-      <div class="grid grid-cols-[110px,1fr,120px,110px,110px,230px,90px,90px] items-center px-4 py-3 border-t border-slate-100 cursor-pointer">
-        <div class="font-semibold">${r.symbol}</div>
-        <div class="text-slate-700">${r.name || ''}</div>
-        <div class="text-right tabular-nums">${r.price!=null?fmt.format(r.price):'-'}</div>
-        <div class="text-right tabular-nums ${r.d1>=0?'text-emerald-600':'text-rose-600'}">${r.d1!=null?pct(r.d1):'-'}</div>
-        <div class="text-right tabular-nums ${r.w1>=0?'text-emerald-600':'text-rose-600'}">${r.w1!=null?pct(r.w1):'-'}</div>
-        <div class="text-center tabular-nums">${r.forecast?`${fmt.format(r.forecast.min)} / <span class="font-semibold">${fmt.format(r.forecast.avg)}</span> / ${fmt.format(r.forecast.max)}`:'-'}</div>
-        <div class="text-right tabular-nums">${r.forecast? (r.forecast.conf||'-')+'%':'-'}</div>
-        <div class="text-right">
-          <button class="px-3 py-1.5 text-sm rounded-lg border border-slate-200 hover:bg-slate-50">Detail</button>
-        </div>
-      </div>
-      <div class="hidden px-4 pb-4">
-        <div class="grid md:grid-cols-[320px,1fr,1fr] gap-6 mt-3 rounded-xl border border-slate-100 bg-slate-50 p-4">
-          <div>
-            <div class="text-xs text-slate-500 mb-1">Mini-graf — 1Y (demo)</div>
-            <div class="rounded-lg border border-slate-200 bg-white p-2">
-              ${r.path?sparkSVG(r.path, r.forecast || {min:0,avg:0,max:0}):'<div class="text-slate-400 text-sm">*bez dat</div>'}
+        <div class="hidden px-4 pb-4">
+          <div class="grid md:grid-cols-[300px,1fr,1fr] gap-6 mt-3 rounded-xl border border-slate-100 bg-slate-50 p-4">
+            <div>
+              <div class="text-xs text-slate-500 mb-1">Mini-graf — 1Y (demo)</div>
+              <div class="rounded-lg border border-slate-200 bg-white p-2">
+                ${sparkSVG(r.path, r.forecast)}
+              </div>
+              <div class="mt-1 text-[11px] text-slate-500">Plná čára: <b>avg</b> · čárkovaně: <b>min/max</b> · tečkovaná: <b>dnes</b></div>
             </div>
-            <div class="mt-1 text-[11px] text-slate-500">Plná: <b>avg</b> · Čárkovaně: <b>min/max</b> · Tečkovaně: <b>dnes</b></div>
-          </div>
-          <div class="text-sm">
-            <div class="text-slate-500 mb-1">Teze</div>
-            <div class="bg-white border border-slate-200 rounded-lg p-3">${r.thesis || '—'}</div>
-          </div>
-          <div class="text-sm">
-            <div class="text-slate-500 mb-1">Neplatí, pokud</div>
-            <div class="bg-white border border-slate-200 rounded-lg p-3">${r.invalid || '—'}</div>
-            <div class="mt-3 text-xs text-slate-500">*Ukázková data, demo verze.</div>
+            <div class="text-sm">
+              <div class="text-slate-500 mb-1">Teze</div>
+              <div class="bg-white border border-slate-200 rounded-lg p-3">${r.thesis}</div>
+            </div>
+            <div class="text-sm">
+              <div class="text-slate-500 mb-1">Neplatí, pokud</div>
+              <div class="bg-white border border-slate-200 rounded-lg p-3">${r.invalid}</div>
+              <div class="mt-3 text-xs text-slate-500">*Ukázková data, demo verze.</div>
+            </div>
           </div>
         </div>
-      </div>
-    `;
-    const head = row.querySelector('.grid');
-    const btn  = row.querySelector('button');
-    const panel= row.children[1];
-    const toggle=()=>panel.classList.toggle('hidden');
-    head.addEventListener('click',(e)=>{ if(e.target.tagName.toLowerCase()==='button')return; toggle(); });
-    btn.addEventListener('click',(e)=>{ e.stopPropagation(); toggle(); });
-    rowsEl.appendChild(row);
-  }
-
-  // ===== Filtrování, stránkování, virtualizace ============================
-  const qEl = document.getElementById('q');
-  const assetEl = document.getElementById('assetFilter');
-  const regionEl= document.getElementById('regionFilter');
-  const sortEl = document.getElementById('sortBy');
-  const pageSizeEl = document.getElementById('pageSize');
-  const shownEl = document.getElementById('shown');
-  const totalEl = document.getElementById('total');
-  const pageEl  = document.getElementById('page');
-  const prevEl  = document.getElementById('prev');
-  const nextEl  = document.getElementById('next');
-  const viewport= document.getElementById('listViewport');
-
-  let universe = [];      // celé univerzum
-  let filtered = [];      // po filtrech
-  let page = 1;
-
-  function applyFilters(){
-    const term = qEl.value.trim().toLowerCase();
-    filtered = universe.filter(r =>
-      (!assetEl.value || r.type===assetEl.value || (assetEl.value==='stock' && (r.type==='stock'||r.type==='etf'))) &&
-      (!regionEl.value || (r.region||'').toUpperCase()===regionEl.value) &&
-      (!term || (r.symbol||'').toLowerCase().includes(term) || (r.name||'').toLowerCase().includes(term) || (r.isin||'').toLowerCase().includes(term))
-    );
-    switch(sortEl.value){
-      case 'name': filtered.sort((a,b)=> (a.name||'').localeCompare(b.name||'')); break;
-      case 'price': filtered.sort((a,b)=> (b.price||0)-(a.price||0)); break;
-      case 'w1': filtered.sort((a,b)=> (b.w1||-Infinity)-(a.w1||-Infinity)); break;
-      case 'conf': filtered.sort((a,b)=> ((b.forecast?.conf)||0)-((a.forecast?.conf)||0)); break;
-      default: filtered.sort((a,b)=> (a.symbol||'').localeCompare(b.symbol||'')); break;
+      `;
+      const head = row.querySelector('.grid');
+      const detailBtn = row.querySelector('button');
+      const panel = row.children[1];
+      function toggle(){ panel.classList.toggle('hidden'); }
+      head.addEventListener('click', (e)=>{ if(e.target.tagName.toLowerCase() === 'button') return; toggle(); });
+      detailBtn.addEventListener('click', (e)=>{ e.stopPropagation(); toggle(); });
+      rowsEl.appendChild(row);
     }
-    page = 1;
-    renderPage();
-  }
 
-  function renderPage(){
-    const size = parseInt(pageSizeEl.value,10)||50;
-    const start = (page-1)*size;
-    const slice = filtered.slice(start, start+size);
-    rowsEl.innerHTML = '';
-    slice.forEach(renderRow);
-    shownEl.textContent = slice.length;
-    totalEl.textContent = filtered.length;
-    pageEl.textContent = `Strana ${page} / ${Math.max(1,Math.ceil(filtered.length/size))}`;
-    prevEl.disabled = page<=1;
-    nextEl.disabled = start+size >= filtered.length;
-  }
-
-  prevEl.onclick = ()=>{ if(page>1){ page--; renderPage(); } };
-  nextEl.onclick = ()=>{ const size=parseInt(pageSizeEl.value,10)||50; if(page*size<filtered.length){ page++; renderPage(); } };
-
-  [qEl, assetEl, regionEl, sortEl, pageSizeEl].forEach(el=>{
-    const evt = (el===qEl)?'input':'change';
-    el.addEventListener(evt, applyFilters);
-  });
-  document.addEventListener('keydown',e=>{ if(e.key==='/'){ e.preventDefault(); qEl.focus(); } });
-
-  // ===== Načtení univerza =================================================
-  async function loadUniverse(){
-    try{
-      const res = await fetch(UNIVERSE_URL, { cache:'no-store' });
-      if(!res.ok) throw new Error('universe not found');
-      const data = await res.json();
-      universe = Array.isArray(data)?data:DEMO;
-    }catch(e){
-      universe = DEMO;
+    function render(list){
+      rowsEl.innerHTML = '';
+      list.forEach(renderRow);
     }
-    // Volitelné: doplnit live ceny/indikátory (napojíš níže)
-    // await hydrateLiveData(universe);
-    applyFilters();
-  }
 
-  // ===== Hook na LIVE API ==================================================
-  // Tady napojíš své API (ticker batch, krypto feed, atd.).
-  // Vstup: array objektů universe; Výstup: do každého doplň `price`, `d1`, `w1`, případně `forecast` & `path`.
-  async function hydrateLiveData(list){
-    // Příklad (pseudo):
-    // const syms = list.slice(0,1000).map(x=>x.symbol);
-    // const live = await fetch('/api/quotes?symbols='+syms.join(',')).then(r=>r.json());
-    // live.forEach(q => {
-    //   const r = list.find(x=>x.symbol===q.symbol);
-    //   if(!r) return;
-    //   r.price = q.price;
-    //   r.d1 = q.change1d;
-    //   r.w1 = q.change1w;
-    //   // Forecasty z AI / tvé služby:
-    //   // r.forecast = { min:q.min, avg:q.avg, max:q.max, conf:q.conf };
-    //   // r.path = q.spark; // {avg:[],min:[],max:[]}
-    // });
-  }
+    // ===== Filtry / třídění =====
+    const q = document.getElementById('q');
+    const typeFilter = document.getElementById('typeFilter');
+    const sortBy = document.getElementById('sortBy');
+    let ROWS = []; // naplní se po fetchi
 
-  loadUniverse();
-</script>
+    function apply(){
+      const term = q.value.trim().toLowerCase();
+      let out = ROWS.filter(r =>
+        (!typeFilter.value || r.type === typeFilter.value) &&
+        (!term || r.symbol.toLowerCase().includes(term) || r.name.toLowerCase().includes(term))
+      );
+      switch(sortBy.value){
+        case 'price': out.sort((a,b)=> b.price - a.price); break;
+        case 'w1': out.sort((a,b)=> b.w1 - a.w1); break;
+        case 'conf': out.sort((a,b)=> b.forecast.conf - a.forecast.conf); break;
+        default: out.sort((a,b)=> a.symbol.localeCompare(b.symbol));
+      }
+      render(out);
+    }
+
+    q.addEventListener('input', apply);
+    typeFilter.addEventListener('change', apply);
+    sortBy.addEventListener('change', apply);
+    document.addEventListener('keydown', (e)=>{ if(e.key === '/') { e.preventDefault(); q.focus(); }});
+
+    // ===== Načtení tickerů z assets/universe-lite.json =====
+    async function bootstrap(){
+      loadingEl.classList.remove('hidden');
+      try {
+        const res = await fetch('/assets/universe-lite.json', {cache:'no-store'});
+        const data = await res.json();
+        const uni = Array.isArray(data) ? data : (data.universe || []);
+
+        // necháme cca 500 položek (když jich bude víc), a z každé uděláme demo řádek
+        ROWS = uni.slice(0, 500).map(demoFromUniverseItem);
+
+        apply();
+      } catch (e){
+        rowsEl.innerHTML = `<div class="p-6 text-sm text-rose-700 bg-rose-50 border border-rose-200 rounded-xl">
+          Nepodařilo se načíst <code>assets/universe-lite.json</code>. Zkontroluj cestu / nasazení.
+        </div>`;
+        console.error(e);
+      } finally {
+        loadingEl.classList.add('hidden');
+      }
+    }
+
+    bootstrap();
+  </script>
 </body>
 </html>
