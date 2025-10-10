@@ -3,289 +3,315 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>StrategyMind — Market Scanner (demo)</title>
-  <meta name="description" content="Vyhledávač akcií, indexů a krypto. Filtry, mini graf, roční predikce s tečkovaným cílem a podmínkami neplatnosti. Demo data.">
-  <link rel="preconnect" href="https://cdn.tailwindcss.com">
+  <title>StrategyMind — Market Forecast (demo)</title>
+
+  <!-- Tailwind přes CDN (kvůli rychlému layoutu) -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: { brand:"#0A2342", mint:"#2bd4a9" },
-          boxShadow: { sweet:"0 24px 70px -24px rgba(2,6,23,.15)" },
-          borderRadius: { "2xl":"1.25rem" }
-        }
-      }
-    }
-  </script>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
   <style>
-    .card{border:1px solid #e5e7eb;background:#fff;border-radius:1.25rem}
-    .pill{border:1px solid #e5e7eb;border-radius:999px;padding:.35rem .7rem;background:#fff}
-    .btn{border-radius:.9rem;padding:.7rem 1rem;font-weight:700}
-    .btn-brand{background:#0A2342;color:#fff}
-    .btn-ghost{background:#fff;border:1px solid #e5e7eb}
-    .row{transition:background .15s ease}
-    .row:hover{background:#f8fafc}
-    .spark path.actual{fill:none;stroke:#3b82f6;stroke-width:2}
-    .spark path.target{fill:none;stroke:#10b981;stroke-width:2;stroke-dasharray:5 4}
+    /* jemný gradient pozadí jako TradingView mood */
+    body { background: radial-gradient(1200px 600px at 70% 10%, #f8fafc 0, #ffffff 60%); }
+    .chip { @apply inline-flex items-center rounded-full border border-slate-200 px-2 py-0.5 text-xs text-slate-600; }
+    .legend-dot{ width:.65rem;height:.65rem;border-radius:50%;display:inline-block;margin-right:.35rem; }
   </style>
 </head>
-<body class="bg-slate-50 text-slate-900 selection:bg-mint/20 selection:text-brand">
-
-  <!-- Top bar -->
-  <header class="sticky top-0 z-40 bg-white/80 backdrop-blur border-b">
-    <div class="mx-auto max-w-7xl px-4 py-3 flex items-center gap-3">
-      <a href="/" class="pill">← Zpět na homepage</a>
-      <nav class="flex items-center gap-2 text-sm">
-        <a class="pill" href="/client/">Klientská sekce</a>
-        <span class="pill bg-slate-100">Market Scanner</span>
-        <a class="pill" href="/client/real-estate/">Real-Estate</a>
-        <a class="pill" href="/client/ideas/">Idea Lab</a>
-      </nav>
-      <div class="ml-auto">
-        <button id="btnReport" class="btn btn-brand">Stáhnout report (MD)</button>
+<body class="min-h-screen text-slate-900">
+  <header class="sticky top-0 z-10 backdrop-blur bg-white/70 border-b border-slate-200">
+    <div class="mx-auto max-w-6xl px-4 py-3 flex items-center gap-3">
+      <a href="/" class="text-sm text-slate-600 hover:text-slate-900">← Zpět na homepage</a>
+      <div class="ml-auto flex gap-2">
+        <a href="/client/" class="chip">Klientská sekce</a>
+        <span class="chip">Market Scanner</span>
       </div>
     </div>
   </header>
 
-  <main class="mx-auto max-w-7xl px-4 py-8">
-    <h1 class="text-2xl md:text-3xl font-extrabold">Market Scanner</h1>
-    <p class="mt-1 text-slate-600 max-w-[70ch]">
-      Vyhledej a filtruj akcie, indexy a krypto. Klikni na řádek pro <em>důvod predikce</em>,
-      <em>podmínky neplatnosti</em> a mini graf. V ostré verzi napojíme živá data a zprávy.
-    </p>
-
-    <!-- Controls -->
-    <div class="mt-5 grid gap-3 md:grid-cols-[1fr,220px,220px]">
-      <input id="q" class="rounded-xl border px-3 py-2" placeholder="Hledat symbol / název…">
-      <select id="type" class="rounded-xl border px-3 py-2">
-        <option value="">Všechny typy</option>
-        <option value="stock">Akcie</option>
-        <option value="index">Index</option>
-        <option value="crypto">Krypto</option>
-      </select>
-      <select id="sort" class="rounded-xl border px-3 py-2">
-        <option value="symbol">Seřadit: Symbol</option>
-        <option value="pred">Seřadit: 1Y průměr predikce</option>
-        <option value="conf">Seřadit: Důvěra</option>
-      </select>
+  <main class="mx-auto max-w-6xl px-4 py-8">
+    <div class="mb-6">
+      <h1 class="text-2xl md:text-3xl font-semibold tracking-tight">NVDA — 1Y forecast (demo)</h1>
+      <p class="text-slate-600 mt-1">Historie ceny + predikce (min / avg / max) s vyznačením současné ceny. V ostré verzi sem napojíme AI a živá data.</p>
     </div>
 
-    <!-- Table -->
-    <section id="table" class="mt-5 card overflow-hidden">
-      <div class="grid grid-cols-[120px_1fr_120px_100px_120px_100px_90px_96px] gap-3 px-4 py-3 text-xs font-semibold text-slate-500 border-b">
-        <div>Symbol</div>
-        <div>Název</div>
-        <div class="text-right">Cena</div>
-        <div class="text-right">1D %</div>
-        <div class="text-right">1W %</div>
-        <div class="text-right">1Y pred. (avg)</div>
-        <div class="text-right">Conf.</div>
-        <div></div>
-      </div>
-      <div id="rows"></div>
-    </section>
-
-    <p class="mt-3 text-xs text-slate-500">
-      *Demo grafy generované z náhodných dat. Tečkovaná linka znázorňuje cílový bod (avg) v horizontu 1Y.
-    </p>
-  </main>
-
-  <!-- Row template -->
-  <template id="rowTpl">
-    <div class="row border-b">
-      <button class="w-full grid grid-cols-[120px_1fr_120px_100px_120px_100px_90px_96px] gap-3 px-4 py-3 text-sm items-center text-left">
-        <div class="font-mono text-slate-700 sym"></div>
-        <div class="name"></div>
-        <div class="text-right price"></div>
-        <div class="text-right d1"></div>
-        <div class="text-right w1"></div>
-        <div class="text-right pred"></div>
-        <div class="text-right conf"></div>
-        <div class="justify-self-end"><span class="pill text-xs">Detail</span></div>
-      </button>
-      <div class="hidden px-4 pb-4">
-        <div class="grid md:grid-cols-[1fr_340px] gap-4">
-          <div class="text-sm">
-            <div class="flex items-center gap-2 mb-1">
-              <span class="pill text-xs">Teze</span>
-              <span class="text-slate-700 thesis"></span>
-            </div>
-            <div class="flex items-center gap-2">
-              <span class="pill text-xs">Neplatí pokud</span>
-              <span class="text-slate-700 invalid"></span>
-            </div>
+    <section class="grid gap-6 md:grid-cols-12">
+      <!-- Graf -->
+      <div class="md:col-span-9 rounded-2xl border border-slate-200 bg-white shadow-sm p-4 md:p-6">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-2">
+            <span class="chip">Předpověď 1Y</span>
+            <span class="chip">Past 2Y</span>
           </div>
-          <div class="card p-3">
-            <svg class="spark w-full h-[120px]" viewBox="0 0 320 120" aria-label="sparkline"></svg>
+          <div class="text-sm text-slate-500">*Demo data</div>
+        </div>
+        <canvas id="forecastChart" height="110"></canvas>
+      </div>
+
+      <!-- Info panel vpravo (etikety jako na screenu) -->
+      <aside class="md:col-span-3 rounded-2xl border border-slate-200 bg-white shadow-sm p-4 md:p-6">
+        <h3 class="font-semibold mb-4">Etikety &amp; hodnoty</h3>
+        <ul class="space-y-2 text-sm">
+          <li class="flex items-center justify-between">
+            <span><span class="legend-dot" style="background:#0ea5e9"></span>Current</span>
+            <span id="lab-current" class="font-medium">—</span>
+          </li>
+          <li class="flex items-center justify-between">
+            <span><span class="legend-dot" style="background:#14b8a6"></span>Avg (1Y)</span>
+            <span id="lab-avg" class="font-medium text-emerald-600">—</span>
+          </li>
+          <li class="flex items-center justify-between">
+            <span><span class="legend-dot" style="background:#22c55e"></span>Max (1Y)</span>
+            <span id="lab-max" class="font-medium">—</span>
+          </li>
+          <li class="flex items-center justify-between">
+            <span><span class="legend-dot" style="background:#ef4444"></span>Min (1Y)</span>
+            <span id="lab-min" class="font-medium">—</span>
+          </li>
+        </ul>
+        <hr class="my-5">
+        <div class="space-y-2 text-sm">
+          <div class="flex items-center justify-between">
+            <span>Confidence</span><span id="lab-conf" class="font-medium">—</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span>Analyst stance</span><span id="lab-stance" class="font-medium">Strong buy</span>
           </div>
         </div>
+      </aside>
+    </section>
+
+    <!-- Poznámky k predikci -->
+    <section class="mt-8 grid gap-6 md:grid-cols-2">
+      <div class="rounded-2xl border border-slate-200 bg-white shadow-sm p-4 md:p-6">
+        <h3 class="font-semibold mb-3">Teze</h3>
+        <p id="lab-thesis" class="text-slate-700">
+          Růst AI segmentu, silný pipeline, rozšiřující se marže. Re-rating po nové produktové linii.
+        </p>
       </div>
-    </div>
-  </template>
+      <div class="rounded-2xl border border-slate-200 bg-white shadow-sm p-4 md:p-6">
+        <h3 class="font-semibold mb-3">Neplatí, pokud</h3>
+        <p id="lab-invalid" class="text-slate-700">
+          Breakdown pod klíčovým supportem a prudká komprese marží / poptávky.
+        </p>
+      </div>
+    </section>
+  </main>
 
   <script>
-    // ---------- Demo data ----------
-    const DATA = [
-      {
-        type:'stock', symbol:'AAPL', name:'Apple Inc.',
-        price:219.85, d1:+1.26, w1:+2.10,
-        pred:{min:165, avg:245, max:310},
-        conf:72,
-        thesis:'Růst služeb a ekosystému, stabilní marže. Re-rating po nové produktové linii.',
-        invalid:'Breakdown pod 195 s objemy a slabý guidance.'
-      },
-      {
-        type:'crypto', symbol:'BTCUSD', name:'Bitcoin',
-        price:67200, d1:+2.30, w1:+6.80,
-        pred:{min:42000, avg:88000, max:120000},
-        conf:58,
-        thesis:'Poptávka přes ETF, halving + omezená nabídka, sílící narativ digitálního zlata.',
-        invalid:'Regulační tlak, silný risk-off, útok na síť.'
-      },
-      {
-        type:'stock', symbol:'NVDA', name:'NVIDIA Corp.',
-        price:108.20, d1:-0.82, w1:+3.40,
-        pred:{min:85, avg:150, max:230},
-        conf:69,
-        thesis:'AI akcelerace datacenter, ekosystém CUDA. Růst inference.',
-        invalid:'Zpomalení hyperscaler capexu, restrikce exportu.'
-      },
-      {
-        type:'index', symbol:'SPY', name:'S&P 500 ETF',
-        price:520.10, d1:+0.41, w1:+1.05,
-        pred:{min:475, avg:585, max:640},
-        conf:64,
-        thesis:'Široký růst zisků, „soft landing“, klesající inflace.',
-        invalid:'Šok na sazbách/nezaměstnanosti, eskalace geopolitiky.'
+    /**
+     * Jednoduchý renderer forecast grafu ve stylu „fan chart“.
+     * Vstupní data můžeš nahradit AI/živými daty.
+     */
+    function renderForecast({
+      symbol = "NVDA",
+      history = [],           // [{t: '2024-01', v: 120}, ...]
+      current,                // číslo
+      forecastMonths = 12,    // kolik bodů dopředu
+      minTarget, avgTarget, maxTarget, // cílové hodnoty po 12 měsících
+      confidence = 0.72,      // 0–1
+      thesis = "", invalidation = ""
+    }) {
+      // Etikety
+      document.querySelector('#lab-current').textContent = formatUSD(current);
+      document.querySelector('#lab-avg').textContent     = formatUSD(avgTarget);
+      document.querySelector('#lab-max').textContent     = formatUSD(maxTarget);
+      document.querySelector('#lab-min').textContent     = formatUSD(minTarget);
+      document.querySelector('#lab-conf').textContent    = Math.round(confidence * 100) + "%";
+      if (thesis)      document.querySelector('#lab-thesis').textContent  = thesis;
+      if (invalidation)document.querySelector('#lab-invalid').textContent = invalidation;
+
+      // Připrav osy/etikety
+      const histLabels = history.map(p => p.t);
+      const histData   = history.map(p => p.v);
+
+      // generuj 12 budoucích měsíců
+      const futureLabels = [];
+      const now = new Date();
+      for (let i = 1; i <= forecastMonths; i++) {
+        const d = new Date(now.getFullYear(), now.getMonth() + i, 1);
+        futureLabels.push(d.toLocaleString('en', {month:'short'}));
       }
-    ];
 
-    // ---------- Rendering ----------
-    const rowsEl = document.getElementById('rows');
-    const tpl = document.getElementById('rowTpl');
+      // Interpolace min/avg/max od current -> target
+      const interp = (to) => {
+        const arr = [];
+        for (let i = 1; i <= forecastMonths; i++) {
+          const v = current + (to - current) * (i / forecastMonths);
+          arr.push(v);
+        }
+        return arr;
+      };
+      const futMin = interp(minTarget);
+      const futAvg = interp(avgTarget);
+      const futMax = interp(maxTarget);
 
-    function pct(v){
-      const c = v>=0 ? 'text-emerald-600' : 'text-rose-600';
-      const s = (v>0?'+':'') + v.toFixed(2) + '%';
-      return `<span class="${c}">${s}</span>`;
-    }
-    function money(v){
-      // Kč/ USD—pro demo nechme prostě číslo s mezerou pro BTC
-      return Intl.NumberFormat('cs-CZ').format(v);
-    }
+      const labels = [...histLabels, ...futureLabels];
 
-    function drawSpark(svg, points, targetY){
-      const w = 320, h = 120, pad = 10;
-      const xs = points.map((_,i)=> pad + i*( (w-2*pad)/(points.length-1) ));
-      const min = Math.min(...points), max = Math.max(...points);
-      const y = v => h-pad - ( (v-min)/(max-min||1) )*(h-2*pad);
+      // Dataset historie
+      const historyDataset = {
+        type: 'line',
+        label: symbol + ' (historie)',
+        data: [...histData, null], // null v bodě přechodu
+        borderColor: '#0ea5e9',
+        borderWidth: 2,
+        tension: 0.3,
+        pointRadius: 0
+      };
 
-      // Path actual
-      const d = points.map((v,i)=> (i?'L':'M') + xs[i] + ',' + y(v)).join(' ');
-      const p1 = document.createElementNS('http://www.w3.org/2000/svg','path');
-      p1.setAttribute('class','actual');
-      p1.setAttribute('d', d);
-      svg.appendChild(p1);
-
-      // Dashed target (horizontal to last x)
-      const lastX = xs[xs.length-1];
-      const ty = y(targetY);
-      const p2 = document.createElementNS('http://www.w3.org/2000/svg','path');
-      p2.setAttribute('class','target');
-      p2.setAttribute('d', `M ${lastX-60},${ty} L ${lastX},${ty}`);
-      svg.appendChild(p2);
-    }
-
-    function randSeries(base){
-      const out = [base* (0.96+Math.random()*0.08)];
-      for(let i=1;i<24;i++){
-        const prev = out[i-1];
-        out.push(prev*(0.985 + Math.random()*0.03));
-      }
-      return out;
-    }
-
-    function render(list){
-      rowsEl.innerHTML = '';
-      list.forEach(item=>{
-        const node = tpl.content.cloneNode(true);
-        node.querySelector('.sym').textContent = item.symbol;
-        node.querySelector('.name').textContent = item.name;
-        node.querySelector('.price').textContent = money(item.price);
-        node.querySelector('.d1').innerHTML = pct(item.d1);
-        node.querySelector('.w1').innerHTML = pct(item.w1);
-        node.querySelector('.pred').innerHTML = `${money(item.pred.avg)}`;
-        node.querySelector('.conf').textContent = item.conf + '%';
-        node.querySelector('.thesis').textContent = item.thesis;
-        node.querySelector('.invalid').textContent = item.invalid;
-
-        const row = node.querySelector('.row');
-        const btn = row.querySelector('button');
-        const detail = row.querySelector('.hidden');
-
-        btn.addEventListener('click', ()=>{
-          detail.classList.toggle('hidden');
-          const svg = row.querySelector('svg.spark');
-          if(!svg.dataset.drawn){
-            const base = item.price/1.2;
-            drawSpark(svg, randSeries(base), item.pred.avg);
-            svg.dataset.drawn = '1';
+      // „Fan“ – min/max vyplněný kužel
+      const minDataset = {
+        type: 'line',
+        label: 'Min (1Y)',
+        data: [...Array(histData.length).fill(null), ...futMin],
+        borderColor: '#ef4444',
+        borderWidth: 1.5,
+        pointRadius: 0,
+        tension: 0.3,
+        fill: false
+      };
+      const maxDataset = {
+        type: 'line',
+        label: 'Max (1Y)',
+        data: [...Array(histData.length).fill(null), ...futMax],
+        borderColor: '#22c55e',
+        borderWidth: 1.5,
+        pointRadius: 0,
+        tension: 0.3,
+        fill: '-1' // vyplní prostor mezi max a předešlým datasetem (min)
+      };
+      // poloprůhledná výplň kužele
+      const fillPlugin = {
+        id: 'fanFill',
+        beforeDatasetsDraw(chart, args, opts) {
+          const {ctx, chartArea, scales} = chart;
+          const y = scales.y;
+          const x = scales.x;
+          ctx.save();
+          ctx.globalAlpha = 0.12;
+          ctx.fillStyle = '#10b981';
+          ctx.beginPath();
+          // pro jednoduchost spojíme oba budoucí průběhy
+          const n = futMin.length;
+          // horní hrana (max) zleva doprava
+          for (let i = 0; i < n; i++) {
+            const xi = x.getPixelForValue(histLabels.length + i);
+            const yi = y.getPixelForValue(futMax[i]);
+            if (i === 0) ctx.moveTo(xi, yi); else ctx.lineTo(xi, yi);
           }
-        });
+          // spodní hrana (min) zprava doleva
+          for (let i = n - 1; i >= 0; i--) {
+            const xi = x.getPixelForValue(histLabels.length + i);
+            const yi = y.getPixelForValue(futMin[i]);
+            ctx.lineTo(xi, yi);
+          }
+          ctx.closePath();
+          ctx.fill();
+          ctx.restore();
+        }
+      };
 
-        rowsEl.appendChild(node);
+      // Avg předpověď – zvýrazněná
+      const avgDataset = {
+        type: 'line',
+        label: 'Avg (1Y)',
+        data: [...Array(histData.length).fill(null), ...futAvg],
+        borderColor: '#14b8a6',
+        borderWidth: 2.5,
+        pointRadius: 0,
+        tension: 0.35
+      };
+
+      // Čárkovaná „current“ baseline (vodorovná od splitu)
+      const currentLine = {
+        id: 'currentLine',
+        afterDatasetsDraw(chart, args, pluginOptions) {
+          const {ctx, scales} = chart;
+          const y = scales.y.getPixelForValue(current);
+          const xLeft  = scales.x.getPixelForValue(histLabels.length - 0.1);
+          const xRight = scales.x.getPixelForValue(labels.length - 1);
+          ctx.save();
+          ctx.setLineDash([6,6]);
+          ctx.strokeStyle = '#0ea5e9';
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.moveTo(xLeft, y);
+          ctx.lineTo(xRight, y);
+          ctx.stroke();
+          ctx.restore();
+        }
+      };
+
+      // Vertikální oddělovač (konec historie)
+      const splitLine = {
+        id: 'splitLine',
+        afterDatasetsDraw(chart) {
+          const {ctx, scales, chartArea} = chart;
+          const x = scales.x.getPixelForValue(histLabels.length - 0.02);
+          ctx.save();
+          ctx.strokeStyle = '#94a3b8';
+          ctx.setLineDash([3,4]);
+          ctx.beginPath();
+          ctx.moveTo(x, chartArea.top);
+          ctx.lineTo(x, chartArea.bottom);
+          ctx.stroke();
+          ctx.restore();
+        }
+      };
+
+      // vykreslení grafu
+      const ctx = document.getElementById('forecastChart').getContext('2d');
+      if (window._forecastChart) window._forecastChart.destroy();
+      window._forecastChart = new Chart(ctx, {
+        data: { labels, datasets: [historyDataset, minDataset, maxDataset, avgDataset] },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: 'index', intersect: false },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: (context) => `${context.dataset.label}: ${formatUSD(context.parsed.y)}`
+              }
+            }
+          },
+          scales: {
+            x: { grid: { display: false } },
+            y: { grid: { color: 'rgba(148,163,184,.2)' } }
+          }
+        },
+        plugins: [fillPlugin, currentLine, splitLine]
       });
     }
 
-    // ---------- Filters & sort ----------
-    const q = document.getElementById('q');
-    const type = document.getElementById('type');
-    const sort = document.getElementById('sort');
+    // Pomocné formátování
+    function formatUSD(v){ return Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:2}).format(v); }
 
-    function apply(){
-      let out = DATA.slice();
+    // ------- DEMO DATA (můžeš zahodit a napojit AI/živá data) -------
+    (function runDemo(){
+      // 24 měsíců historie (umělé čísla kvůli ukázce)
+      const start = 24, seed = 120;
+      const history = Array.from({length: start}, (_,i)=>{
+        const d = new Date(); d.setMonth(d.getMonth()-(start-i));
+        const v = seed + i*4 + (Math.sin(i/2)*8) + (i>16? i*1.6 : 0);
+        return { t: d.toLocaleString('en',{month:'short'})+' '+d.getFullYear().toString().slice(2), v: Math.max(40, Math.round(v*100)/100) };
+      });
+      const current = history[history.length-1].v;
 
-      const s = q.value.trim().toLowerCase();
-      if(s) out = out.filter(x => x.symbol.toLowerCase().includes(s) || x.name.toLowerCase().includes(s));
-
-      if(type.value) out = out.filter(x => x.type === type.value);
-
-      if(sort.value==='pred') out.sort((a,b)=> b.pred.avg - a.pred.avg);
-      else if(sort.value==='conf') out.sort((a,b)=> b.conf - a.conf);
-      else out.sort((a,b)=> a.symbol.localeCompare(b.symbol));
-
-      render(out);
-    }
-    q.addEventListener('input', apply);
-    type.addEventListener('change', apply);
-    sort.addEventListener('change', apply);
-
-    // Report (demo .md stáhne lokální text)
-    document.getElementById('btnReport').addEventListener('click', ()=>{
-      const md = [
-        '# StrategyMind – Market Scanner (demo)',
-        '',
-        ...DATA.map(x=>`## ${x.symbol} — ${x.name}
-- Cena: ${money(x.price)}
-- 1D: ${(x.d1>0?'+':'')+x.d1.toFixed(2)} %
-- 1W: ${(x.w1>0?'+':'')+x.w1.toFixed(2)} %
-- Predikce 1Y (min/avg/max): ${money(x.pred.min)} / ${money(x.pred.avg)} / ${money(x.pred.max)}
-- Důvěra: ${x.conf} %
-- Teze: ${x.thesis}
-- Neplatí pokud: ${x.invalid}
-`)
-      ].join('\n');
-      const blob = new Blob([md], {type:'text/markdown'});
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = 'strategymind_market_report.md';
-      a.click();
-      URL.revokeObjectURL(a.href);
-    });
-
-    // Initial render
-    apply();
+      renderForecast({
+        symbol: "NVDA",
+        history,
+        current,
+        forecastMonths: 12,
+        minTarget: current*0.53,   // ~ -47%
+        avgTarget: current*1.1626,  // +16.26% jako ve screenu
+        maxTarget: current*2.06,    // ~ +106%
+        confidence: 0.72,
+        thesis: "Růst AI poptávky, rozšíření produktové řady, stabilní marže — prostor pro re-rating.",
+        invalidation: "Ztráta klíčového supportu a dlouhodobý útlum poptávky by predikci negoval."
+      });
+    })();
   </script>
 </body>
 </html>
