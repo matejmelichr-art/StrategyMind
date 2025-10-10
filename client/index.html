@@ -5,35 +5,22 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>StrategyMind — Klientská sekce</title>
 
-  <!-- Tailwind CDN -->
   <link rel="preconnect" href="https://cdn.tailwindcss.com">
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
       theme: {
         extend: {
-          colors: {
-            brand: {
-              50:"#ECFEFF",100:"#CFFAFE",200:"#A5F3FC",300:"#67E8F9",
-              400:"#22D3EE",500:"#06B6D4",600:"#0891B2",700:"#0E7490",
-              800:"#155E75",900:"#164E63"
-            }
-          },
-          boxShadow: {
-            soft: "0 12px 40px rgba(2, 132, 199, .08)"
-          },
+          colors: { brand: {50:"#ECFEFF",100:"#CFFAFE",200:"#A5F3FC",300:"#67E8F9",400:"#22D3EE",500:"#06B6D4",600:"#0891B2",700:"#0E7490",800:"#155E75",900:"#164E63"} },
+          boxShadow: { soft: "0 12px 40px rgba(2, 132, 199, .08)" },
           borderRadius: { xl2: "1.25rem" }
         }
       }
     }
   </script>
-
   <style>
-    .glass{ backdrop-filter: blur(10px); background: linear-gradient(180deg,rgba(255,255,255,.75),rgba(255,255,255,.55));}
-    .dark .glass{ background: linear-gradient(180deg,rgba(15,23,42,.65),rgba(15,23,42,.45));}
-    .drop-active{ border-color: rgb(14 116 144) !important; background: rgba(14,116,144,.04); }
-    .fade-enter{ opacity:0; transform: translateY(4px); }
-    .fade-enter-active{ opacity:1; transform:none; transition: all .18s ease-in-out; }
+    .glass{backdrop-filter:blur(10px);background:linear-gradient(180deg,rgba(255,255,255,.75),rgba(255,255,255,.55))}
+    .dark .glass{background:linear-gradient(180deg,rgba(15,23,42,.65),rgba(15,23,42,.45))}
   </style>
 </head>
 <body class="min-h-dvh bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100">
@@ -49,14 +36,10 @@
         <a href="/client/market/" class="px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800">Market Analyzer</a>
         <a href="/client/real-estate/" class="px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800">Real-Estate</a>
         <a href="/client/idea-lab/" class="px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800">Idea Lab</a>
-        <!-- Nové: odkaz otevře panel Trader AI -->
-        <button id="openTraderAI" class="px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800">Trader AI</button>
       </nav>
 
       <div class="flex items-center gap-3">
-        <button id="themeToggle" class="px-3 py-2 text-sm rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700">
-          🌙/☀️
-        </button>
+        <button id="themeToggle" class="px-3 py-2 text-sm rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700">🌙/☀️</button>
         <a href="/" class="px-3 py-2 text-sm rounded-lg border border-slate-300/60 dark:border-slate-700/60 hover:bg-slate-50 dark:hover:bg-slate-800">Zpět na homepage</a>
       </div>
     </div>
@@ -71,14 +54,11 @@
           <div class="inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-medium bg-brand-100 text-brand-800 dark:bg-brand-900/40 dark:text-brand-200 border border-brand-200/60 dark:border-brand-700/60 mb-4">
             Klientská sekce běží <span class="text-xl leading-none">✅</span>
           </div>
-          <h1 class="text-3xl sm:text-4xl font-bold tracking-tight">
-            Všechna vaše rozhodnutí na jednom místě
-          </h1>
+          <h1 class="text-3xl sm:text-4xl font-bold tracking-tight">Všechna vaše rozhodnutí na jednom místě</h1>
           <p class="mt-3 text-slate-600 dark:text-slate-300 max-w-2xl">
-            V demu najdete <strong>Market Analyzer</strong> (tabulka symbolů + mini-grafy s čárkovanou projekcí min/avg/max),
-            první nástřel <strong>Real-Estate feedu</strong> a <strong>Idea Lab</strong> pro plánování. Live verze přidá
-            real-time data, zprávy a exporty. Nově: <strong>Trader AI</strong> – nahraj screenshot grafu a dostaneš
-            vysvětlitelnou analýzu (směr, úrovně, důvody).
+            V demu najdete <strong>Market Analyzer</strong> (tabulka symbolů + mini-grafy s projekcí min/avg/max),
+            první nástřel <strong>Real-Estate feedu</strong> a <strong>Idea Lab</strong> pro plánování.
+            Live verze přidá real-time data, zprávy a exporty.
           </p>
 
           <div class="mt-6 flex flex-wrap gap-3">
@@ -86,36 +66,20 @@
               Otevřít Market Analyzer
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" class="opacity-90"><path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </a>
-            <a href="/client/real-estate/" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-300/70 dark:border-slate-700/70 hover:bg-slate-50 dark:hover:bg-slate-800">
-              Real-Estate Feed
-            </a>
-            <a href="/client/idea-lab/" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-300/70 dark:border-slate-700/70 hover:bg-slate-50 dark:hover:bg-slate-800">
-              Idea Lab
-            </a>
-            <button id="openTraderAI2" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-brand-300/70 text-brand-800 dark:text-brand-200 hover:bg-brand-50 dark:hover:bg-slate-800">
-              Spustit Trader AI
-            </button>
+            <a href="/client/real-estate/" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-300/70 dark:border-slate-700/70 hover:bg-slate-50 dark:hover:bg-slate-800">Real-Estate Feed</a>
+            <a href="/client/idea-lab/" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-300/70 dark:border-slate-700/70 hover:bg-slate-50 dark:hover:bg-slate-800">Idea Lab</a>
           </div>
         </div>
 
-        <!-- Right rail: status -->
         <aside class="glass rounded-2xl p-5 shadow-soft border border-white/50 dark:border-slate-700/40">
           <h3 class="font-semibold mb-4">Status & metriky</h3>
           <dl class="space-y-3 text-sm">
-            <div class="flex items-center justify-between">
-              <dt class="text-slate-500">Uptime (demo)</dt><dd class="font-medium">99.9%</dd>
-            </div>
-            <div class="flex items-center justify-between">
-              <dt class="text-slate-500">Poslední build</dt><dd class="font-medium">před chvílí</dd>
-            </div>
-            <div class="flex items-center justify-between">
-              <dt class="text-slate-500">Verze UI</dt><dd><code class="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800">v0.5</code></dd>
-            </div>
+            <div class="flex items-center justify-between"><dt class="text-slate-500">Uptime (demo)</dt><dd class="font-medium">99.9%</dd></div>
+            <div class="flex items-center justify-between"><dt class="text-slate-500">Poslední build</dt><dd class="font-medium">před chvílí</dd></div>
+            <div class="flex items-center justify-between"><dt class="text-slate-500">Verze UI</dt><dd><code class="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800">v0.5</code></dd></div>
           </dl>
           <hr class="my-4 border-slate-200/60 dark:border-slate-700/60" />
-          <p class="text-xs text-slate-500">
-            Pozn.: Trader AI má demo mock. Zapojení backendu viz komentáře v kódu (endpoint <code>/api/trader-ai/analyze</code>).
-          </p>
+          <p class="text-xs text-slate-500">Pozn.: Data jsou demo. V ostré verzi přibude napojení na live trhy, nemovitosti a vlastní reporty.</p>
         </aside>
       </div>
     </div>
@@ -123,72 +87,33 @@
 
   <!-- Feature cards -->
   <section class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-14">
-    <div class="grid md:grid-cols-4 gap-6">
-      <!-- 1 -->
+    <div class="grid md:grid-cols-3 gap-6">
       <a href="/client/market/" class="group block rounded-2xl border border-slate-200/70 dark:border-slate-700/70 bg-white dark:bg-slate-900 p-6 shadow-soft hover:shadow-xl hover:-translate-y-0.5 transition">
-        <div class="flex items-center justify-between">
-          <h3 class="text-lg font-semibold">Market Analyzer</h3>
-          <span class="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-brand-600/10 text-brand-700 dark:text-brand-300">📈</span>
-        </div>
-        <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">
-          Akcie, indexy, krypto. Filtry, tabulka symbolů, mini-graf s projekcí (min/avg/max).
-        </p>
-        <div class="mt-4 text-brand-700 dark:text-brand-300 inline-flex items-center gap-2">
-          Otevřít <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </div>
+        <div class="flex items-center justify-between"><h3 class="text-lg font-semibold">Market Analyzer</h3><span class="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-brand-600/10 text-brand-700 dark:text-brand-300">📈</span></div>
+        <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Akcie, indexy, krypto. Filtry, tabulka symbolů, mini-graf s projekcí (min/avg/max).</p>
+        <div class="mt-4 text-brand-700 dark:text-brand-300 inline-flex items-center gap-2">Otevřít <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
       </a>
 
-      <!-- 2 -->
       <a href="/client/real-estate/" class="group block rounded-2xl border border-slate-200/70 dark:border-slate-700/70 bg-white dark:bg-slate-900 p-6 shadow-soft hover:shadow-xl hover:-translate-y-0.5 transition">
-        <div class="flex items-center justify-between">
-          <h3 class="text-lg font-semibold">Real-Estate Feed</h3>
-          <span class="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-brand-600/10 text-brand-700 dark:text-brand-300">🏠</span>
-        </div>
-        <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">
-          Nápady, yield & due-diligence. V ostré verzi: scraping, katastr, AI kontrola reality.
-        </p>
-        <div class="mt-4 text-brand-700 dark:text-brand-300 inline-flex items-center gap-2">
-          Otevřít <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </div>
+        <div class="flex items-center justify-between"><h3 class="text-lg font-semibold">Real-Estate Feed</h3><span class="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-brand-600/10 text-brand-700 dark:text-brand-300">🏠</span></div>
+        <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Nápady, yield & due-diligence. V ostré verzi: scraping, katastr, AI kontrola reality.</p>
+        <div class="mt-4 text-brand-700 dark:text-brand-300 inline-flex items-center gap-2">Otevřít <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
       </a>
 
-      <!-- 3 -->
       <a href="/client/idea-lab/" class="group block rounded-2xl border border-slate-200/70 dark:border-slate-700/70 bg-white dark:bg-slate-900 p-6 shadow-soft hover:shadow-xl hover:-translate-y-0.5 transition">
-        <div class="flex items-center justify-between">
-          <h3 class="text-lg font-semibold">Idea Lab</h3>
-          <span class="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-brand-600/10 text-brand-700 dark:text-brand-300">🧠</span>
-        </div>
-        <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">
-          AI plány, kanály, KPI, exporty do MD. Zkratka od nápadu k exekuci.
-        </p>
-        <div class="mt-4 text-brand-700 dark:text-brand-300 inline-flex items-center gap-2">
-          Otevřít <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </div>
+        <div class="flex items-center justify-between"><h3 class="text-lg font-semibold">Idea Lab</h3><span class="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-brand-600/10 text-brand-700 dark:text-brand-300">🧠</span></div>
+        <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">AI plány, kanály, KPI, exporty do MD. Zkratka od nápadu k exekuci.</p>
+        <div class="mt-4 text-brand-700 dark:text-brand-300 inline-flex items-center gap-2">Otevřít <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
       </a>
-
-      <!-- 4: Nová karta Trader AI -->
-      <button id="openTraderAI3" class="text-left group block rounded-2xl border border-slate-200/70 dark:border-slate-700/70 bg-white dark:bg-slate-900 p-6 shadow-soft hover:shadow-xl hover:-translate-y-0.5 transition">
-        <div class="flex items-center justify-between">
-          <h3 class="text-lg font-semibold">Trader AI</h3>
-          <span class="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-brand-600/10 text-brand-700 dark:text-brand-300">🤖</span>
-        </div>
-        <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">
-          Nahraj screenshot grafu + volitelný popis. Dostaneš směr, úrovně a důvody.
-        </p>
-        <div class="mt-4 text-brand-700 dark:text-brand-300 inline-flex items-center gap-2">
-          Spustit <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </div>
-      </button>
     </div>
   </section>
 
-  <!-- What's new -->
   <section class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-20">
     <div class="rounded-2xl border border-slate-200/70 dark:border-slate-700/70 bg-white dark:bg-slate-900 p-6 shadow-soft">
       <h3 class="font-semibold">Co je nového</h3>
       <ul class="mt-3 grid md:grid-cols-3 gap-4 text-sm">
         <li class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/70">✅ Mini-grafy s čárkovanou projekcí (min/avg/max).</li>
-        <li class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/70">🧪 Trader AI: nahrávání screenshotů + demo analýza + historie.</li>
+        <li class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/70">⚙️ Připravené routy: /client/market/, /client/real-estate/, /client/idea-lab/.</li>
         <li class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/70">🎨 Vylepšený layout, stíny a skleněné panely.</li>
       </ul>
     </div>
@@ -201,326 +126,12 @@
     </div>
   </footer>
 
-  <!-- ===================== Trader AI PANEL ===================== -->
-  <div id="traderAIOverlay" class="hidden fixed inset-0 z-50 bg-black/40"></div>
-  <section id="traderAI" class="hidden fixed inset-0 z-50 p-4 md:p-8 overflow-y-auto">
-    <div class="fade-enter glass max-w-5xl mx-auto rounded-2xl border border-white/60 dark:border-slate-700/60 shadow-soft p-0 overflow-hidden">
-      <div class="px-5 py-4 flex items-center justify-between bg-white/70 dark:bg-slate-900/70 border-b border-slate-200/60 dark:border-slate-700/60">
-        <h2 class="text-xl font-semibold">Trader AI — analýza screenshotu</h2>
-        <div class="flex items-center gap-2">
-          <span class="text-xs text-slate-500 hidden sm:inline">Demo běží bez backendu (mock)</span>
-          <button id="closeTraderAI" class="px-3 py-1.5 rounded-lg border border-slate-300/70 dark:border-slate-700/70 hover:bg-slate-100 dark:hover:bg-slate-800">Zavřít</button>
-        </div>
-      </div>
-
-      <div class="p-5 grid lg:grid-cols-2 gap-6 bg-white/70 dark:bg-slate-900/70">
-        <!-- Upload/left -->
-        <div>
-          <label class="text-sm font-medium text-slate-600 dark:text-slate-300">Vlož svůj graf (PNG/JPG nebo PDF)</label>
-          <div id="drop" class="mt-2 rounded-xl border border-dashed border-slate-300 dark:border-slate-700 p-6 text-center cursor-pointer bg-white dark:bg-slate-900">
-            <input id="file" type="file" accept="image/*,.pdf" class="hidden" />
-            <p class="text-slate-500">Přetáhni sem soubor nebo <span class="text-brand-700 dark:text-brand-300 underline">vyber</span></p>
-            <p class="mt-1 text-xs text-slate-400">Max ~10 MB</p>
-            <img id="preview" class="hidden mt-4 max-h-60 mx-auto rounded-lg border border-slate-200 dark:border-slate-700" alt="Náhled" />
-            <canvas id="canvas" class="hidden"></canvas>
-          </div>
-
-          <label class="mt-5 block text-sm font-medium text-slate-600 dark:text-slate-300">Poznámka / úmysl obchodu (volitelně)</label>
-          <textarea id="note" rows="3" class="mt-2 w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 p-3" placeholder="Např.: Hledám breakout nad 245 s targetem 310 a SL 195…"></textarea>
-
-          <div class="mt-3 flex items-center gap-3">
-            <label class="inline-flex items-center gap-2 text-sm">
-              <input id="useWeb" type="checkbox" class="rounded border-slate-300 text-brand-600 focus:ring-brand-500">
-              Prohledat web (zprávy, earnings, sentiment)
-            </label>
-            <label class="inline-flex items-center gap-2 text-sm">
-              <input id="explainLevels" type="checkbox" class="rounded border-slate-300 text-brand-600 focus:ring-brand-500" checked>
-              Vysvětlit klíčové úrovně
-            </label>
-          </div>
-
-          <div class="mt-4 flex items-center gap-3">
-            <button id="analyze" class="px-4 py-2 rounded-xl bg-brand-600 text-white hover:bg-brand-700 shadow-soft disabled:opacity-60 disabled:cursor-not-allowed">
-              Naskenovat můj graf
-            </button>
-            <button id="clear" class="px-3 py-2 rounded-xl border border-slate-300/70 dark:border-slate-700/70 hover:bg-slate-100 dark:hover:bg-slate-800">
-              Vyčistit
-            </button>
-          </div>
-
-          <p id="hint" class="mt-3 text-xs text-slate-500">
-            Backend API: <code>POST /api/trader-ai/analyze</code> (multipart). Pokud není dostupné, zapne se demo-mock.
-          </p>
-        </div>
-
-        <!-- Result/right -->
-        <div>
-          <div class="flex items-center justify-between">
-            <h3 class="text-sm font-semibold text-slate-600 dark:text-slate-300">Výstup analýzy</h3>
-            <button id="saveToHistory" class="text-sm px-3 py-1.5 rounded-lg border border-slate-300/70 dark:border-slate-700/70 hover:bg-slate-100 dark:hover:bg-slate-800" disabled>Uložit do historie</button>
-          </div>
-
-          <div id="result" class="mt-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-4 min-h-[220px]">
-            <p class="text-slate-500 text-sm">Zatím nic. Nahraj graf a klikni „Naskenovat můj graf“.</p>
-          </div>
-
-          <h4 class="mt-6 text-sm font-semibold text-slate-600 dark:text-slate-300">Historie (lokálně)</h4>
-          <div id="history" class="mt-2 space-y-2 text-sm"></div>
-        </div>
-      </div>
-    </div>
-  </section>
-  <!-- =================== /Trader AI PANEL =================== -->
-
   <script>
-    // ---------------- Theme toggle ----------------
-    const btn = document.getElementById('themeToggle');
-    const applyTheme = (m)=>document.documentElement.classList.toggle('dark', m==='dark');
-    applyTheme(sessionStorage.getItem('sm-theme') || 'light');
-    btn.addEventListener('click', () => {
-      const m = document.documentElement.classList.contains('dark') ? 'light' : 'dark';
-      sessionStorage.setItem('sm-theme', m); applyTheme(m);
-    });
-    document.querySelectorAll('a[href]').forEach(a => a.setAttribute('role','link'));
-
-    // ---------------- Trader AI Panel open/close ----------------
-    const openBtns = [document.getElementById('openTraderAI'), document.getElementById('openTraderAI2'), document.getElementById('openTraderAI3')].filter(Boolean);
-    const panel = document.getElementById('traderAI');
-    const overlay = document.getElementById('traderAIOverlay');
-    const closeBtn = document.getElementById('closeTraderAI');
-
-    function openPanel(){
-      overlay.classList.remove('hidden');
-      panel.classList.remove('hidden');
-      panel.querySelector('.fade-enter')?.classList.add('fade-enter-active');
-    }
-    function closePanel(){
-      overlay.classList.add('hidden');
-      panel.classList.add('hidden');
-    }
-    openBtns.forEach(b => b.addEventListener('click', openPanel));
-    closeBtn.addEventListener('click', closePanel);
-    overlay.addEventListener('click', closePanel);
-    document.addEventListener('keydown', e=>{ if(e.key==='Escape' && !panel.classList.contains('hidden')) closePanel(); });
-
-    // ---------------- Trader AI Logic ----------------
-    const drop = document.getElementById('drop');
-    const fileInput = document.getElementById('file');
-    const preview = document.getElementById('preview');
-    const canvas = document.getElementById('canvas');
-    const analyzeBtn = document.getElementById('analyze');
-    const clearBtn = document.getElementById('clear');
-    const result = document.getElementById('result');
-    const noteInput = document.getElementById('note');
-    const useWeb = document.getElementById('useWeb');
-    const explainLevels = document.getElementById('explainLevels');
-    const historyEl = document.getElementById('history');
-    const saveBtn = document.getElementById('saveToHistory');
-
-    // Drag & drop
-    ;['dragenter','dragover'].forEach(ev => drop.addEventListener(ev, e=>{e.preventDefault(); e.stopPropagation(); drop.classList.add('drop-active');}));
-    ;['dragleave','drop'].forEach(ev => drop.addEventListener(ev, e=>{e.preventDefault(); e.stopPropagation(); drop.classList.remove('drop-active');}));
-    drop.addEventListener('click', ()=>fileInput.click());
-    drop.addEventListener('drop', e => {
-      const f = e.dataTransfer.files?.[0]; if (f) loadFile(f);
-    });
-    fileInput.addEventListener('change', e => { const f = e.target.files?.[0]; if (f) loadFile(f); });
-
-    function loadFile(f){
-      if(!f) return;
-      if(!/image\/|pdf$/.test(f.type)) { alert('Podporujeme obrázky (PNG/JPG) a PDF.'); return; }
-      const url = URL.createObjectURL(f);
-      if(f.type==='application/pdf'){
-        preview.classList.add('hidden');
-        canvas.classList.remove('hidden');
-        // jednoduchý „placeholder“ pro PDF – uložíme název, aby backend měl kontext
-        const ctx = canvas.getContext('2d'); canvas.width=600; canvas.height=80;
-        ctx.fillStyle = '#0f172a'; ctx.fillRect(0,0,600,80);
-        ctx.fillStyle = '#e2e8f0'; ctx.font = '16px Inter, sans-serif';
-        ctx.fillText('PDF přiloženo:', 12, 30);
-        ctx.fillText(f.name + ' ('+Math.round(f.size/1024)+' kB)', 12, 55);
-        canvas.dataset.file = f.name;
-        canvas.dataset.blobUrl = url;
-        fileInput._file = f;
-      } else {
-        canvas.classList.add('hidden');
-        preview.classList.remove('hidden');
-        preview.src = url;
-        fileInput._file = f;
-      }
-      saveBtn.disabled = true;
-      result.innerHTML = '<p class="text-sm text-slate-500">Soubor připraven. Klikni <b>Naskenovat můj graf</b>.</p>';
-    }
-
-    clearBtn.addEventListener('click', ()=>{
-      fileInput.value = ''; fileInput._file = null;
-      preview.src=''; preview.classList.add('hidden');
-      canvas.classList.add('hidden');
-      noteInput.value=''; result.innerHTML='<p class="text-slate-500 text-sm">Zatím nic. Nahraj graf.</p>';
-      saveBtn.disabled = true;
-    });
-
-    // Render výstupu
-    function renderOutput(payload){
-      const { direction, confidence, reasons=[], levels={}, risk={}, summary } = payload;
-      result.innerHTML = `
-        <div class="space-y-3">
-          <div class="flex items-center gap-3">
-            <span class="px-2 py-1 rounded-lg text-xs border ${direction==='long'?'border-emerald-300 text-emerald-700 bg-emerald-50':'border-rose-300 text-rose-700 bg-rose-50'}">
-              ${direction==='long'?'LONG 📈':direction==='short'?'SHORT 📉':'SIDEWAYS ⚖️'}
-            </span>
-            <span class="text-sm text-slate-500">Confidence: <b>${confidence}%</b></span>
-          </div>
-          ${summary ? `<p class="text-sm">${summary}</p>`:''}
-          <div class="grid sm:grid-cols-2 gap-3">
-            <div class="rounded-lg border border-slate-200 dark:border-slate-700 p-3">
-              <div class="text-xs font-medium text-slate-500 mb-1">Klíčové úrovně</div>
-              <ul class="text-sm space-y-1">
-                ${levels.entry?`<li>Entry: <b>${levels.entry}</b></li>`:''}
-                ${levels.target?`<li>Target: <b>${levels.target}</b></li>`:''}
-                ${levels.stop?`<li>Stop: <b>${levels.stop}</b></li>`:''}
-              </ul>
-            </div>
-            <div class="rounded-lg border border-slate-200 dark:border-slate-700 p-3">
-              <div class="text-xs font-medium text-slate-500 mb-1">Risk & Management</div>
-              <ul class="text-sm space-y-1">
-                ${risk.rr?`<li>R:R: <b>${risk.rr}</b></li>`:''}
-                ${risk.pos?`<li>Velikost pozice: <b>${risk.pos}</b></li>`:''}
-                ${risk.note?`<li>${risk.note}</li>`:''}
-              </ul>
-            </div>
-          </div>
-          ${reasons.length?`
-            <div class="rounded-lg border border-slate-200 dark:border-slate-700 p-3">
-              <div class="text-xs font-medium text-slate-500 mb-2">Důvody</div>
-              <ul class="list-disc pl-5 space-y-1 text-sm">
-                ${reasons.map(r=>`<li>${r}</li>`).join('')}
-              </ul>
-            </div>`:''}
-        </div>
-      `;
-      saveBtn.disabled = false;
-    }
-
-    // Mock analýza (demo) – jednoduchá heuristika z náhledu
-    async function mockAnalyze({note}){
-      // Pseudo signál: pokud v poznámce je "breakout" → long; "short" → short; jinak náhodně, ale stabilně
-      const t = (note||'').toLowerCase();
-      let direction = 'long';
-      if(t.includes('short')) direction='short';
-      else if(t.includes('range')||t.includes('side')) direction='sideways';
-      else if(t.includes('breakdown')) direction='short';
-      const confidence = direction==='sideways' ? 58 : (direction==='long'? 68 : 62);
-      const levels = direction==='long'
-        ? { entry:'nad lokálním HH ~ +0.5%', target:'+3–5%', stop:'-1.0% pod posledním swingem' }
-        : direction==='short'
-          ? { entry:'pod lokálním LL ~ -0.5%', target:'-3–5%', stop:'+1.0% nad posledním swingem' }
-          : { entry:'uprostřed range', target:'horní/spodní hrana', stop:'mimo range' };
-      const reasons = [
-        direction==='long'?'Série vyšších minim + odraz od MA':'Slabý objem na růstu + odmítnutí rezistence',
-        'Konfluence na horizontálních úrovních',
-        explainLevels.checked ? 'Rozumný poměr R:R při navržených úrovních' : null
-      ].filter(Boolean);
-      const risk = { rr: direction==='sideways'?'~1.0':'~2.0', pos:'1–2% účtu', note:'Nepoužívej finanční páku bez plánu.' };
-      const summary = 'Demo výstup. Po zapojení backendu budou úrovně a důvody odvozené z počítačového vidění + TA.';
-      return { direction, confidence, reasons, levels, risk, summary };
-    }
-
-    // Odeslání na backend (když je dostupný)
-    async function callBackend(file, note){
-      // SPECIFIKACE ENDPOINTU:
-      // POST /api/trader-ai/analyze  (multipart/form-data)
-      // Fields:
-      //   file: (binary) screenshot / pdf
-      //   note: string (volitelné)
-      //   use_web: "true" | "false"
-      //   explain_levels: "true" | "false"
-      // Response (JSON):
-      // {
-      //   direction: "long"|"short"|"sideways",
-      //   confidence: number (0-100),
-      //   reasons: string[],
-      //   levels: { entry?: string, target?: string, stop?: string },
-      //   risk?: { rr?: string, pos?: string, note?: string },
-      //   summary?: string
-      // }
-      const form = new FormData();
-      form.append('file', file);
-      form.append('note', note || '');
-      form.append('use_web', useWeb.checked ? 'true':'false');
-      form.append('explain_levels', explainLevels.checked ? 'true':'false');
-
-      const res = await fetch('/api/trader-ai/analyze', { method:'POST', body: form });
-      if(!res.ok) throw new Error('API returned ' + res.status);
-      return await res.json();
-    }
-
-    analyzeBtn.addEventListener('click', async ()=>{
-      const file = fileInput._file;
-      if(!file){ alert('Nejprve vlož soubor.'); return; }
-      analyzeBtn.disabled = true; analyzeBtn.textContent = 'Analyzuji…';
-      result.innerHTML = '<div class="text-sm text-slate-500">Probíhá analýza…</div>';
-
-      try{
-        let payload;
-        try {
-          payload = await callBackend(file, noteInput.value);
-        } catch(err){
-          // fallback mock
-          payload = await mockAnalyze({note: noteInput.value});
-        }
-        renderOutput(payload);
-        analyzeBtn.textContent = 'Naskenovat můj graf';
-      } catch (e){
-        console.error(e);
-        result.innerHTML = '<p class="text-rose-600 text-sm">Analýza selhala. Zkontroluj soubor nebo server.</p>';
-      } finally {
-        analyzeBtn.disabled = false;
-      }
-    });
-
-    // Historie (localStorage)
-    function loadHistory(){
-      const items = JSON.parse(localStorage.getItem('sm-traderai-history')||'[]');
-      historyEl.innerHTML = items.length ? '' : '<p class="text-slate-500">Prázdné.</p>';
-      items.slice().reverse().forEach((it, idx)=>{
-        const row = document.createElement('div');
-        row.className = 'rounded-lg border border-slate-200 dark:border-slate-700 p-3 flex items-start justify-between gap-3';
-        row.innerHTML = `
-          <div>
-            <div class="text-xs text-slate-500">${new Date(it.ts).toLocaleString()}</div>
-            <div class="text-sm">Směr: <b>${it.direction}</b>, Conf: <b>${it.confidence}%</b></div>
-            ${it.summary?`<div class="text-xs mt-1">${it.summary}</div>`:''}
-          </div>
-          <button data-idx="${idx}" class="rm text-xs px-2 py-1 rounded border border-slate-300/70 dark:border-slate-700/70 hover:bg-slate-100 dark:hover:bg-slate-800">Smazat</button>
-        `;
-        historyEl.appendChild(row);
-      });
-      historyEl.querySelectorAll('.rm').forEach(btn=>{
-        btn.addEventListener('click', ()=>{
-          const items = JSON.parse(localStorage.getItem('sm-traderai-history')||'[]');
-          // reverse pořadí při zobrazení → přepočítat index:
-          const realIndex = items.length - 1 - parseInt(btn.dataset.idx,10);
-          items.splice(realIndex,1);
-          localStorage.setItem('sm-traderai-history', JSON.stringify(items));
-          loadHistory();
-        });
-      });
-    }
-    saveBtn.addEventListener('click', ()=>{
-      const current = result.textContent.includes('Zatím nic') ? null : result.innerHTML;
-      if(!current){ return; }
-      // uložíme strukturovaněji: jen pár polí
-      const extract = /Confidence: <b>(\d+)%<\/b>/; const conf = extract.exec(result.innerHTML)?.[1]||'';
-      const dir = /LONG|SHORT|SIDEWAYS/.exec(result.innerHTML)?.[0]?.toLowerCase() || '';
-      const summaryMatch = result.innerHTML.match(/<p class="text-sm">(.*?)<\/p>/);
-      const summary = summaryMatch ? summaryMatch[1] : '';
-      const items = JSON.parse(localStorage.getItem('sm-traderai-history')||'[]');
-      items.push({ ts: Date.now(), direction: dir, confidence: parseInt(conf||'0',10), summary });
-      localStorage.setItem('sm-traderai-history', JSON.stringify(items));
-      loadHistory();
-    });
-    loadHistory();
+    const btn=document.getElementById('themeToggle');
+    const apply=m=>document.documentElement.classList.toggle('dark',m==='dark');
+    apply(sessionStorage.getItem('sm-theme')||'light');
+    btn.addEventListener('click',()=>{const m=document.documentElement.classList.contains('dark')?'light':'dark';sessionStorage.setItem('sm-theme',m);apply(m)});
+    document.querySelectorAll('a[href]').forEach(a=>a.setAttribute('role','link'));
   </script>
 </body>
 </html>
