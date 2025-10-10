@@ -16,7 +16,7 @@
     .pill{padding:.375rem .625rem;border-radius:9999px;border:1px solid rgba(15,23,42,.08)}
     .kbd{background:#f3f4f6;padding:.125rem .375rem;border-radius:.25rem;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Courier New",monospace;font-size:.75rem}
 
-    /* tabulka – fix sloupce */
+    /* tabulka – sloupce */
     .table-grid{
       display:grid; grid-template-columns: 90px 1fr 120px 100px 100px 250px 80px 220px; align-items:center;
     }
@@ -32,7 +32,7 @@
     .tag{display:inline-block;padding:.15rem .5rem;border:1px solid #e2e8f0;border-radius:9999px;font-size:.7rem;color:#475569;background:#fff}
     .ins-card{border:1px solid #e2e8f0;border-radius:1rem;background:white}
 
-    /* modal */
+    /* modal / buttons */
     .overlay{background:rgba(2,6,23,.45)}
     .fade-enter{opacity:0;transform:translateY(6px)} .fade-enter-active{opacity:1;transform:none;transition:all .18s ease}
     .btn{display:inline-flex;align-items:center;gap:.5rem;border-radius:.75rem;padding:.5rem .9rem}
@@ -41,6 +41,24 @@
 
     /* hvězda */
     .star{width:18px;height:18px;color:#94a3b8} .star.active{color:#f59e0b}
+
+    /* --- detail řádku --- */
+    .row-head{cursor:pointer}
+    .chev{transition:transform .18s ease}
+    .row.open .chev{transform:rotate(180deg)}
+    .details{display:none}
+    .row.open + .details{display:block}
+
+    /* mini-graf (SVG) */
+    .spark path.avg{stroke:#2563eb;stroke-width:2;fill:none}
+    .spark path.min,.spark path.max{stroke-width:2;fill:none;stroke-dasharray:4 4}
+    .spark path.min{stroke:#ef4444}.spark path.max{stroke:#22c55e}
+    .spark line.guide{stroke:#94a3b8;stroke-dasharray:4 4;opacity:.6}
+    .spark .now{stroke:#0ea5e9;stroke-width:2}
+    .target-badges{display:flex;gap:.5rem;flex-wrap:wrap}
+    .tg{display:inline-flex;align-items:center;gap:.4rem;border:1px solid #e2e8f0;border-radius:9999px;padding:.2rem .5rem;font-size:.75rem;background:#fff}
+    .tg .dot{width:.5rem;height:.5rem;border-radius:9999px}
+    .dot.min{background:#ef4444}.dot.avg{background:#2563eb}.dot.max{background:#22c55e}.dot.now{background:#0ea5e9}
   </style>
 </head>
 <body class="bg-slate-50 text-slate-900">
@@ -65,7 +83,7 @@
       <div>
         <h1 class="text-3xl font-semibold tracking-tight">Market Scanner</h1>
         <p class="mt-2 text-slate-600 max-w-3xl">
-          Vyhledej a filtruj akcie, indexy, forex, krypto a komodity. Řádek rozklikni pro tezi, podmínky neplatnosti a mini-graf s 1Y rozmezím.
+          Vyhledej a filtruj akcie, indexy, forex, krypto a komodity. <b>Řádek rozklikni</b> pro tezi, podmínky neplatnosti a <b>mini-graf</b> s 1Y rozmezím.
         </p>
       </div>
       <div class="w-full md:w-auto">
@@ -113,7 +131,7 @@
     <div class="mt-5 overflow-x-auto">
       <div class="min-w-[980px] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
         <div class="table-grid px-4 py-2 text-sm font-medium text-slate-500 bg-slate-50">
-          <div>Symbol</div><div>Název</div><div class="text-right">Cena</div><div class="text-right">1D %</div><div class="text-right">1W %</div><div class="text-center">1Y predikce <span class="text-slate-400">(min / avg / max)</span></div><div class="text-right">Conf.</div><div class="text-right">Akce</div>
+          <div></div><div>Název</div><div class="text-right">Cena</div><div class="text-right">1D %</div><div class="text-right">1W %</div><div class="text-center">1Y predikce <span class="text-slate-400">(min / avg / max)</span></div><div class="text-right">Conf.</div><div class="text-right">Akce</div>
         </div>
         <div id="rows"></div>
       </div>
@@ -177,7 +195,7 @@
             <label class="text-sm text-slate-600">Podmínka</label>
             <select id="alertCond" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2">
               <option value="above">Když cena > cílová</option>
-              <option value="below">Když cena < cílová</option>
+              <option value="below">Když cena &lt; cílová</option>
             </select>
           </div>
         </div>
@@ -205,7 +223,7 @@
     function saveLS(k,v){ localStorage.setItem(k, JSON.stringify(v)); }
     function loadLS(k,def){ try{ return JSON.parse(localStorage.getItem(k)) ?? def }catch(e){ return def } }
 
-    // ===== data (base + extra + signály) =====
+    // ===== data =====
     var baseRows = [
       {type:'stock',symbol:'AAPL',name:'Apple Inc.',price:219.85,d1:1.26,w1:2.10,signals:['breakout','vol'],forecast:{min:165,avg:245,max:310,conf:72}},
       {type:'crypto',symbol:'BTCUSD',name:'Bitcoin',price:67200,d1:2.30,w1:6.80,signals:['breakout','vol'],forecast:{min:42000,avg:88000,max:120000,conf:58}},
@@ -226,74 +244,126 @@
       {type:'commodity',symbol:'WTI',name:'Crude Oil WTI',price:81.4,d1:0.6,w1:1.8,signals:['vol'],forecast:{min:70,avg:86,max:98,conf:55}}
     ];
 
-    var showingAll = false;
-    var currentSetup = '';
-    var dataSource = baseRows.slice();
+    var showingAll=false, currentSetup='', dataSource=baseRows.slice();
+    var watchlist = loadLS('sm_watchlist', []);
 
-    // ===== watchlist =====
-    var watchlist = loadLS('sm_watchlist', []); // [symbols]
     function toggleWatch(symbol){
-      var i = watchlist.indexOf(symbol);
+      var i=watchlist.indexOf(symbol);
       if(i>=0) watchlist.splice(i,1); else watchlist.push(symbol);
-      saveLS('sm_watchlist', watchlist); renderWatchlist(); apply();
+      saveLS('sm_watchlist',watchlist); renderWatchlist(); apply();
     }
     function renderWatchlist(){
-      var bar = document.getElementById('watchlistBar');
-      var chips = document.getElementById('watchlistChips');
-      chips.innerHTML = '';
+      var bar=el('#watchlistBar'), chips=el('#watchlistChips'); chips.innerHTML='';
       watchlist.forEach(function(s){
-        var b=document.createElement('button');
-        b.className='pill bg-white hover:bg-slate-50 text-sm';
-        b.textContent=s;
-        b.title='Klik pro vyhledání, doppř. pro odebrání';
-        b.addEventListener('click', function(){ q.value=s; apply(); });
-        b.addEventListener('contextmenu', function(e){ e.preventDefault(); toggleWatch(s); });
+        var b=document.createElement('button'); b.className='pill bg-white hover:bg-slate-50 text-sm'; b.textContent=s;
+        b.addEventListener('click',function(){ q.value=s; apply(); });
+        b.addEventListener('contextmenu',function(e){e.preventDefault(); toggleWatch(s);});
         chips.appendChild(b);
       });
-      bar.classList.toggle('hidden', watchlist.length===0);
+      bar.classList.toggle('hidden',watchlist.length===0);
     }
 
-    // ===== tabulka =====
-    var container = document.getElementById('rows');
-    var countLabel = document.getElementById('countLabel');
-    var moreBtn = document.getElementById('moreBtn');
+    // ===== tabulka render =====
+    var container=el('#rows'), countLabel=el('#countLabel'), moreBtn=el('#moreBtn');
 
-    function starSVG(active){ return '<svg class="star '+(active?'active':'')+'" viewBox="0 0 24 24" fill="currentColor"><path d="M12 17.3l-5.6 3 1.1-6.4L3 9.8l6.4-.9L12 3l2.6 5.9 6.4.9-4.5 4.1 1.1 6.4z"/></svg>'; }
+    function starSVG(active){return '<svg class="star '+(active?'active':'')+'" viewBox="0 0 24 24" fill="currentColor"><path d="M12 17.3l-5.6 3 1.1-6.4L3 9.8l6.4-.9L12 3l2.6 5.9 6.4.9-4.5 4.1 1.1 6.4z"/></svg>'}
+
+    function sparkSVG(r){
+      var min=r.forecast.min, avg=r.forecast.avg, max=r.forecast.max, now=r.price;
+      var w=460, h=70, p=18;
+      function x(val){ return p + ( (val-min)/(max-min) )*(w-2*p); }
+      var yMid = h/2;
+      return ''+
+        '<svg class="spark w-full" viewBox="0 0 '+w+' '+h+'">'+
+        '<line class="guide" x1="'+x(min)+'" y1="'+(yMid)+'" x2="'+x(max)+'" y2="'+(yMid)+'"/>'+
+        '<path class="min" d="M'+x(min)+' '+(yMid)+' L '+x(min)+' '+(yMid)+'"/>'+
+        '<path class="avg" d="M'+x(min)+' '+(yMid)+' L '+x(avg)+' '+(yMid)+'"/>'+
+        '<path class="max" d="M'+x(avg)+' '+(yMid)+' L '+x(max)+' '+(yMid)+'"/>'+
+        '<line class="now" x1="'+x(now)+'" y1="'+(yMid-16)+'" x2="'+x(now)+'" y2="'+(yMid+16)+'"/>'+
+        '</svg>';
+    }
 
     function render(list){
       container.innerHTML='';
       list.forEach(function(r){
         var inWL = watchlist.includes(r.symbol);
-        var row=document.createElement('div'); row.className="row border-t border-slate-100";
+
+        // Hlavní řádek (klikací)
+        var row=document.createElement('div');
+        row.className="row row-head border-t border-slate-100";
         row.innerHTML =
-          '<div class="table-grid px-4 py-3">'
-          +  '<div class="font-semibold cell-nowrap">'+r.symbol+'</div>'
-          +  '<div class="text-slate-700 truncate">'+r.name+'</div>'
-          +  '<div class="text-right tabular-nums cell-nowrap">'+fmt.format(r.price)+'</div>'
-          +  '<div class="text-right tabular-nums cell-nowrap '+(r.d1>=0?'text-emerald-600':'text-rose-600')+'">'+pct(r.d1)+'</div>'
-          +  '<div class="text-right tabular-nums cell-nowrap '+(r.w1>=0?'text-emerald-600':'text-rose-600')+'">'+pct(r.w1)+'</div>'
-          +  '<div class="text-center tabular-nums cell-nowrap text-[15px]">'+i18n.format(r.forecast.min)+' / <span class="font-semibold">'+i18n.format(r.forecast.avg)+'</span> / '+i18n.format(r.forecast.max)+'</div>'
-          +  '<div class="text-right tabular-nums cell-nowrap">'+r.forecast.conf+'%</div>'
-          +  '<div class="actions cell-nowrap">'
-          +    '<button class="btn btn-ghost" data-watch="'+r.symbol+'" title="'+(inWL?'Odebrat z watchlistu':'Přidat do watchlistu')+'">'+starSVG(inWL)+'</button>'
-          +    '<button class="btn btn-ghost" data-alert="'+r.symbol+'">🔔 Alert</button>'
-          +    '<button class="btn btn-primary" data-ai="'+r.symbol+'">AI predikce</button>'
-          +  '</div>'
-          +'</div>';
+          '<div class="table-grid px-4 py-3">'+
+          '  <div class="font-semibold cell-nowrap flex items-center gap-1">'+
+          '    <span>'+r.symbol+'</span>'+
+          '    <svg class="chev w-4 h-4 opacity-60" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>'+
+          '  </div>'+
+          '  <div class="text-slate-700 truncate">'+r.name+'</div>'+
+          '  <div class="text-right tabular-nums cell-nowrap">'+fmt.format(r.price)+'</div>'+
+          '  <div class="text-right tabular-nums cell-nowrap '+(r.d1>=0?'text-emerald-600':'text-rose-600')+'">'+pct(r.d1)+'</div>'+
+          '  <div class="text-right tabular-nums cell-nowrap '+(r.w1>=0?'text-emerald-600':'text-rose-600')+'">'+pct(r.w1)+'</div>'+
+          '  <div class="text-center tabular-nums cell-nowrap text-[15px]">'+i18n.format(r.forecast.min)+' / <span class="font-semibold">'+i18n.format(r.forecast.avg)+'</span> / '+i18n.format(r.forecast.max)+'</div>'+
+          '  <div class="text-right tabular-nums cell-nowrap">'+r.forecast.conf+'%</div>'+
+          '  <div class="actions cell-nowrap">'+
+          '    <button class="btn btn-ghost" data-watch="'+r.symbol+'" title="'+(inWL?'Odebrat z watchlistu':'Přidat do watchlistu')+'">'+starSVG(inWL)+'</button>'+
+          '    <button class="btn btn-ghost" data-alert="'+r.symbol+'">🔔 Alert</button>'+
+          '    <button class="btn btn-primary" data-ai="'+r.symbol+'"><span class="ai-full">AI predikce</span><span class="ai-short hidden">AI</span></button>'+
+          '  </div>'+
+          '</div>';
+
+        // Detail panel
+        var det=document.createElement('div');
+        det.className="details px-6 pb-5 pt-4 bg-slate-50/60 border-t";
+        det.innerHTML =
+          '<div class="flex flex-col gap-3">'+
+          '  <div class="flex items-start gap-4 flex-wrap">'+
+          '    <div class="grow min-w-[320px]">'+ sparkSVG(r) +'</div>'+
+          '    <div class="target-badges">'+
+          '      <span class="tg"><span class="dot min"></span>Min '+i18n.format(r.forecast.min)+'</span>'+
+          '      <span class="tg"><span class="dot avg"></span>Avg '+i18n.format(r.forecast.avg)+'</span>'+
+          '      <span class="tg"><span class="dot max"></span>Max '+i18n.format(r.forecast.max)+'</span>'+
+          '      <span class="tg"><span class="dot now"></span>Now '+fmt.format(r.price)+'</span>'+
+          '    </div>'+
+          '  </div>'+
+          '  <div class="text-sm text-slate-600">Predikce (1Y): očekávané pásmo <b>'+i18n.format(r.forecast.min)+' – '+i18n.format(r.forecast.max)+'</b>, střed <b>'+i18n.format(r.forecast.avg)+'</b>. Confidence <b>'+r.forecast.conf+'%</b>.</div>'+
+          '  <div class="flex gap-2 flex-wrap pt-1">'+
+          '    <button class="btn btn-primary" data-ai="'+r.symbol+'">AI predikce</button>'+
+          '    <button class="btn btn-ghost" data-alert="'+r.symbol+'">🔔 Vytvořit alert</button>'+
+          '  </div>'+
+          '</div>';
+
+        // Append
         container.appendChild(row);
+        container.appendChild(det);
+
+        // Toggle details
+        row.addEventListener('click', function(e){
+          // neklikej, pokud je to tlačítko v akcích
+          if(e.target.closest('.actions') || e.target.closest('button')) return;
+          row.classList.toggle('open');
+          det.classList.toggle('hidden', false); // detail už zůstává v DOM
+          if(row.classList.contains('open')){ row.nextSibling.classList.remove('hidden'); } else { row.nextSibling.classList.add('hidden'); }
+        });
       });
-      // listeners
+
+      // listeners (watch/alert/ai) – fungují i v detailech
       container.querySelectorAll('[data-watch]').forEach(function(b){
-        b.addEventListener('click', function(){ toggleWatch(this.getAttribute('data-watch')); });
+        b.addEventListener('click', function(e){ e.stopPropagation(); toggleWatch(this.getAttribute('data-watch')); });
       });
       container.querySelectorAll('[data-alert]').forEach(function(b){
-        b.addEventListener('click', function(){
-          var s = this.getAttribute('data-alert');
-          var found = allRows().find(x=>x.symbol===s);
+        b.addEventListener('click', function(e){
+          e.stopPropagation();
+          var s=this.getAttribute('data-alert'); var found=allRows().find(x=>x.symbol===s);
           openAlert(found.symbol, found.price);
         });
       });
-      countLabel.textContent = 'Zobrazeno: ' + list.length + (showingAll ? ' / ' + (baseRows.length + extraRows.length) : '');
+      container.querySelectorAll('[data-ai]').forEach(function(b){
+        b.addEventListener('click', function(e){
+          e.stopPropagation();
+          var s=this.getAttribute('data-ai'); aiPredictionDemo(s);
+        });
+      });
+
+      countLabel.textContent='Zobrazeno: '+list.length+(showingAll?' / '+(baseRows.length+extraRows.length):'');
     }
 
     function allRows(){ return showingAll ? baseRows.concat(extraRows) : baseRows.slice(); }
@@ -304,17 +374,15 @@
       var term=(q.value||'').trim().toLowerCase();
       var pool = showingAll ? baseRows.concat(extraRows) : baseRows.slice();
 
-      // set-up filter
       if(currentSetup){
         pool = pool.filter(function(r){
-          if(currentSetup==='earn') return r.signals && r.signals.includes('earn');
-          if(currentSetup==='mean') return r.signals && r.signals.includes('mean');
-          if(currentSetup==='vol')  return r.signals && r.signals.includes('vol');
-          return r.signals && r.signals.includes('breakout');
+          if(currentSetup==='earn') return r.signals?.includes('earn');
+          if(currentSetup==='mean') return r.signals?.includes('mean');
+          if(currentSetup==='vol')  return r.signals?.includes('vol');
+          return r.signals?.includes('breakout');
         });
       }
 
-      // type filter + search
       var out = pool.filter(function(r){
         var okType = !typeFilter.value || r.type===typeFilter.value;
         var okSearch = !term || r.symbol.toLowerCase().includes(term) || r.name.toLowerCase().includes(term);
@@ -323,82 +391,56 @@
       });
 
       switch(sortBy.value){
-        case 'price': out.sort(function(a,b){return b.price-a.price}); break;
-        case 'w1':    out.sort(function(a,b){return b.w1-a.w1});     break;
-        case 'conf':  out.sort(function(a,b){return b.forecast.conf-a.forecast.conf}); break;
-        default:      out.sort(function(a,b){return a.symbol.localeCompare(b.symbol)});
+        case 'price': out.sort((a,b)=>b.price-a.price); break;
+        case 'w1':    out.sort((a,b)=>b.w1-a.w1); break;
+        case 'conf':  out.sort((a,b)=>b.forecast.conf-a.forecast.conf); break;
+        default:      out.sort((a,b)=>a.symbol.localeCompare(b.symbol));
       }
       render(out);
     }
 
+    document.querySelectorAll('[data-setup]').forEach(b=>b.addEventListener('click',function(){currentSetup=this.dataset.setup;apply();}));
     q.addEventListener('input',apply);
     typeFilter.addEventListener('change',function(){ syncTypeFromTable(); apply(); });
     sortBy.addEventListener('change',apply);
     wlOnly.addEventListener('change',apply);
-    document.querySelectorAll('[data-setup]').forEach(function(b){
-      b.addEventListener('click', function(){ currentSetup=this.getAttribute('data-setup'); apply(); });
-    });
+    moreBtn.addEventListener('click', function(){ showingAll=!showingAll; this.textContent=showingAll?'Zobrazit méně':'Zobrazit vše'; apply(); });
 
-    moreBtn.addEventListener('click', function(){
-      showingAll = !showingAll;
-      moreBtn.textContent = showingAll ? 'Zobrazit méně' : 'Zobrazit vše';
-      apply();
-    });
+    // ===== Insights (beze změn logiky) =====
+    var insData=[], insContainer=el('#insights'), insEmpty=el('#insEmpty'),
+        insSearch=el('#insSearch'), insType=el('#insType'), insSent=el('#insSent'),
+        insHorizon=el('#insHorizon'), insRefresh=el('#insRefresh');
 
-    // ===== Insights =====
-    var insData = [];
-    var insContainer = document.getElementById('insights');
-    var insEmpty = document.getElementById('insEmpty');
-    var insSearch = document.getElementById('insSearch');
-    var insType = document.getElementById('insType');
-    var insSent = document.getElementById('insSent');
-    var insHorizon = document.getElementById('insHorizon');
-    var insRefresh = document.getElementById('insRefresh');
-
-    function impactBadge(sent){
-      if(sent==='up')   return '<span class="badge impact-up">↑ Pozitivní</span>';
-      if(sent==='down') return '<span class="badge impact-down">↓ Negativní</span>';
-      return '<span class="badge impact-flat">↔ Neutrální</span>';
-    }
+    function impactBadge(sent){ if(sent==='up')return'<span class="badge impact-up">↑ Pozitivní</span>'; if(sent==='down')return'<span class="badge impact-down">↓ Negativní</span>'; return'<span class="badge impact-flat">↔ Neutrální</span>'; }
 
     function renderInsights(list){
-      insContainer.innerHTML='';
-      if(!list.length){ insEmpty.classList.remove('hidden'); return; }
-      insEmpty.classList.add('hidden');
-
+      insContainer.innerHTML=''; if(!list.length){insEmpty.classList.remove('hidden');return;} insEmpty.classList.add('hidden');
       list.forEach(function(n){
-        var card = document.createElement('article');
-        card.className = 'ins-card p-4';
-        var tickers = (n.tickers||[]).map(function(t){
-          return '<button class="pill text-sm bg-white hover:bg-slate-50" data-jump="'+t+'">'+t+'</button>';
-        }).join(' ');
+        var card=document.createElement('article'); card.className='ins-card p-4';
+        var tickers=(n.tickers||[]).map(function(t){return'<button class="pill text-sm bg-white hover:bg-slate-50" data-jump="'+t+'">'+t+'</button>'}).join(' ');
         card.innerHTML =
-          '<div class="flex items-start justify-between gap-3">'
-          +  '<div><div class="text-sm text-slate-500">'+n.source+' • '+n.time+'</div><h3 class="mt-0.5 font-semibold">'+n.title+'</h3></div>'
-          +  '<div class="text-right shrink-0">'+impactBadge(n.sentiment)+'<div class="text-xs text-slate-500 mt-1">Pravděpodobnost: <b>'+n.prob+'%</b></div></div>'
-          +'</div>'
-          +'<p class="mt-2 text-sm">'+n.explainer+'</p>'
-          + (n.take?('<ul class="mt-2 text-sm list-disc pl-5">'+n.take.map(function(t){return '<li>'+t+'</li>'}).join('')+'</ul>'):'')
-          +'<div class="mt-3 flex flex-wrap gap-2">'+(n.tags||[]).map(function(t){return '<span class="tag">'+t+'</span>'}).join('')+'</div>'
-          + (tickers?('<div class="mt-3 flex flex-wrap gap-2 items-center"><span class="text-xs text-slate-500">Vztahuje se k:</span>'+tickers+'</div>'):'');
+          '<div class="flex items-start justify-between gap-3">'+
+          '<div><div class="text-sm text-slate-500">'+n.source+' • '+n.time+'</div><h3 class="mt-0.5 font-semibold">'+n.title+'</h3></div>'+
+          '<div class="text-right shrink-0">'+impactBadge(n.sentiment)+'<div class="text-xs text-slate-500 mt-1">Pravděpodobnost: <b>'+n.prob+'%</b></div></div>'+
+          '</div>'+
+          '<p class="mt-2 text-sm">'+n.explainer+'</p>'+
+          (n.take?('<ul class="mt-2 text-sm list-disc pl-5">'+n.take.map(t=>'<li>'+t+'</li>').join('')+'</ul>'):'')+
+          '<div class="mt-3 flex flex-wrap gap-2">'+(n.tags||[]).map(t=>'<span class="tag">'+t+'</span>').join('')+'</div>'+
+          (tickers?('<div class="mt-3 flex flex-wrap gap-2 items-center"><span class="text-xs text-slate-500">Vztahuje se k:</span>'+tickers+'</div>'):'');
         insContainer.appendChild(card);
       });
-      // jump-to-ticker
-      insContainer.querySelectorAll('[data-jump]').forEach(function(b){
-        b.addEventListener('click', function(){ q.value=this.getAttribute('data-jump'); apply(); window.scrollTo({top:0,behavior:'smooth'}); });
-      });
+      insContainer.querySelectorAll('[data-jump]').forEach(function(b){ b.addEventListener('click',function(){ q.value=this.dataset.jump; apply(); scrollTo({top:0,behavior:'smooth'}); }); });
     }
 
     function filterInsights(){
-      var term = (insSearch.value||'').toLowerCase().trim();
-      var list = insData.filter(function(n){
-        var okType = !insType.value || n.type===insType.value;
-        var okSent = !insSent.value || n.sentiment===insSent.value;
-        var okText = !term || n.title.toLowerCase().includes(term);
-        return okType && okSent && okText;
+      var term=(insSearch.value||'').toLowerCase().trim();
+      var list=insData.filter(function(n){
+        var okType=!insType.value||n.type===insType.value;
+        var okSent=!insSent.value||n.sentiment===insSent.value;
+        var okText=!term||n.title.toLowerCase().includes(term);
+        return okType&&okSent&&okText;
       });
-      // sync: když se změní typ v Insights → přepiš tabulkový select
-      if(insType.value !== typeFilter.value){ typeFilter.value = insType.value; }
+      if(insType.value!==typeFilter.value){ typeFilter.value=insType.value; }
       renderInsights(list); apply();
     }
 
@@ -438,66 +480,53 @@
     }
 
     function fetchInsights(){
-      var params = new URLSearchParams({ horizon: insHorizon.value || 'W' });
+      var params=new URLSearchParams({horizon:insHorizon.value||'W'});
       return fetch('/api/trader-ai/news?'+params.toString())
         .then(function(r){ if(!r.ok) throw new Error('fail'); return r.json(); })
         .catch(function(){ return mockInsights(); });
     }
 
     insRefresh.addEventListener('click', function(){
-      insRefresh.disabled = true; insRefresh.textContent = 'Načítám…';
+      insRefresh.disabled=true; insRefresh.textContent='Načítám…';
       fetchInsights().then(function(data){
-        insData = (Array.isArray(data)?data:[]).map(function(n){
-          return {
-            type: n.type || n.asset_type || '',
-            source: n.source || 'Zprávy',
-            time: n.time || n.when || 'nyní',
-            sentiment: n.sentiment || n.impact || 'flat',
-            prob: n.prob || n.probability || 55,
-            title: n.title || n.headline || '—',
-            explainer: n.explainer || n.summary || '',
-            take: n.take || n.actions || [],
-            tags: n.tags || [],
-            tickers: n.tickers || []
-          };
+        insData=(Array.isArray(data)?data:[]).map(function(n){
+          return { type:n.type||n.asset_type||'', source:n.source||'Zprávy', time:n.time||n.when||'nyní',
+            sentiment:n.sentiment||n.impact||'flat', prob:n.prob||n.probability||55, title:n.title||n.headline||'—',
+            explainer:n.explainer||n.summary||'', take:n.take||n.actions||[], tags:n.tags||[], tickers:n.tickers||[] };
         });
         filterInsights();
-      }).finally(function(){ insRefresh.disabled = false; insRefresh.textContent = 'Aktualizovat'; });
+      }).finally(function(){ insRefresh.disabled=false; insRefresh.textContent='Aktualizovat'; });
     });
 
-    insSearch.addEventListener('input', filterInsights);
-    insType.addEventListener('change', filterInsights);
-    insSent.addEventListener('change', filterInsights);
-    insHorizon.addEventListener('change', function(){ /* pro backend */ });
+    insSearch.addEventListener('input',filterInsights);
+    insType.addEventListener('change',filterInsights);
+    insSent.addEventListener('change',filterInsights);
+    insHorizon.addEventListener('change',function(){ /* pro backend */ });
 
-    // sync z tabulky → insights (jen typ)
-    function syncTypeFromTable(){ if(insType.value !== typeFilter.value){ insType.value = typeFilter.value; } }
+    function syncTypeFromTable(){ if(insType.value!==typeFilter.value){ insType.value=typeFilter.value; } }
 
     // ===== Alert modal (demo) =====
     var alertOverlay=el('#alertOverlay'), alertModal=el('#alertModal'), alertClose=el('#alertClose'), alertSave=el('#alertSave');
     function openAlert(symbol, priceNow){
-      el('#alertSymbol').value = symbol;
-      el('#alertPriceNow').value = fmt.format(priceNow);
-      el('#alertTarget').value = ''; el('#alertCond').value='above'; el('#alertNote').value='';
+      el('#alertSymbol').value=symbol; el('#alertPriceNow').value=fmt.format(priceNow);
+      el('#alertTarget').value=''; el('#alertCond').value='above'; el('#alertNote').value='';
       alertOverlay.classList.remove('hidden'); alertModal.classList.remove('hidden');
       requestAnimationFrame(function(){ alertModal.querySelector('.fade-enter').classList.add('fade-enter-active'); });
     }
     function closeAlert(){ alertOverlay.classList.add('hidden'); alertModal.classList.add('hidden'); }
-    alertOverlay.addEventListener('click', closeAlert); alertClose.addEventListener('click', closeAlert);
+    alertOverlay.addEventListener('click',closeAlert); alertClose.addEventListener('click',closeAlert);
 
-    alertSave.addEventListener('click', function(){
-      var alerts = loadLS('sm_alerts', []);
-      var rec = {
-        symbol: el('#alertSymbol').value,
-        cond: el('#alertCond').value,
-        target: parseFloat(el('#alertTarget').value),
-        note: el('#alertNote').value || '',
-        created_at: Date.now()
-      };
+    alertSave.addEventListener('click',function(){
+      var alerts=loadLS('sm_alerts',[]);
+      var rec={symbol:el('#alertSymbol').value,cond:el('#alertCond').value,target:parseFloat(el('#alertTarget').value),note:el('#alertNote').value||'',created_at:Date.now()};
       if(!isFinite(rec.target)){ alert('Zadej platnou cílovou cenu.'); return; }
-      alerts.push(rec); saveLS('sm_alerts', alerts);
-      closeAlert(); alert('Alert uložen (demo).');
+      alerts.push(rec); saveLS('sm_alerts',alerts); closeAlert(); alert('Alert uložen (demo).');
     });
+
+    // ===== AI predikce demo =====
+    function aiPredictionDemo(symbol){
+      alert('AI predikce pro '+symbol+':\n• Směr: ↑ pravděpodobnost 60–70%\n• Úrovně: support/rezistence blízko min/avg/max (viz panel).');
+    }
 
     // ===== init =====
     renderWatchlist();
