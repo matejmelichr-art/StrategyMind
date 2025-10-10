@@ -3,46 +3,195 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>StrategyMind — Klientské centrum</title>
+  <title>StrategyMind — Klientská sekce</title>
+
+  <!-- Tailwind CDN -->
   <link rel="preconnect" href="https://cdn.tailwindcss.com">
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>tailwind.config={theme:{extend:{colors:{brand:"#0A2342",mint:"#2bd4a9"}}}}</script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50:"#ECFEFF",100:"#CFFAFE",200:"#A5F3FC",300:"#67E8F9",
+              400:"#22D3EE",500:"#06B6D4",600:"#0891B2",700:"#0E7490",
+              800:"#155E75",900:"#164E63"
+            }
+          },
+          boxShadow: {
+            soft: "0 12px 40px rgba(2, 132, 199, .08)"
+          },
+          borderRadius: { xl2: "1.25rem" }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    .glass{ backdrop-filter: blur(10px); background: linear-gradient(180deg,rgba(255,255,255,.75),rgba(255,255,255,.55));}
+    .dark .glass{ background: linear-gradient(180deg,rgba(15,23,42,.65),rgba(15,23,42,.45));}
+  </style>
 </head>
-<body class="bg-slate-50 text-slate-900">
-  <header class="sticky top-0 z-50 bg-white/80 backdrop-blur border-b">
-    <div class="mx-auto max-w-6xl px-4 py-3 flex items-center justify-between">
-      <a class="font-semibold" href="/">← Zpět na homepage</a>
-      <nav class="flex gap-2">
-        <a class="px-3 py-2 rounded-lg border hover:bg-slate-50" href="/client/market/">Market Analyzer</a>
-        <a class="px-3 py-2 rounded-lg border hover:bg-slate-50" href="/client/real-estate/">Real-Estate</a>
-        <a class="px-3 py-2 rounded-lg border hover:bg-slate-50" href="/client/ideas/">Idea Lab</a>
+<body class="min-h-dvh bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100">
+  <!-- Top bar -->
+  <header class="sticky top-0 z-30 border-b border-slate-200/60 dark:border-slate-700/60 bg-white/80 dark:bg-slate-900/70 backdrop-blur">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <a href="/" class="flex items-center gap-3 group">
+        <span class="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-brand-600 text-white shadow-soft">SM</span>
+        <span class="text-lg font-semibold group-hover:text-brand-600 transition">StrategyMind</span>
+      </a>
+
+      <nav class="hidden md:flex items-center gap-2">
+        <a href="/client/market/" class="px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800">Market Analyzer</a>
+        <a href="/client/real-estate/" class="px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800">Real-Estate</a>
+        <a href="/client/idea-lab/" class="px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800">Idea Lab</a>
       </nav>
+
+      <div class="flex items-center gap-3">
+        <button id="themeToggle" class="px-3 py-2 text-sm rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700">
+          🌙/☀️
+        </button>
+        <a href="/" class="px-3 py-2 text-sm rounded-lg border border-slate-300/60 dark:border-slate-700/60 hover:bg-slate-50 dark:hover:bg-slate-800">Zpět na homepage</a>
+      </div>
     </div>
   </header>
 
-  <main class="mx-auto max-w-6xl px-4 py-10">
-    <h1 class="text-3xl font-extrabold">Klientská sekce běží ✅</h1>
-    <p class="mt-2 text-slate-600 max-w-prose">
-      Vyber záložku výše. V demu najdeš Market Analyzer s tabulkou symbolů, mini-grafy a čárkovanými projekcemi (min/avg/max).
-    </p>
+  <!-- Hero -->
+  <section class="relative overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-b from-brand-50/80 via-white to-transparent dark:from-brand-900/20 dark:via-slate-900"></div>
+    <div class="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10 lg:py-14">
+      <div class="grid lg:grid-cols-3 gap-8">
+        <div class="lg:col-span-2">
+          <div class="inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-medium bg-brand-100 text-brand-800 dark:bg-brand-900/40 dark:text-brand-200 border border-brand-200/60 dark:border-brand-700/60 mb-4">
+            Klientská sekce běží <span class="text-xl leading-none">✅</span>
+          </div>
+          <h1 class="text-3xl sm:text-4xl font-bold tracking-tight">
+            Všechna vaše rozhodnutí na jednom místě
+          </h1>
+          <p class="mt-3 text-slate-600 dark:text-slate-300 max-w-2xl">
+            V demu najdete <strong>Market Analyzer</strong> (tabulka symbolů + mini-grafy s čárkovanou projekcí min/avg/max),
+            první nástřel <strong>Real-Estate feedu</strong> a <strong>Idea Lab</strong> pro plánování. Live verze přidá
+            real-time data, zprávy a exporty.
+          </p>
 
-    <div class="mt-8 grid sm:grid-cols-3 gap-4">
-      <a href="/client/market/" class="p-5 bg-white border rounded-xl hover:shadow">
-        <div class="text-sm text-slate-500">Otevřít</div>
-        <div class="font-semibold text-lg">Market Analyzer</div>
-        <p class="text-sm mt-1 text-slate-600">Akcie, indexy, krypto, filtry a predikce.</p>
+          <div class="mt-6 flex flex-wrap gap-3">
+            <a href="/client/market/" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-brand-600 text-white hover:bg-brand-700 shadow-soft">
+              Otevřít Market Analyzer
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" class="opacity-90"><path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </a>
+            <a href="/client/real-estate/" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-300/70 dark:border-slate-700/70 hover:bg-slate-50 dark:hover:bg-slate-800">
+              Real-Estate Feed
+            </a>
+            <a href="/client/idea-lab/" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-300/70 dark:border-slate-700/70 hover:bg-slate-50 dark:hover:bg-slate-800">
+              Idea Lab
+            </a>
+          </div>
+        </div>
+
+        <!-- Right rail: status -->
+        <aside class="glass rounded-2xl p-5 shadow-soft border border-white/50 dark:border-slate-700/40">
+          <h3 class="font-semibold mb-4">Status & metriky</h3>
+          <dl class="space-y-3 text-sm">
+            <div class="flex items-center justify-between">
+              <dt class="text-slate-500">Uptime (demo)</dt><dd class="font-medium">99.9%</dd>
+            </div>
+            <div class="flex items-center justify-between">
+              <dt class="text-slate-500">Poslední build</dt><dd class="font-medium">před chvílí</dd>
+            </div>
+            <div class="flex items-center justify-between">
+              <dt class="text-slate-500">Verze UI</dt><dd><code class="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800">v0.4</code></dd>
+            </div>
+          </dl>
+          <hr class="my-4 border-slate-200/60 dark:border-slate-700/60" />
+          <p class="text-xs text-slate-500">
+            Pozn.: Data jsou demo. V ostré verzi přibude napojení na live trhy, nemovitosti a vlastní reporty.
+          </p>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- Feature cards -->
+  <section class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-14">
+    <div class="grid md:grid-cols-3 gap-6">
+      <!-- Card 1 -->
+      <a href="/client/market/" class="group block rounded-2xl border border-slate-200/70 dark:border-slate-700/70 bg-white dark:bg-slate-900 p-6 shadow-soft hover:shadow-xl hover:-translate-y-0.5 transition">
+        <div class="flex items-center justify-between">
+          <h3 class="text-lg font-semibold">Market Analyzer</h3>
+          <span class="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-brand-600/10 text-brand-700 dark:text-brand-300">📈</span>
+        </div>
+        <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">
+          Akcie, indexy, krypto. Filtry, tabulka symbolů, mini-graf s čárkovanou projekcí (min/avg/max) a tlačítko detailu.
+        </p>
+        <div class="mt-4 text-brand-700 dark:text-brand-300 inline-flex items-center gap-2">
+          Otevřít <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
       </a>
-      <a href="/client/real-estate/" class="p-5 bg-white border rounded-xl hover:shadow">
-        <div class="text-sm text-slate-500">Otevřít</div>
-        <div class="font-semibold text-lg">Real-Estate Feed</div>
-        <p class="text-sm mt-1 text-slate-600">Nápady, yield a due-diligence kroky.</p>
+
+      <!-- Card 2 -->
+      <a href="/client/real-estate/" class="group block rounded-2xl border border-slate-200/70 dark:border-slate-700/70 bg-white dark:bg-slate-900 p-6 shadow-soft hover:shadow-xl hover:-translate-y-0.5 transition">
+        <div class="flex items-center justify-between">
+          <h3 class="text-lg font-semibold">Real-Estate Feed</h3>
+          <span class="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-brand-600/10 text-brand-700 dark:text-brand-300">🏠</span>
+        </div>
+        <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">
+          Nápady, yield & due-diligence kroky. V ostré verzi: prohledávání inzerce, katastrální náhledy a AI „reality-check“.
+        </p>
+        <div class="mt-4 text-brand-700 dark:text-brand-300 inline-flex items-center gap-2">
+          Otevřít <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
       </a>
-      <a href="/client/ideas/" class="p-5 bg-white border rounded-xl hover:shadow">
-        <div class="text-sm text-slate-500">Otevřít</div>
-        <div class="font-semibold text-lg">Idea Lab</div>
-        <p class="text-sm mt-1 text-slate-600">AI plány, kanály, KPI a export do MD.</p>
+
+      <!-- Card 3 -->
+      <a href="/client/idea-lab/" class="group block rounded-2xl border border-slate-200/70 dark:border-slate-700/70 bg-white dark:bg-slate-900 p-6 shadow-soft hover:shadow-xl hover:-translate-y-0.5 transition">
+        <div class="flex items-center justify-between">
+          <h3 class="text-lg font-semibold">Idea Lab</h3>
+          <span class="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-brand-600/10 text-brand-700 dark:text-brand-300">🧠</span>
+        </div>
+        <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">
+          AI plány, kanály, KPI, exporty do MD. Zkratka od nápadu k akčním krokům a výsledkům.
+        </p>
+        <div class="mt-4 text-brand-700 dark:text-brand-300 inline-flex items-center gap-2">
+          Otevřít <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
       </a>
     </div>
-  </main>
+  </section>
+
+  <!-- What's new -->
+  <section class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-20">
+    <div class="rounded-2xl border border-slate-200/70 dark:border-slate-700/70 bg-white dark:bg-slate-900 p-6 shadow-soft">
+      <h3 class="font-semibold">Co je nového</h3>
+      <ul class="mt-3 grid md:grid-cols-3 gap-4 text-sm">
+        <li class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/70">✅ Mini-grafy s čárkovanou projekcí (min/avg/max).</li>
+        <li class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/70">⚙️ Připravené routy: /client/market/, /client/real-estate/, /client/idea-lab/.</li>
+        <li class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/70">🎨 Vylepšený layout, stíny a skleněné panely.</li>
+      </ul>
+    </div>
+  </section>
+
+  <footer class="border-t border-slate-200/60 dark:border-slate-700/60">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between text-sm">
+      <span class="text-slate-500">© StrategyMind</span>
+      <a class="text-slate-500 hover:text-brand-600" href="/">Zpět na veřejný web</a>
+    </div>
+  </footer>
+
+  <script>
+    // Dark / light toggle (per-session)
+    const btn = document.getElementById('themeToggle');
+    const root = document.documentElement;
+    const key = 'sm-theme';
+    const apply = (m)=>document.documentElement.classList.toggle('dark', m==='dark');
+    apply(sessionStorage.getItem(key) || 'light');
+    btn.addEventListener('click', () => {
+      const m = document.documentElement.classList.contains('dark') ? 'light' : 'dark';
+      sessionStorage.setItem(key, m); apply(m);
+    });
+
+    // Safety: make whole feature cards clickable on keyboard too
+    document.querySelectorAll('a[href]').forEach(a => a.setAttribute('role','link'));
+  </script>
 </body>
 </html>
