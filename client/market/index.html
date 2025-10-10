@@ -10,12 +10,26 @@
   <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
   <style>
     html,body{ font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial; }
-    .spark path.avg   { stroke-width: 2; fill: none; }
-    .spark path.min,
-    .spark path.max   { stroke-width: 2; fill: none; stroke-dasharray: 4 4; }
     .row:hover { background: #f8fafc; }
     .pill { padding:.375rem .625rem; border-radius:9999px; border:1px solid rgba(15,23,42,.08); }
     .kbd { background:#f3f4f6; padding:.125rem .375rem; border-radius:.25rem; font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Courier New", monospace; font-size:.75rem; }
+
+    /* Mini-graf */
+    .spark path.avg   { stroke:#2563eb; stroke-width: 2; fill: none; }
+    .spark path.min,
+    .spark path.max   { stroke-width: 2; fill: none; stroke-dasharray: 4 4; }
+    .spark path.min   { stroke:#ef4444; }
+    .spark path.max   { stroke:#22c55e; }
+    .spark line.guide { stroke:#94a3b8; stroke-dasharray:4 4; opacity:.6; }
+
+    /* Štítky vpravo od mini-grafu */
+    .spark-wrap { display:flex; align-items:center; gap:.75rem; }
+    .target-badges { display:flex; flex-direction:column; gap:.2rem; font-size:.75rem; line-height:1.1; }
+    .target-badges .b { display:flex; align-items:center; gap:.4rem; white-space:nowrap; }
+    .dot { width:.5rem; height:.5rem; border-radius:9999px; display:inline-block; }
+    .dot.max { background:#22c55e; }
+    .dot.avg { background:#2563eb; }
+    .dot.min { background:#ef4444; }
   </style>
 </head>
 <body class="bg-slate-50 text-slate-900">
@@ -38,7 +52,7 @@
     <h1 class="text-3xl font-semibold tracking-tight">Market Scanner</h1>
     <p class="mt-2 text-slate-600 max-w-3xl">
       Vyhledej a filtruj akcie, indexy a krypto. Řádek <strong>rozklikni</strong> pro tezi predikce, podmínky neplatnosti
-      a <strong>mini-graf</strong> s 1Y rozmezím (<em>min / avg / max</em>). V demu jsou statická data.
+      a <strong>mini-graf</strong> s 1Y rozmezím (<em>min / avg / max</em>) a štítky cílových hodnot. V demu jsou statická data.
     </p>
 
     <!-- Toolbar -->
@@ -86,7 +100,6 @@
     // helpers
     const fmt = new Intl.NumberFormat('cs-CZ', { maximumFractionDigits: 2 });
     const pct = v => (v >= 0 ? '+' : '') + v.toFixed(2) + '%';
-    const cls = v => v >= 0 ? 'text-emerald-600' : 'text-rose-600';
 
     // data (demo)
     const rows = [
@@ -118,6 +131,7 @@
 
     const container = document.getElementById('rows');
 
+    // převod bodů do SVG path
     function pathFrom(points, width=180, height=64, pad=4){
       const max = Math.max(...points.map(v=>Math.abs(v))) || 1;
       const step = (width - pad*2) / (points.length-1);
@@ -132,17 +146,29 @@
       return d;
     }
 
-    function sparkSVG(series){
-      const w=220,h=72;
-      const dAvg = pathFrom(series.avg, w, h);
-      const dMin = pathFrom(series.min, w, h);
-      const dMax = pathFrom(series.max, w, h);
+    // nový mini-graf s pravými štítky a svislou „dnes“ čárou
+    function sparkSVG(series, forecast){
+      const w=220,h=72,pad=4;
+      const dAvg = pathFrom(series.avg, w, h, pad);
+      const dMin = pathFrom(series.min, w, h, pad);
+      const dMax = pathFrom(series.max, w, h, pad);
+      const step = (w - pad*2) / (series.avg.length-1);
+      const guideX = pad + step*(series.avg.length-1);
       return `
-        <svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" class="spark">
-          <path class="min" stroke="#ef4444" d="${dMin}"></path>
-          <path class="max" stroke="#22c55e" d="${dMax}"></path>
-          <path class="avg" stroke="#2563eb" d="${dAvg}"></path>
-        </svg>`;
+        <div class="spark-wrap">
+          <svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" class="spark">
+            <line class="guide" x1="${guideX}" y1="0" x2="${guideX}" y2="${h}"></line>
+            <path class="min" d="${dMin}"></path>
+            <path class="max" d="${dMax}"></path>
+            <path class="avg" d="${dAvg}"></path>
+          </svg>
+          <div class="target-badges">
+            <div class="b"><span class="dot max"></span><span>Max</span><strong>${fmt.format(forecast.max)}</strong></div>
+            <div class="b"><span class="dot avg"></span><span>Avg</span><strong>${fmt.format(forecast.avg)}</strong></div>
+            <div class="b"><span class="dot min"></span><span>Min</span><strong>${fmt.format(forecast.min)}</strong></div>
+          </div>
+        </div>
+      `;
     }
 
     function renderRow(r){
@@ -164,13 +190,13 @@
           </div>
         </div>
         <div class="hidden px-4 pb-4">
-          <div class="grid md:grid-cols-[260px,1fr,1fr] gap-6 mt-3 rounded-xl border border-slate-100 bg-slate-50 p-4">
+          <div class="grid md:grid-cols-[300px,1fr,1fr] gap-6 mt-3 rounded-xl border border-slate-100 bg-slate-50 p-4">
             <div>
               <div class="text-xs text-slate-500 mb-1">Mini-graf — 1Y (demo)</div>
-              <div class="rounded-lg border border-slate-200 bg-white p-2 flex items-center justify-center">
-                ${sparkSVG(r.path)}
+              <div class="rounded-lg border border-slate-200 bg-white p-2">
+                ${sparkSVG(r.path, r.forecast)}
               </div>
-              <div class="mt-1 text-[11px] text-slate-500">Plná čára: <b>avg</b> · čárkovaně: <b>min/max</b></div>
+              <div class="mt-1 text-[11px] text-slate-500">Plná čára: <b>avg</b> · čárkovaně: <b>min/max</b> · tečkovaná: <b>dnes</b></div>
             </div>
             <div class="text-sm">
               <div class="text-slate-500 mb-1">Teze</div>
