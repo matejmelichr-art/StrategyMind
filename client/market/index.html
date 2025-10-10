@@ -16,15 +16,15 @@
     .pill{padding:.375rem .625rem;border-radius:9999px;border:1px solid rgba(15,23,42,.08)}
     .kbd{background:#f3f4f6;padding:.125rem .375rem;border-radius:.25rem;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Courier New",monospace;font-size:.75rem}
 
-    /* tabulka – sloupce */
+    /* tabulka – sloupce (posunuli jsme akce, v tabulce zůstal jen 1 sloupec pro AI) */
     .table-grid{
-      display:grid; grid-template-columns: 90px 1fr 120px 100px 100px 250px 80px 220px; align-items:center;
+      display:grid; grid-template-columns: 90px 1fr 120px 100px 100px 250px 80px 150px; align-items:center;
     }
     .cell-nowrap{white-space:nowrap}
     .actions{display:flex;justify-content:flex-end;gap:.5rem}
-    @media (max-width: 1180px){ .table-grid{grid-template-columns: 80px 1fr 110px 95px 95px 240px 70px 200px} }
+    @media (max-width:1180px){ .table-grid{grid-template-columns:80px 1fr 110px 95px 95px 240px 70px 140px} }
 
-    /* badge/insights */
+    /* insights */
     .badge{display:inline-flex;align-items:center;gap:.35rem;border:1px solid rgba(15,23,42,.12);border-radius:9999px;padding:.25rem .55rem;font-size:.75rem}
     .impact-up{background:#ecfdf5;border-color:#a7f3d0;color:#065f46}
     .impact-down{background:#fef2f2;border-color:#fecaca;color:#7f1d1d}
@@ -32,17 +32,19 @@
     .tag{display:inline-block;padding:.15rem .5rem;border:1px solid #e2e8f0;border-radius:9999px;font-size:.7rem;color:#475569;background:#fff}
     .ins-card{border:1px solid #e2e8f0;border-radius:1rem;background:white}
 
-    /* modal / buttons */
+    /* buttons */
     .overlay{background:rgba(2,6,23,.45)}
     .fade-enter{opacity:0;transform:translateY(6px)} .fade-enter-active{opacity:1;transform:none;transition:all .18s ease}
     .btn{display:inline-flex;align-items:center;gap:.5rem;border-radius:.75rem;padding:.5rem .9rem}
     .btn-primary{background:#06b6d4;color:#fff} .btn-primary:hover{background:#0891b2}
     .btn-ghost{border:1px solid #e2e8f0;background:#fff} .btn-ghost:hover{background:#f8fafc}
 
-    /* hvězda */
+    /* ikonová mini tlačítka v detailu (hvězda/zvonek) */
+    .iconbtn{width:36px;height:36px;border:1px solid #e2e8f0;border-radius:9999px;display:inline-flex;align-items:center;justify-content:center;background:#fff}
+    .iconbtn:hover{background:#f8fafc}
     .star{width:18px;height:18px;color:#94a3b8} .star.active{color:#f59e0b}
 
-    /* --- detail řádku --- */
+    /* detail řádku */
     .row-head{cursor:pointer}
     .chev{transition:transform .18s ease}
     .row.open .chev{transform:rotate(180deg)}
@@ -55,7 +57,7 @@
     .spark path.min{stroke:#ef4444}.spark path.max{stroke:#22c55e}
     .spark line.guide{stroke:#94a3b8;stroke-dasharray:4 4;opacity:.6}
     .spark .now{stroke:#0ea5e9;stroke-width:2}
-    .target-badges{display:flex;gap:.5rem;flex-wrap:wrap}
+    .targets{display:flex;gap:.5rem;flex-wrap:wrap;justify-content:center}
     .tg{display:inline-flex;align-items:center;gap:.4rem;border:1px solid #e2e8f0;border-radius:9999px;padding:.2rem .5rem;font-size:.75rem;background:#fff}
     .tg .dot{width:.5rem;height:.5rem;border-radius:9999px}
     .dot.min{background:#ef4444}.dot.avg{background:#2563eb}.dot.max{background:#22c55e}.dot.now{background:#0ea5e9}
@@ -92,7 +94,7 @@
       </div>
     </div>
 
-    <!-- Watchlist / Presety -->
+    <!-- Presety & Watchlist -->
     <div class="mt-4 flex items-center gap-2 flex-wrap">
       <div id="watchlistBar" class="hidden items-center gap-2 flex-wrap">
         <span class="text-sm text-slate-600">Watchlist:</span>
@@ -103,7 +105,6 @@
       </label>
     </div>
 
-    <!-- Hot set-upy -->
     <div class="mt-3 flex items-center gap-2 flex-wrap">
       <span class="text-sm text-slate-600">Hot set-upy:</span>
       <button class="pill bg-white hover:bg-slate-50 text-sm" data-setup="breakout">Breakout</button>
@@ -141,7 +142,7 @@
       </div>
     </div>
 
-    <!-- Insights -->
+    <!-- Insights (beze změny) -->
     <section class="mt-8">
       <div class="flex items-center justify-between gap-3 flex-wrap">
         <h2 class="text-xl font-semibold">Rychlé výkazy ze zpráv (Insights)</h2>
@@ -244,7 +245,7 @@
       {type:'commodity',symbol:'WTI',name:'Crude Oil WTI',price:81.4,d1:0.6,w1:1.8,signals:['vol'],forecast:{min:70,avg:86,max:98,conf:55}}
     ];
 
-    var showingAll=false, currentSetup='', dataSource=baseRows.slice();
+    var showingAll=false, currentSetup='';
     var watchlist = loadLS('sm_watchlist', []);
 
     function toggleWatch(symbol){
@@ -267,10 +268,11 @@
     var container=el('#rows'), countLabel=el('#countLabel'), moreBtn=el('#moreBtn');
 
     function starSVG(active){return '<svg class="star '+(active?'active':'')+'" viewBox="0 0 24 24" fill="currentColor"><path d="M12 17.3l-5.6 3 1.1-6.4L3 9.8l6.4-.9L12 3l2.6 5.9 6.4.9-4.5 4.1 1.1 6.4z"/></svg>'}
+    function bellSVG(){return '<svg class="w-[18px] h-[18px] text-slate-600" viewBox="0 0 24 24" fill="none"><path d="M15 17H5l2-2v-3a5 5 0 0 1 10 0v3l2 2h-4m-6 0a3 3 0 0 0 6 0" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>'; }
 
     function sparkSVG(r){
       var min=r.forecast.min, avg=r.forecast.avg, max=r.forecast.max, now=r.price;
-      var w=460, h=70, p=18;
+      var w=520, h=90, p=22;
       function x(val){ return p + ( (val-min)/(max-min) )*(w-2*p); }
       var yMid = h/2;
       return ''+
@@ -279,7 +281,7 @@
         '<path class="min" d="M'+x(min)+' '+(yMid)+' L '+x(min)+' '+(yMid)+'"/>'+
         '<path class="avg" d="M'+x(min)+' '+(yMid)+' L '+x(avg)+' '+(yMid)+'"/>'+
         '<path class="max" d="M'+x(avg)+' '+(yMid)+' L '+x(max)+' '+(yMid)+'"/>'+
-        '<line class="now" x1="'+x(now)+'" y1="'+(yMid-16)+'" x2="'+x(now)+'" y2="'+(yMid+16)+'"/>'+
+        '<line class="now" x1="'+x(now)+'" y1="'+(yMid-20)+'" x2="'+x(now)+'" y2="'+(yMid+20)+'"/>'+
         '</svg>';
     }
 
@@ -288,7 +290,7 @@
       list.forEach(function(r){
         var inWL = watchlist.includes(r.symbol);
 
-        // Hlavní řádek (klikací)
+        // hlavní řádek (bez hvězdy a zvonku)
         var row=document.createElement('div');
         row.className="row row-head border-t border-slate-100";
         row.innerHTML =
@@ -303,51 +305,50 @@
           '  <div class="text-right tabular-nums cell-nowrap '+(r.w1>=0?'text-emerald-600':'text-rose-600')+'">'+pct(r.w1)+'</div>'+
           '  <div class="text-center tabular-nums cell-nowrap text-[15px]">'+i18n.format(r.forecast.min)+' / <span class="font-semibold">'+i18n.format(r.forecast.avg)+'</span> / '+i18n.format(r.forecast.max)+'</div>'+
           '  <div class="text-right tabular-nums cell-nowrap">'+r.forecast.conf+'%</div>'+
-          '  <div class="actions cell-nowrap">'+
-          '    <button class="btn btn-ghost" data-watch="'+r.symbol+'" title="'+(inWL?'Odebrat z watchlistu':'Přidat do watchlistu')+'">'+starSVG(inWL)+'</button>'+
-          '    <button class="btn btn-ghost" data-alert="'+r.symbol+'">🔔 Alert</button>'+
-          '    <button class="btn btn-primary" data-ai="'+r.symbol+'"><span class="ai-full">AI predikce</span><span class="ai-short hidden">AI</span></button>'+
-          '  </div>'+
+          '  <div class="actions cell-nowrap"><button class="btn btn-primary" data-ai="'+r.symbol+'">AI predikce</button></div>'+
           '</div>';
 
-        // Detail panel
+        // detail panel (graf uprostřed, ikonky vpravo nahoře)
         var det=document.createElement('div');
         det.className="details px-6 pb-5 pt-4 bg-slate-50/60 border-t";
         det.innerHTML =
-          '<div class="flex flex-col gap-3">'+
-          '  <div class="flex items-start gap-4 flex-wrap">'+
-          '    <div class="grow min-w-[320px]">'+ sparkSVG(r) +'</div>'+
-          '    <div class="target-badges">'+
-          '      <span class="tg"><span class="dot min"></span>Min '+i18n.format(r.forecast.min)+'</span>'+
-          '      <span class="tg"><span class="dot avg"></span>Avg '+i18n.format(r.forecast.avg)+'</span>'+
-          '      <span class="tg"><span class="dot max"></span>Max '+i18n.format(r.forecast.max)+'</span>'+
-          '      <span class="tg"><span class="dot now"></span>Now '+fmt.format(r.price)+'</span>'+
+          '<div class="rounded-xl bg-white border border-slate-200 p-4 shadow-sm">'+
+          '  <div class="flex items-start justify-between gap-3">'+
+          '    <div class="text-sm text-slate-600"><b>'+r.symbol+'</b> • '+r.name+'</div>'+
+          '    <div class="flex items-center gap-2">'+
+          '      <button class="iconbtn" title="'+(inWL?'Odebrat z watchlistu':'Přidat do watchlistu')+'" data-watch="'+r.symbol+'">'+starSVG(inWL)+'</button>'+
+          '      <button class="iconbtn" title="Vytvořit alert" data-alert="'+r.symbol+'">'+bellSVG()+'</button>'+
           '    </div>'+
           '  </div>'+
-          '  <div class="text-sm text-slate-600">Predikce (1Y): očekávané pásmo <b>'+i18n.format(r.forecast.min)+' – '+i18n.format(r.forecast.max)+'</b>, střed <b>'+i18n.format(r.forecast.avg)+'</b>. Confidence <b>'+r.forecast.conf+'%</b>.</div>'+
-          '  <div class="flex gap-2 flex-wrap pt-1">'+
+          '  <div class="mt-3 grid grid-cols-1 place-items-center">'+
+          '    <div class="w-full max-w-[680px]">'+sparkSVG(r)+'</div>'+
+          '  </div>'+
+          '  <div class="mt-3 targets">'+
+          '    <span class="tg"><span class="dot min"></span>Min '+i18n.format(r.forecast.min)+'</span>'+
+          '    <span class="tg"><span class="dot avg"></span>Avg '+i18n.format(r.forecast.avg)+'</span>'+
+          '    <span class="tg"><span class="dot max"></span>Max '+i18n.format(r.forecast.max)+'</span>'+
+          '    <span class="tg"><span class="dot now"></span>Now '+fmt.format(r.price)+'</span>'+
+          '  </div>'+
+          '  <p class="mt-3 text-sm text-slate-600 text-center">Predikce (1Y): pásmo <b>'+i18n.format(r.forecast.min)+' – '+i18n.format(r.forecast.max)+'</b>, střed <b>'+i18n.format(r.forecast.avg)+'</b>. Confidence <b>'+r.forecast.conf+'%</b>.</p>'+
+          '  <div class="mt-3 flex justify-center">'+
           '    <button class="btn btn-primary" data-ai="'+r.symbol+'">AI predikce</button>'+
-          '    <button class="btn btn-ghost" data-alert="'+r.symbol+'">🔔 Vytvořit alert</button>'+
           '  </div>'+
           '</div>';
 
-        // Append
         container.appendChild(row);
         container.appendChild(det);
 
-        // Toggle details
+        // toggle detail
         row.addEventListener('click', function(e){
-          // neklikej, pokud je to tlačítko v akcích
           if(e.target.closest('.actions') || e.target.closest('button')) return;
           row.classList.toggle('open');
-          det.classList.toggle('hidden', false); // detail už zůstává v DOM
-          if(row.classList.contains('open')){ row.nextSibling.classList.remove('hidden'); } else { row.nextSibling.classList.add('hidden'); }
+          if(row.classList.contains('open')) det.classList.remove('hidden'); else det.classList.add('hidden');
         });
       });
 
-      // listeners (watch/alert/ai) – fungují i v detailech
+      // listeners (watch/alert/ai)
       container.querySelectorAll('[data-watch]').forEach(function(b){
-        b.addEventListener('click', function(e){ e.stopPropagation(); toggleWatch(this.getAttribute('data-watch')); });
+        b.addEventListener('click', function(e){ e.stopPropagation(); toggleWatch(this.getAttribute('data-watch')); this.innerHTML=starSVG(watchlist.includes(this.getAttribute('data-watch'))); });
       });
       container.querySelectorAll('[data-alert]').forEach(function(b){
         b.addEventListener('click', function(e){
@@ -357,10 +358,7 @@
         });
       });
       container.querySelectorAll('[data-ai]').forEach(function(b){
-        b.addEventListener('click', function(e){
-          e.stopPropagation();
-          var s=this.getAttribute('data-ai'); aiPredictionDemo(s);
-        });
+        b.addEventListener('click', function(e){ e.stopPropagation(); aiPredictionDemo(this.getAttribute('data-ai')); });
       });
 
       countLabel.textContent='Zobrazeno: '+list.length+(showingAll?' / '+(baseRows.length+extraRows.length):'');
@@ -401,12 +399,12 @@
 
     document.querySelectorAll('[data-setup]').forEach(b=>b.addEventListener('click',function(){currentSetup=this.dataset.setup;apply();}));
     q.addEventListener('input',apply);
-    typeFilter.addEventListener('change',function(){ syncTypeFromTable(); apply(); });
+    typeFilter.addEventListener('change',function(){ if(insType.value!==typeFilter.value){ insType.value=typeFilter.value; } apply(); });
     sortBy.addEventListener('change',apply);
     wlOnly.addEventListener('change',apply);
     moreBtn.addEventListener('click', function(){ showingAll=!showingAll; this.textContent=showingAll?'Zobrazit méně':'Zobrazit vše'; apply(); });
 
-    // ===== Insights (beze změn logiky) =====
+    // ===== Insights (stejné jako dřív) =====
     var insData=[], insContainer=el('#insights'), insEmpty=el('#insEmpty'),
         insSearch=el('#insSearch'), insType=el('#insType'), insSent=el('#insSent'),
         insHorizon=el('#insHorizon'), insRefresh=el('#insRefresh');
@@ -447,34 +445,16 @@
     function mockInsights(){
       return [
         { type:'macro', source:'Makro kalendář', time:'dnes', sentiment:'up', prob:65,
-          title:'Nižší než očekávaná inflace (CPI) – ochlazení jádrové složky',
-          explainer:'Slabší CPI zvyšuje šanci na dřívější uvolnění měnové politiky. Diskontní sazby klesají → vyšší valuace růstových titulů.',
-          take:['Pozitivní skew pro SPX/NDX v horizontu týdnů','Duration-sensitive: tech/AI outperform','USD může oslabit; zlato drží bid'],
+          title:'Nižší než očekávaná inflace (CPI)…',
+          explainer:'Slabší CPI zvyšuje šanci na dřívější uvolnění měnové politiky…',
+          take:['Pozitivní skew pro SPX/NDX','Tech/AI outperform','USD může oslabit; zlato drží bid'],
           tags:['Inflace','Sazby','Růstové akcie'], tickers:['SPX','NDX','AAPL','NVDA']
         },
         { type:'stock', source:'Earnings • NVDA', time:'včera', sentiment:'up', prob:70,
           title:'NVDA beat + zvýšený výhled DC/AI',
-          explainer:'Objednávky v datacentrech přetrvávají, backlog je robustní. Pravděpodobnost pokračování trendu je vyšší.',
-          take:['Pozitivní přelev pro polovodiče (AMD, TSM)','Index NDX citlivý na mega-cap tech'],
+          explainer:'Objednávky v datacentrech přetrvávají, backlog je robustní…',
+          take:['Pozitivní přelev pro polovodiče (AMD, TSM)','NDX citlivý na mega-cap tech'],
           tags:['Earnings','AI','Semiconductors'], tickers:['NVDA','AMD','NDX']
-        },
-        { type:'crypto', source:'Regulace • USA', time:'dnes', sentiment:'down', prob:55,
-          title:'Přísnější rámec pro krypto burzy',
-          explainer:'Krátkodobě tlak na altcoiny kvůli compliance nákladům; BTC/ETH relativně odolnější díky institucionálním tokům.',
-          take:['Defenzivní rotace: BTC>ALT','Sledovat odliv z risk-on tokenů'],
-          tags:['Krypto','Regulace'], tickers:['BTCUSD','ETHUSD']
-        },
-        { type:'commodity', source:'OPEC+', time:'tento týden', sentiment:'up', prob:58,
-          title:'Prodlužení dobrovolných škrtů těžby ropy',
-          explainer:'Tighter supply → vyšší podlaha cen WTI/Brent. Energetický sektor má zlepšený R:R.',
-          take:['XLE a servisní firmy profitují','Pozor na citlivost SPX na dražší energii'],
-          tags:['Ropa','OPEC','Energie'], tickers:['WTI','SPX']
-        },
-        { type:'forex', source:'Fed speakers', time:'dnes', sentiment:'flat', prob:52,
-          title:'Smíšené komentáře členů Fedu',
-          explainer:'Krátkodobě vyšší volatilita USD. Bez jasného směru – range trading na EURUSD pravděpodobný.',
-          take:['Preferovat mean-reversion set-upy na hlavních párech'],
-          tags:['USD','Volatilita'], tickers:['EURUSD','USDJPY']
         }
       ];
     }
@@ -501,9 +481,7 @@
     insSearch.addEventListener('input',filterInsights);
     insType.addEventListener('change',filterInsights);
     insSent.addEventListener('change',filterInsights);
-    insHorizon.addEventListener('change',function(){ /* pro backend */ });
-
-    function syncTypeFromTable(){ if(insType.value!==typeFilter.value){ insType.value=typeFilter.value; } }
+    insHorizon.addEventListener('change',function(){ /* backend horizon */ });
 
     // ===== Alert modal (demo) =====
     var alertOverlay=el('#alertOverlay'), alertModal=el('#alertModal'), alertClose=el('#alertClose'), alertSave=el('#alertSave');
@@ -525,12 +503,16 @@
 
     // ===== AI predikce demo =====
     function aiPredictionDemo(symbol){
-      alert('AI predikce pro '+symbol+':\n• Směr: ↑ pravděpodobnost 60–70%\n• Úrovně: support/rezistence blízko min/avg/max (viz panel).');
+      alert('AI predikce pro '+symbol+':\n• Směr: ↑ pravděpodobnost 60–70%\n• Úrovně: orientačně min/avg/max z panelu.');
     }
 
-    // ===== init =====
+    // init
+    function allRows(){ return showingAll ? baseRows.concat(extraRows) : baseRows.slice(); }
+    function syncTypeFromTable(){ /* n/a */ }
+
     renderWatchlist();
     apply();
+    var insData=[]; // lazy
     insData = mockInsights();
     filterInsights();
   });
