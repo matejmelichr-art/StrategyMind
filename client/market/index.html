@@ -2,371 +2,170 @@
 <html lang="cs">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>StrategyMind — Market Scanner (demo)</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>StrategyMind — Market Scanner</title>
 
-  <!-- Tailwind CDN -->
-  <link rel="preconnect" href="https://cdn.tailwindcss.com" />
+  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
       theme: {
         extend: {
           colors: {
-            brand: "#0AA324",
-            ink: "#0f172a",
+            brand: {600: "#06b6d4"},
           },
           boxShadow: {
-            soft: "0 6px 16px rgba(16,24,40,.06)",
-          },
-          borderRadius: {
-            xl2: "16px",
-          },
-        },
-      },
-    };
+            soft: "0 10px 25px rgba(15,23,42,.08)"
+          }
+        }
+      }
+    }
   </script>
-
-  <style>
-    /* Kompaktní mini-graf (“kartička”) */
-    .spark-mini { width: 160px; height: 90px; }
-    @media (min-width: 768px){ .spark-mini { width: 200px; height: 110px; } }
-    .spark-wrap {
-      border-radius: 14px;
-      background: #fff;
-      box-shadow: 0 6px 16px rgba(16,24,40,.06);
-      padding: 10px;
-    }
-    .spark-note {
-      font-size: 11px;
-      color: #94a3b8;
-      text-align: center;
-      margin-top: 6px;
-    }
-    .chip {
-      font-size: 12px;
-      line-height: 1;
-      padding: 6px 8px;
-      border-radius: 9999px;
-      background: #eef2ff;
-      color: #3730a3;
-      display: inline-flex;
-      gap: 6px;
-      align-items: center;
-    }
-    details > summary::-webkit-details-marker { display:none; }
-    summary { list-style: none; cursor: pointer; }
-  </style>
 </head>
 
-<body class="bg-slate-50 text-slate-900">
-  <header class="border-b bg-white">
-    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center gap-3">
-      <a href="/client/" class="text-sm text-slate-500 hover:text-slate-700">&larr; Zpět na klientskou sekci</a>
-      <nav class="ml-auto flex gap-2">
-        <a href="/client/market/" class="px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100">Market Scanner</a>
-        <a href="/client/" class="px-3 py-1.5 rounded-full hover:bg-slate-100">Real-Estate</a>
-        <a href="/client/" class="px-3 py-1.5 rounded-full hover:bg-slate-100">Idea Lab</a>
+<body class="bg-slate-50 text-slate-800 antialiased">
+  <!-- Top Bar -->
+  <header class="sticky top-0 z-20 border-b bg-white/80 backdrop-blur">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+      <a href="/client/" class="text-sm text-slate-600 hover:text-slate-900">&larr; Zpět na klientskou sekci</a>
+      <nav class="flex gap-2">
+        <a href="/client/market/" class="px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-700 font-medium border border-emerald-100">Market Scanner</a>
+        <a href="/client/real-estate/" class="px-3 py-1.5 rounded-full hover:bg-slate-100">Real-Estate</a>
+        <a href="/client/idea-lab/" class="px-3 py-1.5 rounded-full hover:bg-slate-100">Idea Lab</a>
       </nav>
     </div>
   </header>
 
-  <main class="max-w-6xl mx-auto px-4 py-8">
-    <div class="mb-6">
-      <h1 class="text-2xl md:text-3xl font-semibold">Market Scanner</h1>
-      <p class="text-slate-600 mt-1">
-        Vyhledej a filtruj akcie, indexy a krypto. Rozklikni řádek pro
-        <em>tezi predikce</em>, <em>podmínky neplatnosti</em> a mini-graf s
-        1Y rozmezím <strong>(min / avg / max)</strong>. V ostré verzi napojíme živá data a zprávy.
-      </p>
+  <main class="max-w-7xl mx-auto px-4 py-10">
+    <div class="flex items-center justify-between flex-wrap gap-4 mb-6">
+      <div>
+        <h1 class="text-2xl font-semibold">Market Scanner</h1>
+        <p class="text-slate-600 mt-1 max-w-2xl">
+          Vyhledej a filtruj akcie, indexy a krypto. Rozklikni řádek pro tezi <em>predikce</em>,
+          podmínky <em>neplatnosti</em> a mini-graf s 1Y rozmezím <strong>(min / avg / max)</strong>.
+        </p>
+      </div>
+      <a href="#" class="px-4 py-2 rounded-lg bg-slate-900 text-white hover:bg-black shadow-soft">Stáhnout report (MD)</a>
     </div>
 
-    <!-- Filtry -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-5">
-      <input placeholder="Hledej symbol / název..."
-             class="px-3 py-2 rounded-lg border border-slate-200 bg-white shadow-soft focus:outline-none focus:ring-2 focus:ring-emerald-200" />
-      <select class="px-3 py-2 rounded-lg border border-slate-200 bg-white shadow-soft focus:outline-none">
+    <!-- Search filters -->
+    <div class="flex flex-wrap gap-3 mb-5">
+      <input type="text" placeholder="Hledej symbol / název..." class="px-3 py-2 rounded-lg border border-slate-300 bg-white shadow-sm flex-1 min-w-[180px]" />
+      <select class="px-3 py-2 rounded-lg border border-slate-300 bg-white shadow-sm">
         <option>Všechny typy</option>
         <option>Akcie</option>
+        <option>Indexy</option>
         <option>Krypto</option>
-        <option>Index</option>
       </select>
-      <select class="px-3 py-2 rounded-lg border border-slate-200 bg-white shadow-soft focus:outline-none">
+      <select class="px-3 py-2 rounded-lg border border-slate-300 bg-white shadow-sm">
         <option>Seřadit: Symbol</option>
+        <option>Seřadit: Cena</option>
         <option>Seřadit: 1D %</option>
-        <option>Seřadit: 1W %</option>
         <option>Seřadit: Conf.</option>
       </select>
     </div>
 
-    <!-- TABULKA -->
-    <div class="overflow-hidden rounded-xl2 bg-white shadow-soft border border-slate-100">
-      <div class="grid grid-cols-12 px-4 py-3 text-sm font-medium bg-slate-50 border-b">
-        <div class="col-span-2">Symbol</div>
-        <div class="col-span-3">Název</div>
-        <div class="col-span-2">Cena</div>
-        <div>1D %</div>
-        <div>1W %</div>
-        <div class="text-center">1Y predikce (min / avg / max)</div>
-        <div class="text-center">Conf.</div>
-      </div>
+    <!-- Table -->
+    <div class="overflow-x-auto rounded-2xl bg-white border border-slate-200 shadow-soft">
+      <table class="w-full text-sm text-left">
+        <thead class="bg-slate-50 border-b border-slate-200 text-slate-500 font-medium">
+          <tr>
+            <th class="px-4 py-3">Symbol</th>
+            <th class="px-4 py-3">Název</th>
+            <th class="px-4 py-3 text-right">Cena</th>
+            <th class="px-4 py-3 text-right">1D %</th>
+            <th class="px-4 py-3 text-right">1W %</th>
+            <th class="px-4 py-3 text-center">1Y predikce<br><span class="text-xs text-slate-400">(min / avg / max)</span></th>
+            <th class="px-4 py-3 text-center">Conf.</th>
+            <th class="px-4 py-3 text-center">Detail</th>
+          </tr>
+        </thead>
 
-      <!-- ŘÁDEK: AAPL -->
-      <details class="group open:border-t border-slate-100">
-        <summary class="grid grid-cols-12 items-center gap-3 px-4 py-3 hover:bg-slate-50 cursor-pointer">
-          <div class="col-span-2 font-medium">AAPL</div>
-          <div class="col-span-3 text-slate-600">Apple Inc.</div>
-          <div class="col-span-2 tabular-nums">219,85</div>
-          <div class="text-emerald-600 tabular-nums">+1.26%</div>
-          <div class="text-emerald-600 tabular-nums">+2.10%</div>
+        <tbody class="divide-y divide-slate-100">
+          <!-- Row 1 -->
+          <tr class="hover:bg-slate-50 transition">
+            <td class="px-4 py-3 font-semibold">AAPL</td>
+            <td class="px-4 py-3">Apple Inc.</td>
+            <td class="px-4 py-3 text-right">219.85</td>
+            <td class="px-4 py-3 text-right text-emerald-600 font-medium">+1.26%</td>
+            <td class="px-4 py-3 text-right text-emerald-600 font-medium">+2.10%</td>
+            <td class="px-4 py-3 text-center">
+              <span class="text-slate-500">165 /</span>
+              <span class="font-semibold">245</span>
+              <span class="text-slate-500">/ 310</span>
+            </td>
+            <td class="px-4 py-3 text-center font-medium text-slate-700">72%</td>
+            <td class="px-4 py-3 text-center">
+              <button onclick="openModal('AAPL')" class="text-brand-600 hover:underline font-medium">Detail</button>
+            </td>
+          </tr>
 
-          <div class="flex items-center justify-center">
-            165&nbsp;/&nbsp;<strong>245</strong>&nbsp;/&nbsp;310
-          </div>
+          <!-- Row 2 -->
+          <tr class="hover:bg-slate-50 transition">
+            <td class="px-4 py-3 font-semibold">BTCUSD</td>
+            <td class="px-4 py-3">Bitcoin</td>
+            <td class="px-4 py-3 text-right">67 200</td>
+            <td class="px-4 py-3 text-right text-emerald-600 font-medium">+2.30%</td>
+            <td class="px-4 py-3 text-right text-emerald-600 font-medium">+6.80%</td>
+            <td class="px-4 py-3 text-center">
+              <span class="text-slate-500">42 000 /</span>
+              <span class="font-semibold">88 000</span>
+              <span class="text-slate-500">/ 120 000</span>
+            </td>
+            <td class="px-4 py-3 text-center font-medium text-slate-700">58%</td>
+            <td class="px-4 py-3 text-center">
+              <button onclick="openModal('BTCUSD')" class="text-brand-600 hover:underline font-medium">Detail</button>
+            </td>
+          </tr>
 
-          <div class="flex items-center justify-center gap-3">
-            <span class="text-slate-700">72%</span>
-            <span class="text-sm px-3 py-1 rounded-full bg-slate-100 group-open:bg-emerald-50 group-open:text-emerald-700">Detail</span>
-          </div>
-        </summary>
-
-        <div class="px-4 pb-5">
-          <div class="grid grid-cols-1 md:grid-cols-12 gap-5">
-            <!-- Teze -->
-            <div class="md:col-span-7 bg-slate-50 rounded-xl p-4 border border-slate-100">
-              <div class="flex items-center gap-2 mb-2">
-                <span class="chip"><span>Teze</span></span>
-                <span class="chip bg-slate-100 text-slate-700">Neplatí pokud</span>
-              </div>
-              <p class="text-slate-700 mb-2">
-                Růst služeb a ekosystému, stabilní marže. Re-rating po nové produktové linii.
-              </p>
-              <p class="text-slate-500 text-sm">
-                Neplatí pokud: breakdown pod 195 s objemy a slabá guidance.
-              </p>
-            </div>
-
-            <!-- Mini graf -->
-            <div class="md:col-span-5 flex flex-col items-center">
-              <div class="spark-wrap">
-                <canvas
-                  class="spark-mini"
-                  data-series="216,221,219,224,222,228,233,229,235,241"
-                  data-min="200"
-                  data-avg="245"
-                  data-max="310"
-                ></canvas>
-                <div class="spark-note">*Čárkovaně min/max, plná čára průměr (demo)</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </details>
-
-      <!-- ŘÁDEK: BTCUSD -->
-      <details class="group border-t border-slate-100">
-        <summary class="grid grid-cols-12 items-center gap-3 px-4 py-3 hover:bg-slate-50 cursor-pointer">
-          <div class="col-span-2 font-medium">BTCUSD</div>
-          <div class="col-span-3 text-slate-600">Bitcoin</div>
-          <div class="col-span-2 tabular-nums">67&nbsp;200</div>
-          <div class="text-emerald-600 tabular-nums">+2.30%</div>
-          <div class="text-emerald-600 tabular-nums">+6.80%</div>
-
-          <div class="flex items-center justify-center">
-            42&nbsp;000&nbsp;/&nbsp;<strong>88&nbsp;000</strong>&nbsp;/&nbsp;120&nbsp;000
-          </div>
-
-          <div class="flex items-center justify-center gap-3">
-            <span class="text-slate-700">58%</span>
-            <span class="text-sm px-3 py-1 rounded-full bg-slate-100 group-open:bg-emerald-50 group-open:text-emerald-700">Detail</span>
-          </div>
-        </summary>
-
-        <div class="px-4 pb-5">
-          <div class="grid grid-cols-1 md:grid-cols-12 gap-5">
-            <div class="md:col-span-7 bg-slate-50 rounded-xl p-4 border border-slate-100">
-              <div class="flex items-center gap-2 mb-2">
-                <span class="chip"><span>Teze</span></span>
-                <span class="chip bg-slate-100 text-slate-700">Neplatí pokud</span>
-              </div>
-              <p class="text-slate-700 mb-2">
-                Poptávka přes ETF, halving + omezená nabídka, sílící narativ digitálního zlata.
-              </p>
-              <p class="text-slate-500 text-sm">
-                Neplatí pokud: regulatorní tlak, silný risk-off, významný útok na síť.
-              </p>
-            </div>
-
-            <div class="md:col-span-5 flex flex-col items-center">
-              <div class="spark-wrap">
-                <canvas
-                  class="spark-mini"
-                  data-series="59000,61200,60500,62800,61800,64000,65300,63900,66000,67200"
-                  data-min="42000"
-                  data-avg="88000"
-                  data-max="120000"
-                ></canvas>
-                <div class="spark-note">*Čárkovaně min/max, plná čára průměr (demo)</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </details>
-
-      <!-- ŘÁDEK: NVDA -->
-      <details class="group border-t border-slate-100">
-        <summary class="grid grid-cols-12 items-center gap-3 px-4 py-3 hover:bg-slate-50 cursor-pointer">
-          <div class="col-span-2 font-medium">NVDA</div>
-          <div class="col-span-3 text-slate-600">NVIDIA Corporation</div>
-          <div class="col-span-2 tabular-nums">241,80</div>
-          <div class="text-emerald-600 tabular-nums">+1.85%</div>
-          <div class="text-emerald-600 tabular-nums">+4.10%</div>
-
-          <div class="flex items-center justify-center">
-            128&nbsp;/&nbsp;<strong>281</strong>&nbsp;/&nbsp;498
-          </div>
-
-          <div class="flex items-center justify-center gap-3">
-            <span class="text-slate-700">72%</span>
-            <span class="text-sm px-3 py-1 rounded-full bg-slate-100 group-open:bg-emerald-50 group-open:text-emerald-700">Detail</span>
-          </div>
-        </summary>
-
-        <div class="px-4 pb-5">
-          <div class="grid grid-cols-1 md:grid-cols-12 gap-5">
-            <div class="md:col-span-7 bg-slate-50 rounded-xl p-4 border border-slate-100">
-              <div class="flex items-center gap-2 mb-2">
-                <span class="chip"><span>Teze</span></span>
-                <span class="chip bg-slate-100 text-slate-700">Neplatí pokud</span>
-              </div>
-              <p class="text-slate-700 mb-2">
-                Dominance v AI GPU, rozšíření do datacenter, software a platformní efekt.
-              </p>
-              <p class="text-slate-500 text-sm">
-                Neplatí pokud: prudké ochlazení poptávky po AI compute a tlak konkurence.
-              </p>
-            </div>
-
-            <div class="md:col-span-5 flex flex-col items-center">
-              <div class="spark-wrap">
-                <canvas
-                  class="spark-mini"
-                  data-series="188,198,205,199,210,218,224,219,233,242"
-                  data-min="128.15"
-                  data-avg="281.12"
-                  data-max="498.11"
-                ></canvas>
-                <div class="spark-note">*Čárkovaně min/max, plná čára průměr (demo)</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </details>
+          <!-- Row 3 -->
+          <tr class="hover:bg-slate-50 transition">
+            <td class="px-4 py-3 font-semibold">NVDA</td>
+            <td class="px-4 py-3">NVIDIA Corporation</td>
+            <td class="px-4 py-3 text-right">241.80</td>
+            <td class="px-4 py-3 text-right text-emerald-600 font-medium">+1.85%</td>
+            <td class="px-4 py-3 text-right text-emerald-600 font-medium">+4.10%</td>
+            <td class="px-4 py-3 text-center">
+              <span class="text-slate-500">128 /</span>
+              <span class="font-semibold">281</span>
+              <span class="text-slate-500">/ 498</span>
+            </td>
+            <td class="px-4 py-3 text-center font-medium text-slate-700">72%</td>
+            <td class="px-4 py-3 text-center">
+              <button onclick="openModal('NVDA')" class="text-brand-600 hover:underline font-medium">Detail</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
 
-    <div class="flex justify-end mt-6">
-      <a href="#" class="px-4 py-2 rounded-lg bg-slate-900 text-white hover:bg-black">Stáhnout report (MD)</a>
-    </div>
+    <p class="mt-4 text-sm text-slate-500">
+      *V demu zobrazena statická data. V ostré verzi budou živá data, zprávy a AI predikce.
+    </p>
   </main>
 
-  <!-- Mini-kreslítko: čára historie + svislá vodicí + min/max čárkovaně, avg plně -->
+  <!-- Modal -->
+  <div id="detailModal" class="fixed inset-0 bg-black/40 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full shadow-xl p-6 relative">
+      <button onclick="closeModal()" class="absolute top-3 right-3 text-slate-400 hover:text-slate-600">✕</button>
+      <h2 id="modalTitle" class="text-xl font-semibold mb-3">Detail</h2>
+      <div id="modalContent" class="text-slate-700 text-sm space-y-3">
+        <p><strong>Teze:</strong> Růst ekosystému, expanze marží, nové produkty.</p>
+        <p><strong>Neplatí, pokud:</strong> Dojde k výraznému poklesu pod klíčovou úroveň / ztrátě objemů.</p>
+        <p class="text-slate-500 text-xs">*Ukázková data, demo verze.</p>
+      </div>
+    </div>
+  </div>
+
   <script>
-    (function () {
-      function renderSpark(canvas, series, minPred, avgPred, maxPred) {
-        const dpr = window.devicePixelRatio || 1;
-        const W = canvas.clientWidth, H = canvas.clientHeight;
-        canvas.width = W * dpr; canvas.height = H * dpr;
-        const ctx = canvas.getContext("2d");
-        ctx.scale(dpr, dpr);
-
-        // vnitřní odsazení
-        const pad = 10;
-        const w = W - pad * 2, h = H - pad * 2;
-
-        const minHist = Math.min(...series);
-        const maxHist = Math.max(...series);
-        const yMin = Math.min(minHist, minPred);
-        const yMax = Math.max(maxHist, maxPred);
-
-        const x0 = pad, y0 = pad, x1 = pad + w, y1 = pad + h;
-
-        const xAt = (i) => series.length === 1 ? x0 : x0 + (i / (series.length - 1)) * w;
-        const yAt = (v) => {
-          const t = (v - yMin) / (yMax - yMin || 1);
-          return y1 - t * h;
-        };
-
-        // pozadí
-        ctx.fillStyle = "#ffffff";
-        ctx.fillRect(0, 0, W, H);
-
-        // historická linka
-        ctx.lineWidth = 2;
-        ctx.strokeStyle = "#2563eb";
-        ctx.beginPath();
-        series.forEach((v, i) => {
-          const x = xAt(i), y = yAt(v);
-          if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-        });
-        ctx.stroke();
-
-        // svislá vodicí čára na konci historie
-        const xEnd = xAt(series.length - 1);
-        ctx.setLineDash([4, 4]);
-        ctx.lineWidth = 1;
-        ctx.strokeStyle = "rgba(148,163,184,.6)";
-        ctx.beginPath();
-        ctx.moveTo(xEnd, y0);
-        ctx.lineTo(xEnd, y1);
-        ctx.stroke();
-        ctx.setLineDash([]);
-
-        // predikční značky: max/min čárkovaně, avg plně (vertikální tečky)
-        const yMinP = yAt(minPred), yAvgP = yAt(avgPred), yMaxP = yAt(maxPred);
-
-        ctx.setLineDash([3, 3]);
-        ctx.strokeStyle = "#16a34a"; // MAX zeleně
-        ctx.lineWidth = 2;
-        ctx.beginPath(); ctx.moveTo(xEnd + 10, yMaxP); ctx.lineTo(xEnd + 10, yMaxP); ctx.stroke();
-
-        ctx.strokeStyle = "#dc2626"; // MIN červeně
-        ctx.beginPath(); ctx.moveTo(xEnd + 10, yMinP); ctx.lineTo(xEnd + 10, yMinP); ctx.stroke();
-
-        ctx.setLineDash([]);
-        ctx.strokeStyle = "#0f172a"; // AVG plná
-        ctx.beginPath(); ctx.moveTo(xEnd + 10, yAvgP); ctx.lineTo(xEnd + 10, yAvgP); ctx.stroke();
-
-        // body
-        ctx.fillStyle = "#2563eb";
-        ctx.beginPath();
-        ctx.arc(xEnd, yAt(series[series.length-1]), 2.5, 0, Math.PI*2);
-        ctx.fill();
-
-        ctx.fillStyle = "#0f172a";
-        ctx.beginPath();
-        ctx.arc(xEnd + 10, yAvgP, 2.5, 0, Math.PI*2);
-        ctx.fill();
-      }
-
-      function initSparks() {
-        document.querySelectorAll("canvas.spark-mini").forEach((c) => {
-          const series = (c.dataset.series || "")
-            .split(",")
-            .map(s => parseFloat(s.trim()))
-            .filter(n => !Number.isNaN(n));
-          const min = parseFloat(c.dataset.min);
-          const avg = parseFloat(c.dataset.avg);
-          const max = parseFloat(c.dataset.max);
-          if (series.length) renderSpark(c, series, min, avg, max);
-        });
-      }
-
-      window.addEventListener("load", initSparks);
-      window.addEventListener("resize", () => {
-        clearTimeout(window.__spark_t);
-        window.__spark_t = setTimeout(initSparks, 150);
-      });
-    })();
+    function openModal(symbol) {
+      document.getElementById('modalTitle').innerText = `${symbol} — Predikce (demo)`;
+      document.getElementById('detailModal').classList.remove('hidden');
+      document.getElementById('detailModal').classList.add('flex');
+    }
+    function closeModal() {
+      document.getElementById('detailModal').classList.add('hidden');
+    }
   </script>
 </body>
 </html>
