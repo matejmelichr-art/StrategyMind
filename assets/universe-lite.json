@@ -1,23 +1,3422 @@
-[
-  {
-    "type": "stock",         // "stock" | "etf" | "index" | "commodity" | "futures" | "crypto" | "forex"
-    "region": "US",
-    "exchange": "NASDAQ",
-    "symbol": "AAPL",
-    "name": "Apple Inc.",
-    "isin": "US0378331005",
-    "price": 219.85,
-    "d1": 1.26,
-    "w1": 2.10,
-    "forecast": {"min":165,"avg":245,"max":310,"conf":72},
-    "path": {"avg":[0,1,1.8,1.4,2.1,2.0,2.5],"min":[0,-0.5,-0.2,-0.7,-0.4,-0.8,-1.1],"max":[0,1.6,2.3,1.9,2.7,2.5,3.1]},
-    "thesis": "Růst služeb a ekosystému...",
-    "invalid": "Breakdown pod 195..."
-  },
-  {
-    "type": "index", "region":"US", "symbol":"SPX", "name":"S&P 500 Index"
-  },
-  {
-    "type": "futures", "region":"US", "exchange":"CME", "symbol":"ESZ4", "name":"E-mini S&P 500 Dec 2024"
-  }
-]
+{
+  "version": "1.0",
+  "count": 488,
+  "universe": [
+    {
+      "type": "index",
+      "region": "US",
+      "exchange": "INDEX",
+      "symbol": "SPX",
+      "name": "S&P 500 Index"
+    },
+    {
+      "type": "index",
+      "region": "US",
+      "exchange": "INDEX",
+      "symbol": "NDX",
+      "name": "NASDAQ 100"
+    },
+    {
+      "type": "index",
+      "region": "US",
+      "exchange": "INDEX",
+      "symbol": "DJI",
+      "name": "Dow Jones Industrial Average"
+    },
+    {
+      "type": "index",
+      "region": "US",
+      "exchange": "INDEX",
+      "symbol": "RUT",
+      "name": "Russell 2000"
+    },
+    {
+      "type": "index",
+      "region": "US",
+      "exchange": "INDEX",
+      "symbol": "VIX",
+      "name": "CBOE Volatility Index"
+    },
+    {
+      "type": "index",
+      "region": "CA",
+      "exchange": "INDEX",
+      "symbol": "TSX",
+      "name": "S&P/TSX Composite"
+    },
+    {
+      "type": "index",
+      "region": "BR",
+      "exchange": "INDEX",
+      "symbol": "IBOV",
+      "name": "Bovespa Index"
+    },
+    {
+      "type": "index",
+      "region": "MX",
+      "exchange": "INDEX",
+      "symbol": "MXX",
+      "name": "IPC Mexico"
+    },
+    {
+      "type": "index",
+      "region": "EU",
+      "exchange": "INDEX",
+      "symbol": "STOXX50E",
+      "name": "EURO STOXX 50"
+    },
+    {
+      "type": "index",
+      "region": "DE",
+      "exchange": "INDEX",
+      "symbol": "DAX",
+      "name": "DAX 40"
+    },
+    {
+      "type": "index",
+      "region": "FR",
+      "exchange": "INDEX",
+      "symbol": "CAC",
+      "name": "CAC 40"
+    },
+    {
+      "type": "index",
+      "region": "UK",
+      "exchange": "INDEX",
+      "symbol": "FTSE",
+      "name": "FTSE 100"
+    },
+    {
+      "type": "index",
+      "region": "CH",
+      "exchange": "INDEX",
+      "symbol": "SMI",
+      "name": "Swiss Market Index"
+    },
+    {
+      "type": "index",
+      "region": "ES",
+      "exchange": "INDEX",
+      "symbol": "IBEX",
+      "name": "IBEX 35"
+    },
+    {
+      "type": "index",
+      "region": "NL",
+      "exchange": "INDEX",
+      "symbol": "AEX",
+      "name": "AEX 25"
+    },
+    {
+      "type": "index",
+      "region": "SE",
+      "exchange": "INDEX",
+      "symbol": "OMXS30",
+      "name": "OMX Stockholm 30"
+    },
+    {
+      "type": "index",
+      "region": "DK",
+      "exchange": "INDEX",
+      "symbol": "OMXC25",
+      "name": "OMX Copenhagen 25"
+    },
+    {
+      "type": "index",
+      "region": "NO",
+      "exchange": "INDEX",
+      "symbol": "OBX",
+      "name": "OBX"
+    },
+    {
+      "type": "index",
+      "region": "IT",
+      "exchange": "INDEX",
+      "symbol": "FTSEMIB",
+      "name": "FTSE MIB"
+    },
+    {
+      "type": "index",
+      "region": "JP",
+      "exchange": "INDEX",
+      "symbol": "N225",
+      "name": "Nikkei 225"
+    },
+    {
+      "type": "index",
+      "region": "JP",
+      "exchange": "INDEX",
+      "symbol": "TOPIX",
+      "name": "TOPIX"
+    },
+    {
+      "type": "index",
+      "region": "CN",
+      "exchange": "INDEX",
+      "symbol": "CSI300",
+      "name": "CSI 300"
+    },
+    {
+      "type": "index",
+      "region": "CN",
+      "exchange": "INDEX",
+      "symbol": "SSE50",
+      "name": "SSE 50"
+    },
+    {
+      "type": "index",
+      "region": "HK",
+      "exchange": "INDEX",
+      "symbol": "HSI",
+      "name": "Hang Seng Index"
+    },
+    {
+      "type": "index",
+      "region": "KR",
+      "exchange": "INDEX",
+      "symbol": "KOSPI",
+      "name": "KOSPI"
+    },
+    {
+      "type": "index",
+      "region": "IN",
+      "exchange": "INDEX",
+      "symbol": "SENSEX",
+      "name": "BSE SENSEX"
+    },
+    {
+      "type": "index",
+      "region": "IN",
+      "exchange": "INDEX",
+      "symbol": "NIFTY50",
+      "name": "NIFTY 50"
+    },
+    {
+      "type": "index",
+      "region": "AU",
+      "exchange": "INDEX",
+      "symbol": "XJO",
+      "name": "ASX 200"
+    },
+    {
+      "type": "index",
+      "region": "SG",
+      "exchange": "INDEX",
+      "symbol": "STI",
+      "name": "Straits Times Index"
+    },
+    {
+      "type": "index",
+      "region": "TW",
+      "exchange": "INDEX",
+      "symbol": "TAIEX",
+      "name": "TAIEX"
+    },
+    {
+      "type": "index",
+      "region": "ZA",
+      "exchange": "INDEX",
+      "symbol": "J200",
+      "name": "FTSE/JSE Top 40"
+    },
+    {
+      "type": "index",
+      "region": "RU",
+      "exchange": "INDEX",
+      "symbol": "IMOEX",
+      "name": "MOEX Russia"
+    },
+    {
+      "type": "index",
+      "region": "TR",
+      "exchange": "INDEX",
+      "symbol": "XU100",
+      "name": "BIST 100"
+    },
+    {
+      "type": "index",
+      "region": "SA",
+      "exchange": "INDEX",
+      "symbol": "TASI",
+      "name": "Tadawul All Share"
+    },
+    {
+      "type": "index",
+      "region": "AE",
+      "exchange": "INDEX",
+      "symbol": "DFMGI",
+      "name": "DFM General Index"
+    },
+    {
+      "type": "index",
+      "region": "QA",
+      "exchange": "INDEX",
+      "symbol": "DSM",
+      "name": "QE Index"
+    },
+    {
+      "type": "index",
+      "region": "ID",
+      "exchange": "INDEX",
+      "symbol": "IDX30",
+      "name": "IDX 30"
+    },
+    {
+      "type": "index",
+      "region": "MY",
+      "exchange": "INDEX",
+      "symbol": "FBMKLCI",
+      "name": "FTSE Bursa KLCI"
+    },
+    {
+      "type": "index",
+      "region": "TH",
+      "exchange": "INDEX",
+      "symbol": "SET",
+      "name": "SET Index"
+    },
+    {
+      "type": "index",
+      "region": "PH",
+      "exchange": "INDEX",
+      "symbol": "PSEI",
+      "name": "PSEi"
+    },
+    {
+      "type": "forex",
+      "region": "Global",
+      "exchange": "FX",
+      "symbol": "EURUSD",
+      "name": "EURUSD"
+    },
+    {
+      "type": "forex",
+      "region": "Global",
+      "exchange": "FX",
+      "symbol": "USDJPY",
+      "name": "USDJPY"
+    },
+    {
+      "type": "forex",
+      "region": "Global",
+      "exchange": "FX",
+      "symbol": "GBPUSD",
+      "name": "GBPUSD"
+    },
+    {
+      "type": "forex",
+      "region": "Global",
+      "exchange": "FX",
+      "symbol": "USDCHF",
+      "name": "USDCHF"
+    },
+    {
+      "type": "forex",
+      "region": "Global",
+      "exchange": "FX",
+      "symbol": "AUDUSD",
+      "name": "AUDUSD"
+    },
+    {
+      "type": "forex",
+      "region": "Global",
+      "exchange": "FX",
+      "symbol": "USDCAD",
+      "name": "USDCAD"
+    },
+    {
+      "type": "forex",
+      "region": "Global",
+      "exchange": "FX",
+      "symbol": "NZDUSD",
+      "name": "NZDUSD"
+    },
+    {
+      "type": "forex",
+      "region": "Global",
+      "exchange": "FX",
+      "symbol": "EURJPY",
+      "name": "EURJPY"
+    },
+    {
+      "type": "forex",
+      "region": "Global",
+      "exchange": "FX",
+      "symbol": "EURGBP",
+      "name": "EURGBP"
+    },
+    {
+      "type": "forex",
+      "region": "Global",
+      "exchange": "FX",
+      "symbol": "EURCHF",
+      "name": "EURCHF"
+    },
+    {
+      "type": "forex",
+      "region": "Global",
+      "exchange": "FX",
+      "symbol": "GBPJPY",
+      "name": "GBPJPY"
+    },
+    {
+      "type": "forex",
+      "region": "Global",
+      "exchange": "FX",
+      "symbol": "AUDJPY",
+      "name": "AUDJPY"
+    },
+    {
+      "type": "forex",
+      "region": "Global",
+      "exchange": "FX",
+      "symbol": "CHFJPY",
+      "name": "CHFJPY"
+    },
+    {
+      "type": "forex",
+      "region": "Global",
+      "exchange": "FX",
+      "symbol": "CADJPY",
+      "name": "CADJPY"
+    },
+    {
+      "type": "forex",
+      "region": "Global",
+      "exchange": "FX",
+      "symbol": "NZDJPY",
+      "name": "NZDJPY"
+    },
+    {
+      "type": "forex",
+      "region": "Global",
+      "exchange": "FX",
+      "symbol": "EURAUD",
+      "name": "EURAUD"
+    },
+    {
+      "type": "forex",
+      "region": "Global",
+      "exchange": "FX",
+      "symbol": "GBPAUD",
+      "name": "GBPAUD"
+    },
+    {
+      "type": "forex",
+      "region": "Global",
+      "exchange": "FX",
+      "symbol": "AUDCAD",
+      "name": "AUDCAD"
+    },
+    {
+      "type": "forex",
+      "region": "Global",
+      "exchange": "FX",
+      "symbol": "AUDNZD",
+      "name": "AUDNZD"
+    },
+    {
+      "type": "forex",
+      "region": "Global",
+      "exchange": "FX",
+      "symbol": "EURNZD",
+      "name": "EURNZD"
+    },
+    {
+      "type": "forex",
+      "region": "Global",
+      "exchange": "FX",
+      "symbol": "GBPCAD",
+      "name": "GBPCAD"
+    },
+    {
+      "type": "forex",
+      "region": "Global",
+      "exchange": "FX",
+      "symbol": "GBPNZD",
+      "name": "GBPNZD"
+    },
+    {
+      "type": "forex",
+      "region": "Global",
+      "exchange": "FX",
+      "symbol": "EURCAD",
+      "name": "EURCAD"
+    },
+    {
+      "type": "forex",
+      "region": "Global",
+      "exchange": "FX",
+      "symbol": "USDCNH",
+      "name": "USDCNH"
+    },
+    {
+      "type": "forex",
+      "region": "Global",
+      "exchange": "FX",
+      "symbol": "USDHKD",
+      "name": "USDHKD"
+    },
+    {
+      "type": "forex",
+      "region": "Global",
+      "exchange": "FX",
+      "symbol": "USDSGD",
+      "name": "USDSGD"
+    },
+    {
+      "type": "forex",
+      "region": "Global",
+      "exchange": "FX",
+      "symbol": "USDSEK",
+      "name": "USDSEK"
+    },
+    {
+      "type": "forex",
+      "region": "Global",
+      "exchange": "FX",
+      "symbol": "USDNOK",
+      "name": "USDNOK"
+    },
+    {
+      "type": "forex",
+      "region": "Global",
+      "exchange": "FX",
+      "symbol": "USDDKK",
+      "name": "USDDKK"
+    },
+    {
+      "type": "forex",
+      "region": "Global",
+      "exchange": "FX",
+      "symbol": "USDTRY",
+      "name": "USDTRY"
+    },
+    {
+      "type": "forex",
+      "region": "Global",
+      "exchange": "FX",
+      "symbol": "USDZAR",
+      "name": "USDZAR"
+    },
+    {
+      "type": "forex",
+      "region": "Global",
+      "exchange": "FX",
+      "symbol": "USDINR",
+      "name": "USDINR"
+    },
+    {
+      "type": "forex",
+      "region": "Global",
+      "exchange": "FX",
+      "symbol": "USDMXN",
+      "name": "USDMXN"
+    },
+    {
+      "type": "forex",
+      "region": "Global",
+      "exchange": "FX",
+      "symbol": "USDILS",
+      "name": "USDILS"
+    },
+    {
+      "type": "forex",
+      "region": "Global",
+      "exchange": "FX",
+      "symbol": "USDBRL",
+      "name": "USDBRL"
+    },
+    {
+      "type": "forex",
+      "region": "Global",
+      "exchange": "FX",
+      "symbol": "EURSEK",
+      "name": "EURSEK"
+    },
+    {
+      "type": "forex",
+      "region": "Global",
+      "exchange": "FX",
+      "symbol": "EURNOK",
+      "name": "EURNOK"
+    },
+    {
+      "type": "forex",
+      "region": "Global",
+      "exchange": "FX",
+      "symbol": "EURDKK",
+      "name": "EURDKK"
+    },
+    {
+      "type": "forex",
+      "region": "Global",
+      "exchange": "FX",
+      "symbol": "EURPLN",
+      "name": "EURPLN"
+    },
+    {
+      "type": "forex",
+      "region": "Global",
+      "exchange": "FX",
+      "symbol": "EURHUF",
+      "name": "EURHUF"
+    },
+    {
+      "type": "forex",
+      "region": "Global",
+      "exchange": "FX",
+      "symbol": "EURCZK",
+      "name": "EURCZK"
+    },
+    {
+      "type": "forex",
+      "region": "Global",
+      "exchange": "FX",
+      "symbol": "EURTRY",
+      "name": "EURTRY"
+    },
+    {
+      "type": "forex",
+      "region": "Global",
+      "exchange": "FX",
+      "symbol": "EURZAR",
+      "name": "EURZAR"
+    },
+    {
+      "type": "forex",
+      "region": "Global",
+      "exchange": "FX",
+      "symbol": "GBPSEK",
+      "name": "GBPSEK"
+    },
+    {
+      "type": "forex",
+      "region": "Global",
+      "exchange": "FX",
+      "symbol": "GBPNOK",
+      "name": "GBPNOK"
+    },
+    {
+      "type": "forex",
+      "region": "Global",
+      "exchange": "FX",
+      "symbol": "GBPDKK",
+      "name": "GBPDKK"
+    },
+    {
+      "type": "forex",
+      "region": "Global",
+      "exchange": "FX",
+      "symbol": "GBPPLN",
+      "name": "GBPPLN"
+    },
+    {
+      "type": "forex",
+      "region": "Global",
+      "exchange": "FX",
+      "symbol": "GBPHUF",
+      "name": "GBPHUF"
+    },
+    {
+      "type": "forex",
+      "region": "Global",
+      "exchange": "FX",
+      "symbol": "GBPCZK",
+      "name": "GBPCZK"
+    },
+    {
+      "type": "forex",
+      "region": "Global",
+      "exchange": "FX",
+      "symbol": "GBPTRY",
+      "name": "GBPTRY"
+    },
+    {
+      "type": "forex",
+      "region": "Global",
+      "exchange": "FX",
+      "symbol": "AUDSGD",
+      "name": "AUDSGD"
+    },
+    {
+      "type": "forex",
+      "region": "Global",
+      "exchange": "FX",
+      "symbol": "AUDSEK",
+      "name": "AUDSEK"
+    },
+    {
+      "type": "forex",
+      "region": "Global",
+      "exchange": "FX",
+      "symbol": "AUDNOK",
+      "name": "AUDNOK"
+    },
+    {
+      "type": "forex",
+      "region": "Global",
+      "exchange": "FX",
+      "symbol": "AUDCHF",
+      "name": "AUDCHF"
+    },
+    {
+      "type": "forex",
+      "region": "Global",
+      "exchange": "FX",
+      "symbol": "AUDHKD",
+      "name": "AUDHKD"
+    },
+    {
+      "type": "forex",
+      "region": "Global",
+      "exchange": "FX",
+      "symbol": "CADCHF",
+      "name": "CADCHF"
+    },
+    {
+      "type": "forex",
+      "region": "Global",
+      "exchange": "FX",
+      "symbol": "CADSGD",
+      "name": "CADSGD"
+    },
+    {
+      "type": "forex",
+      "region": "Global",
+      "exchange": "FX",
+      "symbol": "CADHKD",
+      "name": "CADHKD"
+    },
+    {
+      "type": "forex",
+      "region": "Global",
+      "exchange": "FX",
+      "symbol": "NZDCHF",
+      "name": "NZDCHF"
+    },
+    {
+      "type": "forex",
+      "region": "Global",
+      "exchange": "FX",
+      "symbol": "NZDSGD",
+      "name": "NZDSGD"
+    },
+    {
+      "type": "forex",
+      "region": "Global",
+      "exchange": "FX",
+      "symbol": "SGDJPY",
+      "name": "SGDJPY"
+    },
+    {
+      "type": "forex",
+      "region": "Global",
+      "exchange": "FX",
+      "symbol": "HKDJPY",
+      "name": "HKDJPY"
+    },
+    {
+      "type": "forex",
+      "region": "Global",
+      "exchange": "FX",
+      "symbol": "CNHJPY",
+      "name": "CNHJPY"
+    },
+    {
+      "type": "commodity",
+      "region": "Global",
+      "exchange": "CME",
+      "symbol": "XAUUSD",
+      "name": "Gold Spot"
+    },
+    {
+      "type": "commodity",
+      "region": "Global",
+      "exchange": "CME",
+      "symbol": "XAGUSD",
+      "name": "Silver Spot"
+    },
+    {
+      "type": "commodity",
+      "region": "Global",
+      "exchange": "NYMEX",
+      "symbol": "CL",
+      "name": "WTI Crude Oil"
+    },
+    {
+      "type": "commodity",
+      "region": "Global",
+      "exchange": "ICE",
+      "symbol": "BRN",
+      "name": "Brent Crude"
+    },
+    {
+      "type": "commodity",
+      "region": "Global",
+      "exchange": "NYMEX",
+      "symbol": "NG",
+      "name": "Natural Gas"
+    },
+    {
+      "type": "commodity",
+      "region": "Global",
+      "exchange": "COMEX",
+      "symbol": "HG",
+      "name": "Copper"
+    },
+    {
+      "type": "commodity",
+      "region": "US",
+      "exchange": "CBOT",
+      "symbol": "ZC",
+      "name": "Corn"
+    },
+    {
+      "type": "commodity",
+      "region": "US",
+      "exchange": "CBOT",
+      "symbol": "ZW",
+      "name": "Wheat"
+    },
+    {
+      "type": "commodity",
+      "region": "US",
+      "exchange": "CBOT",
+      "symbol": "ZS",
+      "name": "Soybeans"
+    },
+    {
+      "type": "commodity",
+      "region": "US",
+      "exchange": "ICEUS",
+      "symbol": "KC",
+      "name": "Coffee"
+    },
+    {
+      "type": "commodity",
+      "region": "US",
+      "exchange": "ICEUS",
+      "symbol": "SB",
+      "name": "Sugar"
+    },
+    {
+      "type": "commodity",
+      "region": "US",
+      "exchange": "ICEUS",
+      "symbol": "CC",
+      "name": "Cocoa"
+    },
+    {
+      "type": "commodity",
+      "region": "US",
+      "exchange": "ICEUS",
+      "symbol": "CT",
+      "name": "Cotton"
+    },
+    {
+      "type": "commodity",
+      "region": "US",
+      "exchange": "CME",
+      "symbol": "LE",
+      "name": "Live Cattle"
+    },
+    {
+      "type": "commodity",
+      "region": "US",
+      "exchange": "CME",
+      "symbol": "HE",
+      "name": "Lean Hogs"
+    },
+    {
+      "type": "commodity",
+      "region": "US",
+      "exchange": "CME",
+      "symbol": "GC",
+      "name": "Gold Futures"
+    },
+    {
+      "type": "commodity",
+      "region": "US",
+      "exchange": "CME",
+      "symbol": "SI",
+      "name": "Silver Futures"
+    },
+    {
+      "type": "commodity",
+      "region": "US",
+      "exchange": "CME",
+      "symbol": "PL",
+      "name": "Platinum Futures"
+    },
+    {
+      "type": "commodity",
+      "region": "US",
+      "exchange": "CME",
+      "symbol": "PA",
+      "name": "Palladium Futures"
+    },
+    {
+      "type": "commodity",
+      "region": "US",
+      "exchange": "NYMEX",
+      "symbol": "RB",
+      "name": "RBOB Gasoline"
+    },
+    {
+      "type": "commodity",
+      "region": "US",
+      "exchange": "NYMEX",
+      "symbol": "HO",
+      "name": "Heating Oil"
+    },
+    {
+      "type": "commodity",
+      "region": "US",
+      "exchange": "CME",
+      "symbol": "OJ",
+      "name": "Orange Juice"
+    },
+    {
+      "type": "commodity",
+      "region": "US",
+      "exchange": "CME",
+      "symbol": "LBR",
+      "name": "Lumber"
+    },
+    {
+      "type": "commodity",
+      "region": "US",
+      "exchange": "CME",
+      "symbol": "SM",
+      "name": "Soybean Meal"
+    },
+    {
+      "type": "commodity",
+      "region": "US",
+      "exchange": "CME",
+      "symbol": "BO",
+      "name": "Soybean Oil"
+    },
+    {
+      "type": "crypto",
+      "region": "Global",
+      "exchange": "CRYPTO",
+      "symbol": "BTCUSD",
+      "name": "BTC"
+    },
+    {
+      "type": "crypto",
+      "region": "Global",
+      "exchange": "CRYPTO",
+      "symbol": "ETHUSD",
+      "name": "ETH"
+    },
+    {
+      "type": "crypto",
+      "region": "Global",
+      "exchange": "CRYPTO",
+      "symbol": "USDTUSD",
+      "name": "USDT"
+    },
+    {
+      "type": "crypto",
+      "region": "Global",
+      "exchange": "CRYPTO",
+      "symbol": "BNBUSD",
+      "name": "BNB"
+    },
+    {
+      "type": "crypto",
+      "region": "Global",
+      "exchange": "CRYPTO",
+      "symbol": "SOLUSD",
+      "name": "SOL"
+    },
+    {
+      "type": "crypto",
+      "region": "Global",
+      "exchange": "CRYPTO",
+      "symbol": "XRPUSD",
+      "name": "XRP"
+    },
+    {
+      "type": "crypto",
+      "region": "Global",
+      "exchange": "CRYPTO",
+      "symbol": "USDCUSD",
+      "name": "USDC"
+    },
+    {
+      "type": "crypto",
+      "region": "Global",
+      "exchange": "CRYPTO",
+      "symbol": "ADAUSD",
+      "name": "ADA"
+    },
+    {
+      "type": "crypto",
+      "region": "Global",
+      "exchange": "CRYPTO",
+      "symbol": "DOGEUSD",
+      "name": "DOGE"
+    },
+    {
+      "type": "crypto",
+      "region": "Global",
+      "exchange": "CRYPTO",
+      "symbol": "TRXUSD",
+      "name": "TRX"
+    },
+    {
+      "type": "crypto",
+      "region": "Global",
+      "exchange": "CRYPTO",
+      "symbol": "TONUSD",
+      "name": "TON"
+    },
+    {
+      "type": "crypto",
+      "region": "Global",
+      "exchange": "CRYPTO",
+      "symbol": "DOTUSD",
+      "name": "DOT"
+    },
+    {
+      "type": "crypto",
+      "region": "Global",
+      "exchange": "CRYPTO",
+      "symbol": "MATICUSD",
+      "name": "MATIC"
+    },
+    {
+      "type": "crypto",
+      "region": "Global",
+      "exchange": "CRYPTO",
+      "symbol": "AVAXUSD",
+      "name": "AVAX"
+    },
+    {
+      "type": "crypto",
+      "region": "Global",
+      "exchange": "CRYPTO",
+      "symbol": "SHIBUSD",
+      "name": "SHIB"
+    },
+    {
+      "type": "crypto",
+      "region": "Global",
+      "exchange": "CRYPTO",
+      "symbol": "WBTCUSD",
+      "name": "WBTC"
+    },
+    {
+      "type": "crypto",
+      "region": "Global",
+      "exchange": "CRYPTO",
+      "symbol": "LINKUSD",
+      "name": "LINK"
+    },
+    {
+      "type": "crypto",
+      "region": "Global",
+      "exchange": "CRYPTO",
+      "symbol": "BCHUSD",
+      "name": "BCH"
+    },
+    {
+      "type": "crypto",
+      "region": "Global",
+      "exchange": "CRYPTO",
+      "symbol": "LTCUSD",
+      "name": "LTC"
+    },
+    {
+      "type": "crypto",
+      "region": "Global",
+      "exchange": "CRYPTO",
+      "symbol": "NEARUSD",
+      "name": "NEAR"
+    },
+    {
+      "type": "crypto",
+      "region": "Global",
+      "exchange": "CRYPTO",
+      "symbol": "ATOMUSD",
+      "name": "ATOM"
+    },
+    {
+      "type": "crypto",
+      "region": "Global",
+      "exchange": "CRYPTO",
+      "symbol": "XLMUSD",
+      "name": "XLM"
+    },
+    {
+      "type": "crypto",
+      "region": "Global",
+      "exchange": "CRYPTO",
+      "symbol": "ETCUSD",
+      "name": "ETC"
+    },
+    {
+      "type": "crypto",
+      "region": "Global",
+      "exchange": "CRYPTO",
+      "symbol": "APTUSD",
+      "name": "APT"
+    },
+    {
+      "type": "crypto",
+      "region": "Global",
+      "exchange": "CRYPTO",
+      "symbol": "HBARUSD",
+      "name": "HBAR"
+    },
+    {
+      "type": "crypto",
+      "region": "Global",
+      "exchange": "CRYPTO",
+      "symbol": "OPUSD",
+      "name": "OP"
+    },
+    {
+      "type": "crypto",
+      "region": "Global",
+      "exchange": "CRYPTO",
+      "symbol": "ARBUSD",
+      "name": "ARB"
+    },
+    {
+      "type": "crypto",
+      "region": "Global",
+      "exchange": "CRYPTO",
+      "symbol": "FILUSD",
+      "name": "FIL"
+    },
+    {
+      "type": "crypto",
+      "region": "Global",
+      "exchange": "CRYPTO",
+      "symbol": "INJUSD",
+      "name": "INJ"
+    },
+    {
+      "type": "crypto",
+      "region": "Global",
+      "exchange": "CRYPTO",
+      "symbol": "IMXUSD",
+      "name": "IMX"
+    },
+    {
+      "type": "crypto",
+      "region": "Global",
+      "exchange": "CRYPTO",
+      "symbol": "RNDRUSD",
+      "name": "RNDR"
+    },
+    {
+      "type": "crypto",
+      "region": "Global",
+      "exchange": "CRYPTO",
+      "symbol": "OKBUSD",
+      "name": "OKB"
+    },
+    {
+      "type": "crypto",
+      "region": "Global",
+      "exchange": "CRYPTO",
+      "symbol": "SUIUSD",
+      "name": "SUI"
+    },
+    {
+      "type": "crypto",
+      "region": "Global",
+      "exchange": "CRYPTO",
+      "symbol": "VETUSD",
+      "name": "VET"
+    },
+    {
+      "type": "crypto",
+      "region": "Global",
+      "exchange": "CRYPTO",
+      "symbol": "TIAUSD",
+      "name": "TIA"
+    },
+    {
+      "type": "crypto",
+      "region": "Global",
+      "exchange": "CRYPTO",
+      "symbol": "AAVEUSD",
+      "name": "AAVE"
+    },
+    {
+      "type": "crypto",
+      "region": "Global",
+      "exchange": "CRYPTO",
+      "symbol": "MKRUSD",
+      "name": "MKR"
+    },
+    {
+      "type": "crypto",
+      "region": "Global",
+      "exchange": "CRYPTO",
+      "symbol": "ALGOUSD",
+      "name": "ALGO"
+    },
+    {
+      "type": "crypto",
+      "region": "Global",
+      "exchange": "CRYPTO",
+      "symbol": "GRTUSD",
+      "name": "GRT"
+    },
+    {
+      "type": "crypto",
+      "region": "Global",
+      "exchange": "CRYPTO",
+      "symbol": "ICPUSD",
+      "name": "ICP"
+    },
+    {
+      "type": "crypto",
+      "region": "Global",
+      "exchange": "CRYPTO",
+      "symbol": "QNTUSD",
+      "name": "QNT"
+    },
+    {
+      "type": "crypto",
+      "region": "Global",
+      "exchange": "CRYPTO",
+      "symbol": "FTMUSD",
+      "name": "FTM"
+    },
+    {
+      "type": "crypto",
+      "region": "Global",
+      "exchange": "CRYPTO",
+      "symbol": "FLOWUSD",
+      "name": "FLOW"
+    },
+    {
+      "type": "crypto",
+      "region": "Global",
+      "exchange": "CRYPTO",
+      "symbol": "SANDUSD",
+      "name": "SAND"
+    },
+    {
+      "type": "crypto",
+      "region": "Global",
+      "exchange": "CRYPTO",
+      "symbol": "AXSUSD",
+      "name": "AXS"
+    },
+    {
+      "type": "crypto",
+      "region": "Global",
+      "exchange": "CRYPTO",
+      "symbol": "EGLDUSD",
+      "name": "EGLD"
+    },
+    {
+      "type": "crypto",
+      "region": "Global",
+      "exchange": "CRYPTO",
+      "symbol": "KASUSD",
+      "name": "KAS"
+    },
+    {
+      "type": "crypto",
+      "region": "Global",
+      "exchange": "CRYPTO",
+      "symbol": "JUPUSD",
+      "name": "JUP"
+    },
+    {
+      "type": "crypto",
+      "region": "Global",
+      "exchange": "CRYPTO",
+      "symbol": "SEIUSD",
+      "name": "SEI"
+    },
+    {
+      "type": "crypto",
+      "region": "Global",
+      "exchange": "CRYPTO",
+      "symbol": "STXUSD",
+      "name": "STX"
+    },
+    {
+      "type": "crypto",
+      "region": "Global",
+      "exchange": "CRYPTO",
+      "symbol": "WIFUSD",
+      "name": "WIF"
+    },
+    {
+      "type": "crypto",
+      "region": "Global",
+      "exchange": "CRYPTO",
+      "symbol": "PEPEUSD",
+      "name": "PEPE"
+    },
+    {
+      "type": "crypto",
+      "region": "Global",
+      "exchange": "CRYPTO",
+      "symbol": "BONKUSD",
+      "name": "BONK"
+    },
+    {
+      "type": "crypto",
+      "region": "Global",
+      "exchange": "CRYPTO",
+      "symbol": "PYTHUSD",
+      "name": "PYTH"
+    },
+    {
+      "type": "crypto",
+      "region": "Global",
+      "exchange": "CRYPTO",
+      "symbol": "RUNEUSD",
+      "name": "RUNE"
+    },
+    {
+      "type": "crypto",
+      "region": "Global",
+      "exchange": "CRYPTO",
+      "symbol": "KAVAUSD",
+      "name": "KAVA"
+    },
+    {
+      "type": "crypto",
+      "region": "Global",
+      "exchange": "CRYPTO",
+      "symbol": "CAKEUSD",
+      "name": "CAKE"
+    },
+    {
+      "type": "crypto",
+      "region": "Global",
+      "exchange": "CRYPTO",
+      "symbol": "ZECUSD",
+      "name": "ZEC"
+    },
+    {
+      "type": "crypto",
+      "region": "Global",
+      "exchange": "CRYPTO",
+      "symbol": "GMXUSD",
+      "name": "GMX"
+    },
+    {
+      "type": "crypto",
+      "region": "Global",
+      "exchange": "CRYPTO",
+      "symbol": "DYDXUSD",
+      "name": "DYDX"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "AAPL",
+      "name": "AAPL"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "MSFT",
+      "name": "MSFT"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "GOOGL",
+      "name": "GOOGL"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "GOOG",
+      "name": "GOOG"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "AMZN",
+      "name": "AMZN"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "NVDA",
+      "name": "NVDA"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "META",
+      "name": "META"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "TSLA",
+      "name": "TSLA"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "BRK.B",
+      "name": "BRK.B"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "UNH",
+      "name": "UNH"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "LLY",
+      "name": "LLY"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "JPM",
+      "name": "JPM"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "V",
+      "name": "V"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "XOM",
+      "name": "XOM"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "MA",
+      "name": "MA"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "PG",
+      "name": "PG"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "HD",
+      "name": "HD"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "AVGO",
+      "name": "AVGO"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "JNJ",
+      "name": "JNJ"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "ADBE",
+      "name": "ADBE"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "COST",
+      "name": "COST"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "ORCL",
+      "name": "ORCL"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "MRK",
+      "name": "MRK"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "PEP",
+      "name": "PEP"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "KO",
+      "name": "KO"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "NFLX",
+      "name": "NFLX"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "ABBV",
+      "name": "ABBV"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "CRM",
+      "name": "CRM"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "TMO",
+      "name": "TMO"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "CSCO",
+      "name": "CSCO"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "WMT",
+      "name": "WMT"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "ACN",
+      "name": "ACN"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "MCD",
+      "name": "MCD"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "AMD",
+      "name": "AMD"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "LIN",
+      "name": "LIN"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "INTC",
+      "name": "INTC"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "IBM",
+      "name": "IBM"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "TXN",
+      "name": "TXN"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "AMAT",
+      "name": "AMAT"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "ISRG",
+      "name": "ISRG"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "CVX",
+      "name": "CVX"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "NKE",
+      "name": "NKE"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "PM",
+      "name": "PM"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "HON",
+      "name": "HON"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "NOW",
+      "name": "NOW"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "QCOM",
+      "name": "QCOM"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "BKNG",
+      "name": "BKNG"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "ABNB",
+      "name": "ABNB"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "SPGI",
+      "name": "SPGI"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "BLK",
+      "name": "BLK"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "CAT",
+      "name": "CAT"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "GE",
+      "name": "GE"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "GS",
+      "name": "GS"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "MS",
+      "name": "MS"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "DE",
+      "name": "DE"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "LMT",
+      "name": "LMT"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "RTX",
+      "name": "RTX"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "MDT",
+      "name": "MDT"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "SYK",
+      "name": "SYK"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "ELV",
+      "name": "ELV"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "PFE",
+      "name": "PFE"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "DHR",
+      "name": "DHR"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "AMT",
+      "name": "AMT"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "NEE",
+      "name": "NEE"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "SCHW",
+      "name": "SCHW"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "UBER",
+      "name": "UBER"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "SBUX",
+      "name": "SBUX"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "ADP",
+      "name": "ADP"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "PLD",
+      "name": "PLD"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "INTU",
+      "name": "INTU"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "GILD",
+      "name": "GILD"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "T",
+      "name": "T"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "MO",
+      "name": "MO"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "BA",
+      "name": "BA"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "GM",
+      "name": "GM"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "F",
+      "name": "F"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "SHOP",
+      "name": "SHOP"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "PANW",
+      "name": "PANW"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "SNOW",
+      "name": "SNOW"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "NET",
+      "name": "NET"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "CRWD",
+      "name": "CRWD"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "ZS",
+      "name": "ZS"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "DDOG",
+      "name": "DDOG"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "MU",
+      "name": "MU"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "KLAC",
+      "name": "KLAC"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "LRCX",
+      "name": "LRCX"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "ASML",
+      "name": "ASML"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "SAP",
+      "name": "SAP"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "SONY",
+      "name": "SONY"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "TM",
+      "name": "TM"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "HMC",
+      "name": "HMC"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "NVO",
+      "name": "NVO"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "AZN",
+      "name": "AZN"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "BP",
+      "name": "BP"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "SHEL",
+      "name": "SHEL"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "BHP",
+      "name": "BHP"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "RIO",
+      "name": "RIO"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "TTE",
+      "name": "TTE"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "UL",
+      "name": "UL"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "BUD",
+      "name": "BUD"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "BTI",
+      "name": "BTI"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "DELL",
+      "name": "DELL"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "HPQ",
+      "name": "HPQ"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "WDAY",
+      "name": "WDAY"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "TEAM",
+      "name": "TEAM"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "MDB",
+      "name": "MDB"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "DOCU",
+      "name": "DOCU"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "SQ",
+      "name": "SQ"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "PYPL",
+      "name": "PYPL"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "COIN",
+      "name": "COIN"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "ROKU",
+      "name": "ROKU"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "TWLO",
+      "name": "TWLO"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "UBS",
+      "name": "UBS"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "HSBC",
+      "name": "HSBC"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "BABA",
+      "name": "BABA"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "JD",
+      "name": "JD"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "PDD",
+      "name": "PDD"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "BIDU",
+      "name": "BIDU"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "NTES",
+      "name": "NTES"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "MELI",
+      "name": "MELI"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "PINS",
+      "name": "PINS"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "SPOT",
+      "name": "SPOT"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "ETSY",
+      "name": "ETSY"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "EBAY",
+      "name": "EBAY"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "ABT",
+      "name": "ABT"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "MDLZ",
+      "name": "MDLZ"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "KHC",
+      "name": "KHC"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "GIS",
+      "name": "GIS"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "K",
+      "name": "K"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "SYY",
+      "name": "SYY"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "KR",
+      "name": "KR"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "DG",
+      "name": "DG"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "DLTR",
+      "name": "DLTR"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "LOW",
+      "name": "LOW"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "TGT",
+      "name": "TGT"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "CARR",
+      "name": "CARR"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "OTIS",
+      "name": "OTIS"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "MMM",
+      "name": "MMM"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "ETN",
+      "name": "ETN"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "PH",
+      "name": "PH"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "EMR",
+      "name": "EMR"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "ITW",
+      "name": "ITW"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "ROP",
+      "name": "ROP"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "ADSK",
+      "name": "ADSK"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "ANET",
+      "name": "ANET"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "VEEV",
+      "name": "VEEV"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "OKTA",
+      "name": "OKTA"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "TTD",
+      "name": "TTD"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "BKR",
+      "name": "BKR"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "SLB",
+      "name": "SLB"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "HAL",
+      "name": "HAL"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "NOC",
+      "name": "NOC"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "TDG",
+      "name": "TDG"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "HII",
+      "name": "HII"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "CME",
+      "name": "CME"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "ICE",
+      "name": "ICE"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "NDAQ",
+      "name": "NDAQ"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "CBOE",
+      "name": "CBOE"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "AON",
+      "name": "AON"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "MMC",
+      "name": "MMC"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "PGR",
+      "name": "PGR"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "TRV",
+      "name": "TRV"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "ALL",
+      "name": "ALL"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "AIG",
+      "name": "AIG"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "MET",
+      "name": "MET"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "PRU",
+      "name": "PRU"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "C",
+      "name": "C"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "BAC",
+      "name": "BAC"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "WFC",
+      "name": "WFC"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "USB",
+      "name": "USB"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "PNC",
+      "name": "PNC"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "TFC",
+      "name": "TFC"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "BK",
+      "name": "BK"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "CB",
+      "name": "CB"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "AFL",
+      "name": "AFL"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "LUV",
+      "name": "LUV"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "DAL",
+      "name": "DAL"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "UAL",
+      "name": "UAL"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "AAL",
+      "name": "AAL"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "RCL",
+      "name": "RCL"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "CCL",
+      "name": "CCL"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "NCLH",
+      "name": "NCLH"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "MAR",
+      "name": "MAR"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "HLT",
+      "name": "HLT"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "LYV",
+      "name": "LYV"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "CMCSA",
+      "name": "CMCSA"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "DIS",
+      "name": "DIS"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "PARA",
+      "name": "PARA"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "WBD",
+      "name": "WBD"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "CHTR",
+      "name": "CHTR"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "VZ",
+      "name": "VZ"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "TMUS",
+      "name": "TMUS"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "CI",
+      "name": "CI"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "HUM",
+      "name": "HUM"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "CNC",
+      "name": "CNC"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "DGX",
+      "name": "DGX"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "IQV",
+      "name": "IQV"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "ILMN",
+      "name": "ILMN"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "BMY",
+      "name": "BMY"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "REGN",
+      "name": "REGN"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "VRTX",
+      "name": "VRTX"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "GSK",
+      "name": "GSK"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "SNY",
+      "name": "SNY"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "EQNR",
+      "name": "EQNR"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "ENB",
+      "name": "ENB"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "TRP",
+      "name": "TRP"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "DUK",
+      "name": "DUK"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "SO",
+      "name": "SO"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "AEP",
+      "name": "AEP"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "EXC",
+      "name": "EXC"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "D",
+      "name": "D"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "ED",
+      "name": "ED"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "PCG",
+      "name": "PCG"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "SRE",
+      "name": "SRE"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "XEL",
+      "name": "XEL"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "FE",
+      "name": "FE"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "AWK",
+      "name": "AWK"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "WBA",
+      "name": "WBA"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "CVS",
+      "name": "CVS"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "UNP",
+      "name": "UNP"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "CSX",
+      "name": "CSX"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "NSC",
+      "name": "NSC"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "CP",
+      "name": "CP"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "CNI",
+      "name": "CNI"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "UPS",
+      "name": "UPS"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "FDX",
+      "name": "FDX"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "EXPE",
+      "name": "EXPE"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "ORLY",
+      "name": "ORLY"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "AZO",
+      "name": "AZO"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "KMX",
+      "name": "KMX"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "ULTA",
+      "name": "ULTA"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "EL",
+      "name": "EL"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "TAP",
+      "name": "TAP"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "BF.B",
+      "name": "BF.B"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "STZ",
+      "name": "STZ"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "LULU",
+      "name": "LULU"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "VFC",
+      "name": "VFC"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "PVH",
+      "name": "PVH"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "RL",
+      "name": "RL"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "TJX",
+      "name": "TJX"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "ROST",
+      "name": "ROST"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "M",
+      "name": "M"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "KSS",
+      "name": "KSS"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "BBY",
+      "name": "BBY"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "W",
+      "name": "W"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "HOOD",
+      "name": "HOOD"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "AFRM",
+      "name": "AFRM"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "U",
+      "name": "U"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "PLTR",
+      "name": "PLTR"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "AI",
+      "name": "AI"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "SMCI",
+      "name": "SMCI"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "PATH",
+      "name": "PATH"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "FSLY",
+      "name": "FSLY"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "DOCN",
+      "name": "DOCN"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "CDNS",
+      "name": "CDNS"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "SNPS",
+      "name": "SNPS"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "ANSS",
+      "name": "ANSS"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "KEYS",
+      "name": "KEYS"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "TEL",
+      "name": "TEL"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "GLW",
+      "name": "GLW"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "APH",
+      "name": "APH"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "MRVL",
+      "name": "MRVL"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "SWKS",
+      "name": "SWKS"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "NXPI",
+      "name": "NXPI"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "ON",
+      "name": "ON"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "ADI",
+      "name": "ADI"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "MPWR",
+      "name": "MPWR"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "ALB",
+      "name": "ALB"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "LTHM",
+      "name": "LTHM"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "SQM",
+      "name": "SQM"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "FCX",
+      "name": "FCX"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "NUE",
+      "name": "NUE"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "STLD",
+      "name": "STLD"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "X",
+      "name": "X"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "CLF",
+      "name": "CLF"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "AA",
+      "name": "AA"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "CMI",
+      "name": "CMI"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "PCAR",
+      "name": "PCAR"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "HOG",
+      "name": "HOG"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "TXT",
+      "name": "TXT"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "GD",
+      "name": "GD"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "LHX",
+      "name": "LHX"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "BWXT",
+      "name": "BWXT"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "HEI",
+      "name": "HEI"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "SPR",
+      "name": "SPR"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "TDY",
+      "name": "TDY"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "RKT",
+      "name": "RKT"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "LEN",
+      "name": "LEN"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "PHM",
+      "name": "PHM"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "DHI",
+      "name": "DHI"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "TOL",
+      "name": "TOL"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "NVR",
+      "name": "NVR"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "Z",
+      "name": "Z"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "ZG",
+      "name": "ZG"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "OPEN",
+      "name": "OPEN"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "RDFN",
+      "name": "RDFN"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "EXR",
+      "name": "EXR"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "PSA",
+      "name": "PSA"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "DLR",
+      "name": "DLR"
+    },
+    {
+      "type": "stock",
+      "region": "US",
+      "exchange": "NYSE/NASDAQ",
+      "symbol": "EQIX",
+      "name": "EQIX"
+    }
+  ]
+}
