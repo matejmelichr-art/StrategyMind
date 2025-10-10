@@ -22,37 +22,18 @@
     .spark path.max   { stroke:#22c55e; }
     .spark line.guide { stroke:#94a3b8; stroke-dasharray:4 4; opacity:.6; }
 
-    /* Box kolem grafu a štítků */
-    .spark-wrap {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 1rem;
-      width: 100%;
-    }
-
-    /* Štítky vpravo */
-    .target-badges {
-      display: flex;
-      flex-direction: column;
-      gap: .25rem;
-      font-size: .8rem;
-      min-width: 80px;
-    }
-    .b { display:flex; align-items:center; justify-content:space-between; gap:.3rem; }
-    .dot { width:.6rem; height:.6rem; border-radius:9999px; display:inline-block; }
-    .dot.max { background:#22c55e; }
-    .dot.avg { background:#2563eb; }
-    .dot.min { background:#ef4444; }
+    .spark-wrap{display:flex;align-items:center;justify-content:space-between;gap:1rem;width:100%;}
+    .target-badges{display:flex;flex-direction:column;gap:.25rem;font-size:.8rem;min-width:86px}
+    .b{display:flex;align-items:center;justify-content:space-between;gap:.4rem}
+    .dot{width:.6rem;height:.6rem;border-radius:9999px;display:inline-block}
+    .dot.max{background:#22c55e}.dot.avg{background:#2563eb}.dot.min{background:#ef4444}
   </style>
 </head>
 <body class="bg-slate-50 text-slate-900">
   <header class="sticky top-0 z-20 backdrop-blur bg-white/80 border-b border-slate-200">
     <div class="max-w-6xl mx-auto px-4 py-3 flex items-center gap-3">
       <a href="/client/" class="text-sm text-slate-600 hover:text-slate-900 flex items-center gap-2">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" class="opacity-70">
-          <path d="M15 6l-6 6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" class="opacity-70"><path d="M15 6l-6 6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
         Zpět na klientskou sekci
       </a>
       <div class="ml-auto flex items-center gap-2">
@@ -71,78 +52,124 @@
       a <strong>mini-graf</strong> s 1Y rozmezím (<em>min / avg / max</em>) a štítky cílových hodnot.
     </p>
 
+    <!-- Toolbar -->
     <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-3">
       <div class="relative">
         <input id="q" class="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white outline-none focus:ring-2 focus:ring-slate-200"
-          placeholder="Hledej symbol / název…" />
-        <div class="absolute inset-y-0 right-2 flex items-center text-slate-400 pointer-events-none">
-          <span class="kbd">/</span>
-        </div>
+               placeholder="Hledej symbol / název…" />
+        <div class="absolute inset-y-0 right-2 flex items-center text-slate-400 pointer-events-none"><span class="kbd">/</span></div>
       </div>
       <select id="typeFilter" class="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white outline-none focus:ring-2 focus:ring-slate-200">
         <option value="">Všechny typy</option>
         <option value="stock">Akcie</option>
         <option value="crypto">Krypto</option>
+        <option value="index">Index</option>
       </select>
       <select id="sortBy" class="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white outline-none focus:ring-2 focus:ring-slate-200">
         <option value="symbol">Seřadit: Symbol</option>
         <option value="price">Seřadit: Cena</option>
+        <option value="w1">Seřadit: 1W %</option>
+        <option value="conf">Seřadit: Confidence</option>
       </select>
     </div>
 
+    <!-- Table -->
     <div class="mt-5 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
       <div class="grid grid-cols-[110px,1fr,120px,110px,110px,230px,90px,90px] px-4 py-2 text-sm font-medium text-slate-500 bg-slate-50">
         <div>Symbol</div><div>Název</div><div class="text-right">Cena</div>
         <div class="text-right">1D %</div><div class="text-right">1W %</div>
-        <div class="text-center">1Y predikce</div><div class="text-right">Conf.</div><div></div>
+        <div class="text-center">1Y predikce <span class="text-slate-400">(min / avg / max)</span></div>
+        <div class="text-right">Conf.</div><div></div>
       </div>
       <div id="rows"></div>
     </div>
 
-    <p class="mt-3 text-xs text-slate-500">* Demo verze se statickými daty.</p>
+    <p class="mt-3 text-xs text-slate-500">* Demo verze se statickými daty. V ostré verzi připojíme AI teze + zprávy + živé ceny.</p>
   </main>
 
   <script>
+    // helpers
     const fmt = new Intl.NumberFormat('cs-CZ', { maximumFractionDigits: 2 });
     const pct = v => (v >= 0 ? '+' : '') + v.toFixed(2) + '%';
 
+    // demo data
     const rows = [
-      {type:'stock',symbol:'AAPL',name:'Apple Inc.',price:219.85,d1:1.26,w1:2.10,
-        forecast:{min:165,avg:245,max:310,conf:72},
+      { type:'stock', symbol:'AAPL', name:'Apple Inc.', price:219.85, d1:1.26, w1:2.10,
+        forecast:{ min:165, avg:245, max:310, conf:72 },
         thesis:'Růst služeb a ekosystému, stabilní marže. Re-rating po nové produktové linii.',
         invalid:'Breakdown pod 195 s objemy a slabá guidance.',
-        path:{avg:[0,1,1.8,1.4,2.1,2.0,2.5],min:[0,-0.5,-0.2,-0.7,-0.4,-0.8,-1.1],max:[0,1.6,2.3,1.9,2.7,2.5,3.1]}},
-      {type:'crypto',symbol:'BTCUSD',name:'Bitcoin',price:67200,d1:2.30,w1:6.80,
-        forecast:{min:42000,avg:88000,max:120000,conf:58},
+        path:{ avg:[0,1,1.8,1.4,2.1,2.0,2.5], min:[0,-0.5,-0.2,-0.7,-0.4,-0.8,-1.1], max:[0,1.6,2.3,1.9,2.7,2.5,3.1] } },
+      { type:'crypto', symbol:'BTCUSD', name:'Bitcoin', price:67200, d1:2.30, w1:6.80,
+        forecast:{ min:42000, avg:88000, max:120000, conf:58 },
         thesis:'Poptávka přes ETF, halving + omezená nabídka, sílící narativ „digitální zlato“.',
         invalid:'Regulační tlak, silný risk-off, útok na síť.',
-        path:{avg:[0,1.1,1.0,1.3,1.45,1.42,1.55],min:[0,0.2,0.1,0.15,0.1,0.05,0],max:[0,1.7,1.9,2.2,2.4,2.5,2.8]}}
+        path:{ avg:[0,1.1,1.0,1.3,1.45,1.42,1.55], min:[0,0.2,0.1,0.15,0.1,0.05,0], max:[0,1.7,1.9,2.2,2.4,2.5,2.8] } },
+      { type:'stock', symbol:'NVDA', name:'NVIDIA Corporation', price:241.80, d1:1.85, w1:4.10,
+        forecast:{ min:128, avg:281, max:498, conf:72 },
+        thesis:'Udržitelná poptávka po AI akcelerátorech, expanze do datacenter a softwaru.',
+        invalid:'Cyklus investic do DC se zpomalí, regulace vývozu čipů.',
+        path:{ avg:[0,0.6,0.9,0.7,1.2,1.6,1.9], min:[0,-0.3,-0.4,-0.5,-0.7,-0.8,-1.0], max:[0,1.2,1.6,1.5,2.0,2.6,3.0] } }
     ];
 
     const container = document.getElementById('rows');
 
-    function pathFrom(points, w=180, h=64, pad=4){
-      const max = Math.max(...points.map(v=>Math.abs(v))) || 1;
+    // --- NEW: normalizace tak, aby poslední body = min:-1, avg:0, max:+1
+    function normalizeSeries(series){
+      const L = series.avg.length - 1;
+      const aL = series.avg[L];
+      const mnL = series.min[L];
+      const mxL = series.max[L];
+      const range = (mxL - mnL) || 1;           // ochrana proti dělení nulou
+      const k = 2 / range;                      // měřítko do intervalu [-1, +1] kolem avg
+      const shift = aL;
+
+      const map = arr => arr.map((v,i) => {
+        if (i === L) return 0;                  // zarovnej poslední avg přesně doprostřed
+        return (v - shift) * k;                 // převod na „unit“ osu
+      });
+
+      return {
+        avg: map(series.avg),
+        min: series.min.map((v,i)=> i===L ? -1 : (v - shift)*k),
+        max: series.max.map((v,i)=> i===L ? +1 : (v - shift)*k),
+      };
+    }
+
+    // převod z „unit“ [-1, +1] do SVG
+    function pathFromUnit(points, w=180, h=64, pad=4){
       const step = (w - pad*2) / (points.length-1);
-      const scaleY = v => (h/2 - (v/max)*(h/2 - pad));
+      const scaleY = v => {
+        const yUnit = Math.max(-1, Math.min(1, v));        // clamp
+        // -1 => bottom (h-pad), 0 => middle, +1 => top (pad)
+        const half = (h/2 - pad);
+        return (h/2) - yUnit * half;
+      };
       const scaleX = i => pad + i*step;
-      return points.map((v,i)=>`${i===0?'M':'L'}${scaleX(i)},${scaleY(v)}`).join(' ');
+      let d = '';
+      for (let i=0;i<points.length;i++){
+        const x = scaleX(i), y = scaleY(points[i]);
+        d += (i===0 ? `M${x},${y}` : ` L${x},${y}`);
+      }
+      return d;
     }
 
     function sparkSVG(series, forecast){
-      const w=180,h=64,pad=4;
-      const dAvg=pathFrom(series.avg,w,h,pad);
-      const dMin=pathFrom(series.min,w,h,pad);
-      const dMax=pathFrom(series.max,w,h,pad);
-      const step=(w-pad*2)/(series.avg.length-1);
-      const guideX=pad+step*(series.avg.length-1);
+      // normalizuj tak, aby poslední body odpovídaly Min/Avg/Max
+      const S = normalizeSeries(series);
+      const w=180, h=64, pad=4;
+      const dAvg = pathFromUnit(S.avg, w, h, pad);
+      const dMin = pathFromUnit(S.min, w, h, pad);
+      const dMax = pathFromUnit(S.max, w, h, pad);
+      const step = (w - pad*2) / (S.avg.length-1);
+      const guideX = pad + step*(S.avg.length-1);
+
       return `
         <div class="spark-wrap">
           <svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" class="spark">
-            <line class="guide" x1="${guideX}" y1="0" x2="${guideX}" y2="${h}" />
-            <path class="min" d="${dMin}" />
-            <path class="max" d="${dMax}" />
-            <path class="avg" d="${dAvg}" />
+            <line class="guide" x1="${guideX}" y1="0" x2="${guideX}" y2="${h}"></line>
+            <path class="min" d="${dMin}"></path>
+            <path class="max" d="${dMax}"></path>
+            <path class="avg" d="${dAvg}"></path>
           </svg>
           <div class="target-badges">
             <div class="b"><span class="dot max"></span>Max <strong>${fmt.format(forecast.max)}</strong></div>
@@ -153,25 +180,28 @@
       `;
     }
 
+    // řádek
     function renderRow(r){
-      const div=document.createElement('div');
-      div.className='row';
-      div.innerHTML=`
+      const row = document.createElement('div');
+      row.className = "row";
+      row.innerHTML = `
         <div class="grid grid-cols-[110px,1fr,120px,110px,110px,230px,90px,90px] items-center px-4 py-3 border-t border-slate-100 cursor-pointer">
           <div class="font-semibold">${r.symbol}</div>
           <div class="text-slate-700">${r.name}</div>
-          <div class="text-right">${fmt.format(r.price)}</div>
-          <div class="text-right ${r.d1>=0?'text-emerald-600':'text-rose-600'}">${pct(r.d1)}</div>
-          <div class="text-right ${r.w1>=0?'text-emerald-600':'text-rose-600'}">${pct(r.w1)}</div>
-          <div class="text-center">${fmt.format(r.forecast.min)} / <b>${fmt.format(r.forecast.avg)}</b> / ${fmt.format(r.forecast.max)}</div>
-          <div class="text-right">${r.forecast.conf}%</div>
+          <div class="text-right tabular-nums">${fmt.format(r.price)}</div>
+          <div class="text-right tabular-nums ${r.d1>=0?'text-emerald-600':'text-rose-600'}">${pct(r.d1)}</div>
+          <div class="text-right tabular-nums ${r.w1>=0?'text-emerald-600':'text-rose-600'}">${pct(r.w1)}</div>
+          <div class="text-center tabular-nums">
+            ${fmt.format(r.forecast.min)} / <span class="font-semibold">${fmt.format(r.forecast.avg)}</span> / ${fmt.format(r.forecast.max)}
+          </div>
+          <div class="text-right tabular-nums">${r.forecast.conf}%</div>
           <div class="text-right"><button class="px-3 py-1.5 text-sm rounded-lg border border-slate-200 hover:bg-slate-50">Detail</button></div>
         </div>
         <div class="hidden px-4 pb-4">
           <div class="grid md:grid-cols-[320px,1fr,1fr] gap-6 mt-3 rounded-xl border border-slate-100 bg-slate-50 p-4">
             <div>
               <div class="text-xs text-slate-500 mb-1">Mini-graf — 1Y (demo)</div>
-              <div class="rounded-lg border border-slate-200 bg-white p-3">${sparkSVG(r.path,r.forecast)}</div>
+              <div class="rounded-lg border border-slate-200 bg-white p-3">${sparkSVG(r.path, r.forecast)}</div>
               <div class="mt-1 text-[11px] text-slate-500">Plná čára: avg · čárkovaně: min/max · tečkovaná: dnes</div>
             </div>
             <div class="text-sm">
@@ -181,20 +211,48 @@
             <div class="text-sm">
               <div class="text-slate-500 mb-1">Neplatí, pokud</div>
               <div class="bg-white border border-slate-200 rounded-lg p-3">${r.invalid}</div>
+              <div class="mt-3 text-xs text-slate-500">*Ukázková data, demo verze.</div>
             </div>
           </div>
-        </div>`;
-      const head=div.querySelector('.grid');
-      const panel=div.children[1];
-      const btn=div.querySelector('button');
-      const toggle=()=>panel.classList.toggle('hidden');
-      head.addEventListener('click',e=>{if(e.target.tagName!=='BUTTON')toggle();});
-      btn.addEventListener('click',e=>{e.stopPropagation();toggle();});
-      container.appendChild(div);
+        </div>
+      `;
+      const head = row.querySelector('.grid');
+      const panel = row.children[1];
+      const btn = row.querySelector('button');
+      const toggle = ()=> panel.classList.toggle('hidden');
+      head.addEventListener('click', e=>{ if(e.target.tagName.toLowerCase()!=='button') toggle(); });
+      btn.addEventListener('click', e=>{ e.stopPropagation(); toggle(); });
+      container.appendChild(row);
     }
 
-    function render(list){container.innerHTML='';list.forEach(renderRow);}
-    render(rows);
+    function render(list){ container.innerHTML=''; list.forEach(renderRow); }
+
+    // filtry
+    const q = document.getElementById('q');
+    const typeFilter = document.getElementById('typeFilter');
+    const sortBy = document.getElementById('sortBy');
+
+    function apply(){
+      const term = q.value.trim().toLowerCase();
+      let out = rows.filter(r =>
+        (!typeFilter.value || r.type === typeFilter.value) &&
+        (!term || r.symbol.toLowerCase().includes(term) || r.name.toLowerCase().includes(term))
+      );
+      switch (sortBy.value){
+        case 'price': out.sort((a,b)=> b.price - a.price); break;
+        case 'w1': out.sort((a,b)=> b.w1 - a.w1); break;
+        case 'conf': out.sort((a,b)=> b.forecast.conf - a.forecast.conf); break;
+        default: out.sort((a,b)=> a.symbol.localeCompare(b.symbol));
+      }
+      render(out);
+    }
+
+    q.addEventListener('input', apply);
+    typeFilter.addEventListener('change', apply);
+    sortBy.addEventListener('change', apply);
+    document.addEventListener('keydown', e=>{ if(e.key === '/'){ e.preventDefault(); q.focus(); }});
+
+    apply();
   </script>
 </body>
 </html>
