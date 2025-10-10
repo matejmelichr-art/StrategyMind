@@ -14,6 +14,8 @@
     .row:hover{background:#f8fafc}
     .pill{padding:.375rem .625rem;border-radius:9999px;border:1px solid rgba(15,23,42,.08)}
     .kbd{background:#f3f4f6;padding:.125rem .375rem;border-radius:.25rem;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Courier New",monospace;font-size:.75rem}
+
+    /* mini-graf */
     .spark path.avg{stroke:#2563eb;stroke-width:2;fill:none}
     .spark path.min,.spark path.max{stroke-width:2;fill:none;stroke-dasharray:4 4}
     .spark path.min{stroke:#ef4444}.spark path.max{stroke:#22c55e}
@@ -23,20 +25,36 @@
     .target-badges .b{display:flex;align-items:center;gap:.4rem;white-space:nowrap}
     .dot{width:.5rem;height:.5rem;border-radius:9999px;display:inline-block}
     .dot.max{background:#22c55e}.dot.avg{background:#2563eb}.dot.min{background:#ef4444}
+
+    /* AI Edge panel */
     .overlay{background:rgba(2,6,23,.45)}
     .fade-enter{opacity:0;transform:translateY(6px)}
     .fade-enter-active{opacity:1;transform:none;transition:all .18s ease}
     .drop-active{border-color:#0ea5e9 !important;background:rgba(14,165,233,.05)}
+
+    /* jednotná definice sloupců tabulky (o něco širší, aby se nic nepřekrývalo) */
+    .table-grid{
+      display:grid;
+      grid-template-columns: 100px 1fr 120px 110px 110px 260px 90px 130px;
+      align-items:center;
+    }
+    @media (max-width: 1024px){
+      /* na užších šířkách trochu víc místa predikci/akcím */
+      .table-grid{
+        grid-template-columns: 90px 1fr 110px 100px 100px 280px 80px 140px;
+      }
+    }
   </style>
 </head>
 <body class="bg-slate-50 text-slate-900">
+  <!-- Header -->
   <header class="sticky top-0 z-20 backdrop-blur bg-white/80 border-b border-slate-200">
     <div class="max-w-6xl mx-auto px-4 py-3 flex items-center gap-3">
       <a href="/client/" class="text-sm text-slate-600 hover:text-slate-900 flex items-center gap-2">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" class="opacity-70"><path d="M15 6l-6 6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
         Zpět na klientskou sekci
       </a>
-      <!-- nav pills – teď s flex-wrap, ať se nepřekrývají -->
+      <!-- nav pills – s wrapem, aby se nepřekrývaly -->
       <div class="ml-auto flex flex-wrap items-center gap-2 overflow-x-auto">
         <a href="/client/market/" class="pill bg-white font-medium whitespace-nowrap">Market Scanner</a>
         <a href="/client/real-estate/" class="pill whitespace-nowrap">Real-Estate</a>
@@ -79,19 +97,28 @@
       </select>
     </div>
 
-    <!-- Table -->
-    <div class="mt-5 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-      <div class="grid grid-cols-[100px,1fr,120px,110px,110px,230px,90px,110px] px-4 py-2 text-sm font-medium text-slate-500 bg-slate-50">
-        <div>Symbol</div><div>Název</div><div class="text-right">Cena</div><div class="text-right">1D %</div><div class="text-right">1W %</div>
-        <div class="text-center">1Y predikce <span class="text-slate-400">(min / avg / max)</span></div><div class="text-right">Conf.</div><div class="text-right">Akce</div>
+    <!-- Table (scroll wrapper) -->
+    <div class="mt-5 overflow-x-auto">
+      <div class="min-w-[980px] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <!-- head -->
+        <div class="table-grid px-4 py-2 text-sm font-medium text-slate-500 bg-slate-50">
+          <div>Symbol</div>
+          <div>Název</div>
+          <div class="text-right">Cena</div>
+          <div class="text-right">1D %</div>
+          <div class="text-right">1W %</div>
+          <div class="text-center">1Y predikce <span class="text-slate-400">(min / avg / max)</span></div>
+          <div class="text-right">Conf.</div>
+          <div class="text-right">Akce</div>
+        </div>
+        <div id="rows"></div>
       </div>
-      <div id="rows"></div>
     </div>
 
     <p class="mt-3 text-xs text-slate-500">* Demo verze se statickými daty. V ostré verzi připojíme AI teze + zprávy + živé ceny.</p>
   </main>
 
-  <!-- ===================== AI EDGE PANEL ===================== -->
+  <!-- ============== AI EDGE PANEL ============== -->
   <div id="edgeOverlay" class="hidden fixed inset-0 z-50 overlay"></div>
   <section id="edgePanel" class="hidden fixed inset-0 z-50 p-4 md:p-8 overflow-y-auto">
     <div class="fade-enter max-w-5xl mx-auto rounded-2xl border border-slate-200 bg-white shadow-lg overflow-hidden">
@@ -142,7 +169,7 @@
       </div>
     </div>
   </section>
-  <!-- =================== /AI EDGE PANEL =================== -->
+  <!-- ============== /AI EDGE PANEL ============== -->
 
   <script>
     // ===== helpers =====
@@ -189,44 +216,48 @@
     }
 
     function renderRow(r){
-      const row=document.createElement('div'); row.className="row";
-      row.innerHTML=`<div class="grid grid-cols-[100px,1fr,120px,110px,110px,230px,90px,110px] items-center px-4 py-3 border-t border-slate-100 cursor-pointer">
-        <div class="font-semibold">${r.symbol}</div>
-        <div class="text-slate-700">${r.name}</div>
-        <div class="text-right tabular-nums">${fmt.format(r.price)}</div>
-        <div class="text-right tabular-nums ${r.d1>=0?'text-emerald-600':'text-rose-600'}">${pct(r.d1)}</div>
-        <div class="text-right tabular-nums ${r.w1>=0?'text-emerald-600':'text-rose-600'}">${pct(r.w1)}</div>
-        <div class="text-center tabular-nums">${fmt.format(r.forecast.min)} / <span class="font-semibold">${fmt.format(r.forecast.avg)}</span> / ${fmt.format(r.forecast.max)}</div>
-        <div class="text-right tabular-nums">${r.forecast.conf}%</div>
-        <div class="text-right flex justify-end">
-          <button class="mr-2 px-3 py-1.5 text-sm rounded-lg border border-slate-200 hover:bg-slate-50">Detail</button>
-          <button class="px-3 py-1.5 text-sm rounded-lg bg-cyan-600 text-white hover:bg-cyan-700" data-ai-edge>AI predikce</button>
-        </div>
-      </div>
-      <div class="hidden px-4 pb-4">
-        <div class="grid md:grid-cols-[300px,1fr,1fr] gap-6 mt-3 rounded-xl border border-slate-100 bg-slate-50 p-4">
-          <div>
-            <div class="text-xs text-slate-500 mb-1">Mini-graf — 1Y (demo)</div>
-            <div class="rounded-lg border border-slate-200 bg-white p-2">${sparkSVG(r.path,r.forecast)}</div>
-            <div class="mt-1 text-[11px] text-slate-500">Plná čára: <b>avg</b> · čárkovaně: <b>min/max</b> · tečkovaná: <b>dnes</b></div>
+      const row=document.createElement('div'); row.className="row border-t border-slate-100";
+      row.innerHTML=`
+        <div class="table-grid px-4 py-3 cursor-pointer">
+          <div class="font-semibold whitespace-nowrap">${r.symbol}</div>
+          <div class="text-slate-700 truncate">${r.name}</div>
+          <div class="text-right tabular-nums whitespace-nowrap">${fmt.format(r.price)}</div>
+          <div class="text-right tabular-nums whitespace-nowrap ${r.d1>=0?'text-emerald-600':'text-rose-600'}">${pct(r.d1)}</div>
+          <div class="text-right tabular-nums whitespace-nowrap ${r.w1>=0?'text-emerald-600':'text-rose-600'}">${pct(r.w1)}</div>
+          <div class="text-center tabular-nums whitespace-nowrap text-[15px]">
+            ${fmt.format(r.forecast.min)} / <span class="font-semibold">${fmt.format(r.forecast.avg)}</span> / ${fmt.format(r.forecast.max)}
           </div>
-          <div class="text-sm">
-            <div class="text-slate-500 mb-1">Teze</div>
-            <div class="bg-white border border-slate-200 rounded-lg p-3">${r.thesis}</div>
-          </div>
-          <div class="text-sm">
-            <div class="text-slate-500 mb-1">Neplatí, pokud</div>
-            <div class="bg-white border border-slate-200 rounded-lg p-3">${r.invalid}</div>
-            <div class="mt-3 text-xs text-slate-500">*Ukázková data, demo verze.</div>
+          <div class="text-right tabular-nums whitespace-nowrap">${r.forecast.conf}%</div>
+          <div class="text-right flex justify-end gap-2 shrink-0">
+            <button class="px-3 py-1.5 text-sm rounded-lg border border-slate-200 hover:bg-slate-50 shrink-0">Detail</button>
+            <button class="px-3 py-1.5 text-sm rounded-lg bg-cyan-600 text-white hover:bg-cyan-700 shrink-0 min-w-[110px]" data-ai-edge>AI predikce</button>
           </div>
         </div>
-      </div>`;
-      const head=row.querySelector('.grid');
+
+        <div class="hidden px-4 pb-4">
+          <div class="grid md:grid-cols-[300px,1fr,1fr] gap-6 mt-3 rounded-xl border border-slate-100 bg-slate-50 p-4">
+            <div>
+              <div class="text-xs text-slate-500 mb-1">Mini-graf — 1Y (demo)</div>
+              <div class="rounded-lg border border-slate-200 bg-white p-2">${sparkSVG(r.path,r.forecast)}</div>
+              <div class="mt-1 text-[11px] text-slate-500">Plná čára: <b>avg</b> · čárkovaně: <b>min/max</b> · tečkovaná: <b>dnes</b></div>
+            </div>
+            <div class="text-sm">
+              <div class="text-slate-500 mb-1">Teze</div>
+              <div class="bg-white border border-slate-200 rounded-lg p-3">${r.thesis}</div>
+            </div>
+            <div class="text-sm">
+              <div class="text-slate-500 mb-1">Neplatí, pokud</div>
+              <div class="bg-white border border-slate-200 rounded-lg p-3">${r.invalid}</div>
+              <div class="mt-3 text-xs text-slate-500">*Ukázková data, demo verze.</div>
+            </div>
+          </div>
+        </div>`;
+      const head=row.querySelector('.table-grid');
       const detailBtn=row.querySelector('button');
       const aiBtn=row.querySelector('[data-ai-edge]');
       const panel=row.children[1];
       function toggle(){panel.classList.toggle('hidden')}
-      head.addEventListener('click',e=>{if(e.target.tagName.toLowerCase()==='button')return;toggle()});
+      head.addEventListener('click',e=>{ if(e.target.tagName.toLowerCase()==='button') return; toggle() });
       detailBtn.addEventListener('click',e=>{e.stopPropagation();toggle()});
       aiBtn.addEventListener('click',e=>{e.stopPropagation();openEdge(r.symbol)});
       container.appendChild(row);
@@ -237,7 +268,12 @@
     function apply(){
       const term=q.value.trim().toLowerCase();
       let out=rows.filter(r=>(!typeFilter.value||r.type===typeFilter.value)&&(!term||r.symbol.toLowerCase().includes(term)||r.name.toLowerCase().includes(term)));
-      switch(sortBy.value){case 'price':out.sort((a,b)=>b.price-a.price);break;case 'w1':out.sort((a,b)=>b.w1-a.w1);break;case 'conf':out.sort((a,b)=>b.forecast.conf-a.forecast.conf);break;default:out.sort((a,b)=>a.symbol.localeCompare(b.symbol))}
+      switch(sortBy.value){
+        case 'price':out.sort((a,b)=>b.price-a.price);break;
+        case 'w1':out.sort((a,b)=>b.w1-a.w1);break;
+        case 'conf':out.sort((a,b)=>b.forecast.conf-a.forecast.conf);break;
+        default:out.sort((a,b)=>a.symbol.localeCompare(b.symbol));
+      }
       render(out);
     }
     q.addEventListener('input',apply); typeFilter.addEventListener('change',apply); sortBy.addEventListener('change',apply);
@@ -344,7 +380,7 @@
         <button data-idx="${idx}" class="rm text-xs px-2 py-1 rounded border border-slate-300 hover:bg-slate-100">Smazat</button>`; edgeHistory.appendChild(div)});
       edgeHistory.querySelectorAll('.rm').forEach(btn=>btn.addEventListener('click',()=>{const items=JSON.parse(localStorage.getItem('sm-edge-history')||'[]');const realIndex=items.length-1-parseInt(btn.dataset.idx,10);items.splice(realIndex,1);localStorage.setItem('sm-edge-history',JSON.stringify(items));loadEdgeHistory()}))
     }
-    edgeSave.addEventListener('click',()=>{if(edgeResult.textContent.includes('Zatím nic'))return; const conf=(/Confidence: <b>(\d+)%<\/b>/).exec(edgeResult.innerHTML)?.[1]||''; const dir=/LONG|SHORT|SIDEWAYS/.exec(edgeResult.innerHTML)?.[0]?.toLowerCase()||''; const summary=edgeResult.innerHTML.match(/<p class="text-sm">(.*?)<\/p>/)?.[1]||''; const items=JSON.parse(localStorage.getItem('sm-edge-history')||'[]'); items.push({ts:Date.now(),symbol:edgeSymbol.value.trim().toUpperCase(),direction:dir,confidence:parseInt(conf||'0',10),summary}); localStorage.setItem('sm-edge-history',JSON.stringify(items)); loadEdgeHistory()});
+    edgeSave.addEventListener('click',()=>{if(edgeResult.textContent.includes('Zatím nic'))return; const conf=(/Confidence: <b>(\d+)%<\/b>/).exec(edgeResult.innerHTML)?.[1]||''; const dir=/LONG|SHORT|SIDEWAYS/.exec(edgeResult.innerHTML)?.[0]?.toLowerCase()||''; const summary=edgeResult.innerHTML.match(/<p class="text-sm">(.*?)<\/p>/)?.[1]||''; const items=JSON.parse(localStorage.getItem('sm-edge-history')||'[]'); items.push({ts:Date.now(),symbol=edgeSymbol.value.trim().toUpperCase(),direction:dir,confidence:parseInt(conf||'0',10),summary}); localStorage.setItem('sm-edge-history',JSON.stringify(items)); loadEdgeHistory()});
     loadEdgeHistory();
   </script>
 </body>
