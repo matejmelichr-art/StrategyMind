@@ -1,263 +1,313 @@
 <!doctype html>
-<html lang="cs">
+<html lang="cs" class="h-full bg-slate-50">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>StrategyMind — Market Scanner</title>
+  <title>Market Scanner — StrategyMind (demo)</title>
 
-  <!-- Tailwind -->
+  <!-- Tailwind (CDN) -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: { brand: { 600: "#06b6d4" } },
-          boxShadow: { soft: "0 10px 25px rgba(15,23,42,.08)" }
-        }
-      }
-    }
-  </script>
+
+  <!-- Chart.js pro mini-graf v modalu -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 
   <style>
-    /* Mini graf – rozměry a vyhlazení */
-    .spark { width: 160px; height: 46px; }
-    .spark svg { width: 100%; height: 100%; display: block; }
-    .spark path { fill: none; stroke-width: 2; }
-    .spark .avg { stroke: #06b6d4; }           /* tyrkys – AVG čára */
-    .spark .min { stroke: #ef4444; stroke-dasharray: 4 3; } /* čárkovaně */
-    .spark .max { stroke: #10b981; stroke-dasharray: 4 3; } /* čárkovaně */
-    .num { font-variant-numeric: tabular-nums; } /* krásné zarovnání čísel */
+    .card { @apply bg-white rounded-2xl shadow-sm ring-1 ring-slate-200; }
+    .pill { @apply inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium; }
+    .pill-blue { @apply bg-blue-50 text-blue-700; }
+    .pill-amber { @apply bg-amber-50 text-amber-700; }
+    .num { font-variant-numeric: tabular-nums; }
   </style>
 </head>
+<body class="min-h-full">
 
-<body class="bg-slate-50 text-slate-800 antialiased">
-  <!-- Top Bar -->
-  <header class="sticky top-0 z-20 border-b bg-white/80 backdrop-blur">
-    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-      <a href="/client/" class="text-sm text-slate-600 hover:text-slate-900">&larr; Zpět na klientskou sekci</a>
-      <nav class="flex gap-2">
-        <a href="/client/market/" class="px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-700 font-medium border border-emerald-100">Market Scanner</a>
-        <a href="/client/real-estate/" class="px-3 py-1.5 rounded-full hover:bg-slate-100">Real-Estate</a>
-        <a href="/client/idea-lab/" class="px-3 py-1.5 rounded-full hover:bg-slate-100">Idea Lab</a>
+  <!-- Top bar -->
+  <header class="w-full bg-white/70 backdrop-blur border-b border-slate-200 sticky top-0 z-30">
+    <div class="mx-auto max-w-6xl px-4 py-3 flex items-center gap-3">
+      <a href="/client/" class="text-slate-500 hover:text-slate-700 text-sm">← Zpět na klientskou sekci</a>
+      <nav class="ml-auto flex gap-2">
+        <a href="/client/market/" class="pill pill-blue">Market Scanner</a>
+        <a href="/client/real-estate/" class="pill bg-slate-100 text-slate-700">Real-Estate</a>
+        <a href="/client/ideas/" class="pill bg-slate-100 text-slate-700">Idea Lab</a>
       </nav>
     </div>
   </header>
 
-  <main class="max-w-7xl mx-auto px-4 py-10">
-    <div class="flex items-center justify-between flex-wrap gap-4 mb-6">
-      <div>
-        <h1 class="text-2xl font-semibold">Market Scanner</h1>
-        <p class="text-slate-600 mt-1 max-w-2xl">
-          Vyhledej a filtruj akcie, indexy a krypto. Rozklikni řádek pro tezi <em>predikce</em>,
-          podmínky <em>neplatnosti</em> a mini-graf s 1Y rozmezím <strong>(min / avg / max)</strong>.
-        </p>
-      </div>
-      <a href="#" class="px-4 py-2 rounded-lg bg-slate-900 text-white hover:bg-black shadow-soft">Stáhnout report (MD)</a>
-    </div>
+  <main class="mx-auto max-w-6xl px-4 py-8">
+    <section class="mb-6">
+      <h1 class="text-3xl font-semibold tracking-tight text-slate-900">Market Scanner</h1>
+      <p class="text-slate-600 mt-2">
+        Vyhledej a filtruj akcie, indexy a krypto. Rozklikni řádek pro
+        <em class="italic">tezi predikce</em>, <em class="italic">podmínky neplatnosti</em>
+        a mini-graf s 1Y rozmezím (<strong>min / avg / max</strong>).
+        V ostré verzi napojíme živá data a zprávy.
+      </p>
+    </section>
 
-    <!-- Filtry (zatím vizuální) -->
-    <div class="flex flex-wrap gap-3 mb-5">
-      <input id="q" type="text" placeholder="Hledej symbol / název…" class="px-3 py-2 rounded-lg border border-slate-300 bg-white shadow-sm flex-1 min-w-[180px]" oninput="render()" />
-      <select id="type" class="px-3 py-2 rounded-lg border border-slate-300 bg-white shadow-sm" onchange="render()">
+    <!-- Filtry -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
+      <input id="q" type="search" placeholder="Hledej symbol / název…" class="card px-4 py-2.5 outline-none focus:ring-2 ring-slate-200 focus:ring-blue-500"/>
+      <select id="typeFilter" class="card px-4 py-2.5">
         <option value="all">Všechny typy</option>
-        <option value="equity">Akcie</option>
+        <option value="stock">Akcie</option>
         <option value="crypto">Krypto</option>
+        <option value="index">Indexy</option>
       </select>
-      <select id="sort" class="px-3 py-2 rounded-lg border border-slate-300 bg-white shadow-sm" onchange="render()">
+      <select id="sortBy" class="card px-4 py-2.5">
         <option value="symbol">Seřadit: Symbol</option>
+        <option value="name">Seřadit: Název</option>
         <option value="price">Seřadit: Cena</option>
-        <option value="d1">Seřadit: 1D %</option>
-        <option value="conf">Seřadit: Conf.</option>
+        <option value="conf">Seřadit: Confidence</option>
       </select>
     </div>
 
     <!-- Tabulka -->
-    <div class="overflow-x-auto rounded-2xl bg-white border border-slate-200 shadow-soft">
-      <table class="w-full text-sm text-left">
-        <thead class="bg-slate-50 border-b border-slate-200 text-slate-500 font-medium">
+    <div class="card overflow-hidden">
+      <table class="w-full text-sm">
+        <thead class="bg-slate-50/60 text-slate-600">
           <tr>
-            <th class="px-4 py-3">Symbol</th>
-            <th class="px-4 py-3">Název</th>
-            <th class="px-4 py-3 text-right">Cena</th>
-            <th class="px-4 py-3 text-right">1D %</th>
-            <th class="px-4 py-3 text-right">1W %</th>
-            <th class="px-4 py-3 text-center">1Y predikce<br><span class="text-xs text-slate-400">(min / avg / max)</span></th>
-            <th class="px-4 py-3 text-center">Conf.</th>
-            <th class="px-4 py-3 text-center">Detail</th>
+            <th class="text-left px-4 py-3 font-medium">Symbol</th>
+            <th class="text-left px-4 py-3 font-medium">Název</th>
+            <th class="text-right px-4 py-3 font-medium">Cena</th>
+            <th class="text-right px-4 py-3 font-medium">1D %</th>
+            <th class="text-right px-4 py-3 font-medium">1W %</th>
+            <th class="text-right px-4 py-3 font-medium">
+              1Y predikce<br><span class="text-xs text-slate-400">(min / <b>avg</b> / max)</span>
+            </th>
+            <th class="text-right px-4 py-3 font-medium">Conf.</th>
+            <th class="px-4 py-3"></th>
           </tr>
         </thead>
-        <tbody id="rows" class="divide-y divide-slate-100"></tbody>
+        <tbody id="rows" class="divide-y divide-slate-100 bg-white"></tbody>
       </table>
     </div>
 
-    <p class="mt-4 text-sm text-slate-500">
-      *V demu jsou statická data + demo grafy. V ostré verzi budou živá data, zprávy a AI predikce.
-    </p>
+    <p class="text-xs text-slate-500 mt-3">* V demu jsou statická data. V ostré verzi bude AI teze + zprávy + živé ceny.</p>
   </main>
 
-  <!-- Modal -->
-  <div id="detailModal" class="fixed inset-0 bg-black/40 hidden items-center justify-center p-4">
-    <div class="bg-white rounded-2xl max-w-lg w-full shadow-xl p-6 relative">
-      <button onclick="closeModal()" class="absolute top-3 right-3 text-slate-400 hover:text-slate-600">✕</button>
-      <h2 id="modalTitle" class="text-xl font-semibold mb-3">Detail</h2>
-      <div id="modalContent" class="text-slate-700 text-sm space-y-3"></div>
+  <!-- Modal (Detail) -->
+  <div id="modal" class="fixed inset-0 z-50 hidden">
+    <div class="absolute inset-0 bg-slate-900/50" onclick="closeModal()"></div>
+    <div class="relative mx-auto mt-16 max-w-3xl w-[92%]">
+      <div class="card p-5">
+        <div class="flex items-start justify-between gap-4">
+          <div>
+            <h3 id="mTitle" class="text-xl font-semibold text-slate-900">Symbol — Detail</h3>
+            <p id="mSubtitle" class="text-slate-500 text-sm">Teze & podmínky neplatnosti</p>
+          </div>
+          <button class="pill bg-slate-100 text-slate-700" onclick="closeModal()">Zavřít</button>
+        </div>
+
+        <div class="mt-5 grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-5">
+          <!-- Graf -->
+          <div class="card p-4">
+            <div class="flex items-center justify-between mb-2">
+              <div class="text-sm text-slate-500">Historie + 1Y predikce</div>
+              <div class="text-xs text-slate-400">* Demo</div>
+            </div>
+            <canvas id="mChart" width="640" height="280"></canvas>
+          </div>
+
+          <!-- Popis a čísla -->
+          <aside class="card p-4">
+            <div class="space-y-3">
+              <div>
+                <span class="pill pill-blue">Teze</span>
+                <p id="mThesis" class="mt-2 text-slate-700 text-sm"></p>
+              </div>
+              <div>
+                <span class="pill pill-amber">Neplatí, pokud</span>
+                <p id="mInvalid" class="mt-2 text-slate-700 text-sm"></p>
+              </div>
+              <hr class="my-2">
+              <dl class="grid grid-cols-2 gap-x-3 gap-y-1 text-sm">
+                <dt class="text-slate-500">Aktuální</dt><dd id="vCur" class="num text-right font-medium"></dd>
+                <dt class="text-slate-500">Avg (1Y)</dt><dd id="vAvg" class="num text-right"></dd>
+                <dt class="text-slate-500">Max (1Y)</dt><dd id="vMax" class="num text-right"></dd>
+                <dt class="text-slate-500">Min (1Y)</dt><dd id="vMin" class="num text-right"></dd>
+                <dt class="text-slate-500">Confidence</dt><dd id="vConf" class="num text-right"></dd>
+              </dl>
+            </div>
+          </aside>
+        </div>
+      </div>
     </div>
   </div>
 
   <script>
-    // ---------- Data (demo) ----------
-    const DATA = [
+    // ---------- Demo data ----------
+    const data = [
       {
-        type: "equity",
-        symbol: "AAPL",
-        name: "Apple Inc.",
-        price: 219.85,
-        d1: 0.0126,
-        w1: 0.0210,
+        symbol: 'AAPL', name: 'Apple Inc.', type: 'stock',
+        price: 219.85, d1: 1.26, w1: 2.10, conf: 0.72,
         forecast: { min:165, avg:245, max:310 },
-        conf: 0.72,
-        thesis: "Růst služeb a ekosystému, stabilní marže. Re-rating po nové produktové linii.",
-        invalidIf: "Breakdown pod 195 s objemy a slabá guidance."
+        thesis: 'Růst služeb a ekosystému, stabilní marže. Re-rating po nové produktové linii.',
+        invalid: 'Neplatí při breakdownu pod 195 s objemy a slabé guidance.',
+        history: [180,188,191,195,192,199,204,207,210,206,212,219] // 12 bodů (past 2Y zjednodušeno)
       },
       {
-        type: "crypto",
-        symbol: "BTCUSD",
-        name: "Bitcoin",
-        price: 67200,
-        d1: 0.0230,
-        w1: 0.0680,
+        symbol: 'BTCUSD', name: 'Bitcoin', type: 'crypto',
+        price: 67200, d1: 2.30, w1: 6.80, conf: 0.58,
         forecast: { min:42000, avg:88000, max:120000 },
-        conf: 0.58,
-        thesis: "Poptávka přes ETF, halving + omezená nabídka, sílící narativ digitálního zlata.",
-        invalidIf: "Silný risk-off a regulace, ztráta klíčového trendu."
+        thesis: 'Poptávka přes ETF, halving + omezená nabídka, sílící narativ digitálního zlata.',
+        invalid: 'Neplatí při silném risk-off, regulační restrikci či útoku na síť.',
+        history: [52000,56000,59000,62000,60000,63000,65000,61000,64000,68000,66000,67200]
       },
       {
-        type: "equity",
-        symbol: "NVDA",
-        name: "NVIDIA Corporation",
-        price: 241.80,
-        d1: 0.0185,
-        w1: 0.0410,
+        symbol: 'NVDA', name: 'NVIDIA Corporation', type: 'stock',
+        price: 241.80, d1: 1.85, w1: 4.10, conf: 0.72,
         forecast: { min:128, avg:281, max:498 },
-        conf: 0.72,
-        thesis: "Dominance v AI akceleraci, rozšiřující se TAM, dlouhý backlog.",
-        invalidIf: "Výrazné uvolnění poptávky po AI čipech / regulační zásahy."
+        thesis: 'AI akceleruje poptávku, rozšíření do datacenter a edge; silná produktová roadmapa.',
+        invalid: 'Neplatí při prudkém poklesu poptávky po AI capexu a zhoršení marží.',
+        history: [180,194,205,198,202,216,228,235,240,232,238,242]
       }
     ];
 
-    // ---------- Utility formátování ----------
-    const fmtNum = new Intl.NumberFormat("cs-CZ");
-    const fmtPrice = (n) => fmtNum.format(n);
-    const fmtPct = (x) => (x>=0? "+" : "") + (x*100).toFixed(2).replace(".", ",") + "%";
-    const pctClass = (x) => x>0 ? "text-emerald-600" : x<0 ? "text-rose-600" : "text-slate-600";
+    // ---------- Helpers ----------
+    const fmt = new Intl.NumberFormat('cs-CZ');
+    const fmtPct = (v)=> (v>=0?'+':'') + v.toFixed(2) + '%';
+    const fmtMoney = (v)=> (v>=1000 ? fmt.format(Math.round(v)) : fmt.format(v.toFixed ? v.toFixed(2) : v));
+    const by = {
+      symbol: (a,b)=> a.symbol.localeCompare(b.symbol),
+      name:   (a,b)=> a.name.localeCompare(b.name),
+      price:  (a,b)=> a.price - b.price,
+      conf:   (a,b)=> a.conf - b.conf,
+    };
 
-    // ---------- Sparkline kreslení (min/avg/max) ----------
-    function sparkline(container, series, min, avg, max){
-      const w = container.clientWidth || 160, h = container.clientHeight || 46;
-      const svgNS = "http://www.w3.org/2000/svg";
-      const svg = document.createElementNS(svgNS, "svg");
-      svg.setAttribute("viewBox", `0 0 ${w} ${h}`);
+    // ---------- Render table ----------
+    const rowsEl = document.getElementById('rows');
+    function render() {
+      const q = document.getElementById('q').value.trim().toLowerCase();
+      const type = document.getElementById('typeFilter').value;
+      const sort = document.getElementById('sortBy').value;
 
-      // škály
-      const xs = (i)=> i/(series.length-1) * (w-10) + 5;
-      const minY = Math.min(...series), maxY = Math.max(...series);
-      const ys = (v)=> h - 6 - ( (v - minY) / Math.max(1e-6, (maxY - minY)) ) * (h-12);
+      const filtered = data
+        .filter(x => (type==='all' || x.type===type))
+        .filter(x => !q || x.symbol.toLowerCase().includes(q) || x.name.toLowerCase().includes(q))
+        .sort(by[sort]);
 
-      // hlavní linie (avg proxy – historie ceny)
-      const path = document.createElementNS(svgNS, "path");
-      path.setAttribute("class","avg");
-      path.setAttribute("d", "M " + series.map((v,i)=> `${xs(i)} ${ys(v)}`).join(" L "));
-      svg.appendChild(path);
-
-      // vertikální značky min / avg / max na konci
-      const xEnd = w-8;
-      const addV = (cls, yValue) => {
-        const p = document.createElementNS(svgNS, "path");
-        p.setAttribute("class", cls);
-        const y = ys(yValue);
-        p.setAttribute("d", `M ${xEnd} ${y-14} L ${xEnd} ${y+14}`);
-        svg.appendChild(p);
-      };
-      addV("min", min);
-      addV("avg", avg);
-      addV("max", max);
-
-      container.innerHTML = "";
-      container.appendChild(svg);
+      rowsEl.innerHTML = filtered.map(x => rowHtml(x)).join('');
     }
 
-    // demo historie (škálovaná kolem avg)
-    function demoSeries(avg){
-      const base = [0.88,0.93,0.97,0.95,1.02,1.00,1.05,1.08];
-      return base.map(x => avg * x);
-    }
-
-    // ---------- Render tabulky ----------
-    function render(){
-      const q = (document.getElementById("q").value || "").toLowerCase();
-      const t = document.getElementById("type").value;
-      const s = document.getElementById("sort").value;
-
-      let rows = DATA.filter(d =>
-        (t==="all" || d.type===t) &&
-        (d.symbol.toLowerCase().includes(q) || d.name.toLowerCase().includes(q))
-      );
-
-      rows.sort((a,b)=>{
-        if(s==="price") return b.price - a.price;
-        if(s==="d1") return b.d1 - a.d1;
-        if(s==="conf") return b.conf - a.conf;
-        return a.symbol.localeCompare(b.symbol,"cs");
-      });
-
-      const tbody = document.getElementById("rows");
-      tbody.innerHTML = rows.map(d => `
-        <tr class="hover:bg-slate-50 transition">
-          <td class="px-4 py-3 font-semibold">${d.symbol}</td>
-          <td class="px-4 py-3">${d.name}</td>
-          <td class="px-4 py-3 text-right num">${fmtPrice(d.price)}</td>
-          <td class="px-4 py-3 text-right num ${pctClass(d.d1)}">${fmtPct(d.d1).replace(".",",")}</td>
-          <td class="px-4 py-3 text-right num ${pctClass(d.w1)}">${fmtPct(d.w1).replace(".",",")}</td>
-          <td class="px-2 py-2 text-center">
-            <div class="mx-auto spark" id="sp-${d.symbol}"></div>
-            <div class="mt-1 text-[12px] text-slate-600 num">
-              ${fmtPrice(d.forecast.min)} /
-              <span class="font-semibold text-slate-800">${fmtPrice(d.forecast.avg)}</span> /
-              ${fmtPrice(d.forecast.max)}
-            </div>
+    function rowHtml(x){
+      const f = x.forecast;
+      return `
+        <tr class="hover:bg-slate-50">
+          <td class="px-4 py-3 font-medium text-slate-900">${x.symbol}</td>
+          <td class="px-4 py-3 text-slate-700">${x.name}</td>
+          <td class="px-4 py-3 text-right num">${fmtMoney(x.price)}</td>
+          <td class="px-4 py-3 text-right num ${x.d1>=0?'text-emerald-600':'text-rose-600'}">${fmtPct(x.d1)}</td>
+          <td class="px-4 py-3 text-right num ${x.w1>=0?'text-emerald-600':'text-rose-600'}">${fmtPct(x.w1)}</td>
+          <td class="px-4 py-3 text-right num">
+            ${fmtMoney(f.min)} <span class="text-slate-400">/</span>
+            <b>${fmtMoney(f.avg)}</b> <span class="text-slate-400">/</span>
+            ${fmtMoney(f.max)}
           </td>
-          <td class="px-4 py-3 text-center font-medium text-slate-700 num">${Math.round(d.conf*100)}%</td>
-          <td class="px-4 py-3 text-center">
-            <button onclick="openModal('${d.symbol}')" class="text-brand-600 hover:underline font-medium">Detail</button>
+          <td class="px-4 py-3 text-right num">${Math.round(x.conf*100)}%</td>
+          <td class="px-4 py-3 text-right">
+            <button class="pill pill-blue hover:bg-blue-100" onclick="openDetail('${x.symbol}')">Detail</button>
           </td>
         </tr>
-      `).join("");
-
-      // po vykreslení tabulky vykreslit i grafy
-      rows.forEach(d=>{
-        const el = document.getElementById(`sp-${d.symbol}`);
-        sparkline(el, demoSeries(d.forecast.avg), d.forecast.min, d.forecast.avg, d.forecast.max);
-      });
-    }
-
-    // ---------- Modal ----------
-    function openModal(symbol){
-      const d = DATA.find(x=>x.symbol===symbol);
-      document.getElementById("modalTitle").innerText = `${d.symbol} — Predikce (demo)`;
-      document.getElementById("modalContent").innerHTML = `
-        <p><strong>Teze:</strong> ${d.thesis}</p>
-        <p><strong>Neplatí, pokud:</strong> ${d.invalidIf}</p>
-        <p class="text-slate-500 text-xs">*Ukázková data, demo verze (min/avg/max: ${fmtPrice(d.forecast.min)} / ${fmtPrice(d.forecast.avg)} / ${fmtPrice(d.forecast.max)}).</p>
       `;
-      const m = document.getElementById("detailModal");
-      m.classList.remove("hidden"); m.classList.add("flex");
-    }
-    function closeModal(){
-      document.getElementById("detailModal").classList.add("hidden");
     }
 
-    // první render
-    window.addEventListener("load", render);
+    // ---------- Modal + Chart ----------
+    let chart;
+    function openDetail(symbol){
+      const x = data.find(d=>d.symbol===symbol);
+      if(!x) return;
+
+      document.getElementById('mTitle').textContent = `${x.symbol} — Predikce (demo)`;
+      document.getElementById('mSubtitle').textContent = x.name;
+      document.getElementById('mThesis').textContent = x.thesis;
+      document.getElementById('mInvalid').textContent = x.invalid;
+      document.getElementById('vCur').textContent = fmtMoney(x.price);
+      document.getElementById('vAvg').textContent = fmtMoney(x.forecast.avg);
+      document.getElementById('vMax').textContent = fmtMoney(x.forecast.max);
+      document.getElementById('vMin').textContent = fmtMoney(x.forecast.min);
+      document.getElementById('vConf').textContent = Math.round(x.conf*100)+'%';
+
+      const labels = [...Array(x.history.length).keys()].map(i => ''); // skryté značky
+      labels.push('Now','1Y');
+
+      // poskládáme datasety: historie + tři „vějíře“ do 1Y
+      const last = x.history[x.history.length-1];
+      const datasets = [
+        {
+          label:'History',
+          data:[...x.history, last, null],
+          borderColor:'#2563eb',
+          backgroundColor:'transparent',
+          borderWidth:2,
+          tension:0.25,
+          pointRadius:0
+        },
+        {
+          label:'Avg',
+          data:[...Array(x.history.length).fill(null), last, x.forecast.avg],
+          borderColor:'#10b981',
+          borderWidth:2,
+          pointRadius:0,
+          tension:0,
+        },
+        {
+          label:'Max',
+          data:[...Array(x.history.length).fill(null), last, x.forecast.max],
+          borderColor:'#10b981',
+          borderDash:[6,4],
+          borderWidth:2,
+          pointRadius:0,
+          tension:0,
+        },
+        {
+          label:'Min',
+          data:[...Array(x.history.length).fill(null), last, x.forecast.min],
+          borderColor:'#ef4444',
+          borderDash:[6,4],
+          borderWidth:2,
+          pointRadius:0,
+          tension:0,
+        },
+      ];
+
+      const ctx = document.getElementById('mChart').getContext('2d');
+      if(chart) chart.destroy();
+      chart = new Chart(ctx,{
+        type:'line',
+        data:{ labels, datasets },
+        options:{
+          responsive:true,
+          maintainAspectRatio:false,
+          scales:{
+            x:{ display:false, grid:{display:false} },
+            y:{ display:false, grid:{display:false} }
+          },
+          plugins:{
+            legend:{ display:false },
+            tooltip:{
+              callbacks:{
+                label: (c)=> {
+                  const name = c.dataset.label;
+                  return `${name}: ${fmtMoney(c.parsed.y)}`;
+                }
+              }
+            }
+          }
+        }
+      });
+
+      document.getElementById('modal').classList.remove('hidden');
+    }
+
+    function closeModal(){
+      document.getElementById('modal').classList.add('hidden');
+    }
+
+    // ---------- Wire up ----------
+    document.getElementById('q').addEventListener('input', render);
+    document.getElementById('typeFilter').addEventListener('change', render);
+    document.getElementById('sortBy').addEventListener('change', render);
+    render();
   </script>
 </body>
 </html>
