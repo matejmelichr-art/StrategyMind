@@ -1,313 +1,288 @@
 <!doctype html>
-<html lang="cs" class="h-full bg-slate-50">
+<html lang="cs">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Market Scanner — StrategyMind (demo)</title>
-
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>StrategyMind – Market Scanner</title>
+  <link rel="icon" href="/StrategyMind_App_Icon.jpg" />
   <!-- Tailwind (CDN) -->
   <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- Chart.js pro mini-graf v modalu -->
+  <!-- Chart.js pro graf v modalu -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-
   <style>
-    .card { @apply bg-white rounded-2xl shadow-sm ring-1 ring-slate-200; }
-    .pill { @apply inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium; }
-    .pill-blue { @apply bg-blue-50 text-blue-700; }
-    .pill-amber { @apply bg-amber-50 text-amber-700; }
-    .num { font-variant-numeric: tabular-nums; }
+    .card { @apply bg-white/80 backdrop-blur shadow-sm ring-1 ring-black/5 rounded-2xl; }
+    .chip { @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium; }
+    .muted { @apply text-slate-500; }
+    .btn { @apply inline-flex items-center gap-2 rounded-xl px-3 py-1.5 text-sm font-medium bg-slate-900 text-white hover:bg-slate-800; }
+    .th { @apply text-left text-xs font-medium text-slate-500 uppercase tracking-wide; }
+    .td { @apply py-3.5 align-middle; }
+    .link { @apply text-slate-700 hover:text-slate-900 underline underline-offset-2; }
+    .kpi-up { @apply text-emerald-600 font-medium; }
+    .kpi-down { @apply text-rose-600 font-medium; }
+    .modal-mask { @apply fixed inset-0 z-40 bg-black/40 backdrop-blur-sm; }
+    .modal { @apply fixed inset-0 z-50 flex items-center justify-center p-4; }
+    .modal-card { @apply card w-full max-w-3xl; }
+    .spark { width: 220px; height: 90px; }
   </style>
 </head>
-<body class="min-h-full">
-
-  <!-- Top bar -->
-  <header class="w-full bg-white/70 backdrop-blur border-b border-slate-200 sticky top-0 z-30">
-    <div class="mx-auto max-w-6xl px-4 py-3 flex items-center gap-3">
-      <a href="/client/" class="text-slate-500 hover:text-slate-700 text-sm">← Zpět na klientskou sekci</a>
-      <nav class="ml-auto flex gap-2">
-        <a href="/client/market/" class="pill pill-blue">Market Scanner</a>
-        <a href="/client/real-estate/" class="pill bg-slate-100 text-slate-700">Real-Estate</a>
-        <a href="/client/ideas/" class="pill bg-slate-100 text-slate-700">Idea Lab</a>
-      </nav>
-    </div>
+<body class="bg-slate-50 text-slate-900">
+  <header class="mx-auto max-w-6xl px-4 pt-6">
+    <a href="/client/" class="link">&larr; Zpět na klientskou sekci</a>
   </header>
 
-  <main class="mx-auto max-w-6xl px-4 py-8">
-    <section class="mb-6">
-      <h1 class="text-3xl font-semibold tracking-tight text-slate-900">Market Scanner</h1>
-      <p class="text-slate-600 mt-2">
+  <main class="mx-auto max-w-6xl px-4 pb-24">
+    <div class="mt-6 mb-6">
+      <h1 class="text-3xl font-semibold tracking-tight">Market Scanner</h1>
+      <p class="muted mt-1">
         Vyhledej a filtruj akcie, indexy a krypto. Rozklikni řádek pro
-        <em class="italic">tezi predikce</em>, <em class="italic">podmínky neplatnosti</em>
-        a mini-graf s 1Y rozmezím (<strong>min / avg / max</strong>).
-        V ostré verzi napojíme živá data a zprávy.
+        <em>tezi predikce</em>, <em>podmínky neplatnosti</em> a mini-graf s 1Y rozmezím
+        (<strong>min / avg / max</strong>). V demu jsou statická data.
       </p>
-    </section>
+    </div>
 
     <!-- Filtry -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
-      <input id="q" type="search" placeholder="Hledej symbol / název…" class="card px-4 py-2.5 outline-none focus:ring-2 ring-slate-200 focus:ring-blue-500"/>
-      <select id="typeFilter" class="card px-4 py-2.5">
-        <option value="all">Všechny typy</option>
+    <div class="mb-4 grid gap-3 md:grid-cols-3">
+      <input id="q" type="search" placeholder="Hledej symbol / název…" class="card w-full px-3 py-2" />
+      <select id="typeFilter" class="card px-3 py-2">
+        <option value="">Všechny typy</option>
         <option value="stock">Akcie</option>
         <option value="crypto">Krypto</option>
         <option value="index">Indexy</option>
       </select>
-      <select id="sortBy" class="card px-4 py-2.5">
+      <select id="sortBy" class="card px-3 py-2">
         <option value="symbol">Seřadit: Symbol</option>
-        <option value="name">Seřadit: Název</option>
-        <option value="price">Seřadit: Cena</option>
-        <option value="conf">Seřadit: Confidence</option>
+        <option value="price">Cena</option>
+        <option value="conf">Confidence</option>
       </select>
     </div>
 
     <!-- Tabulka -->
     <div class="card overflow-hidden">
-      <table class="w-full text-sm">
-        <thead class="bg-slate-50/60 text-slate-600">
+      <table class="w-full min-w-[820px]">
+        <thead class="bg-slate-50">
           <tr>
-            <th class="text-left px-4 py-3 font-medium">Symbol</th>
-            <th class="text-left px-4 py-3 font-medium">Název</th>
-            <th class="text-right px-4 py-3 font-medium">Cena</th>
-            <th class="text-right px-4 py-3 font-medium">1D %</th>
-            <th class="text-right px-4 py-3 font-medium">1W %</th>
-            <th class="text-right px-4 py-3 font-medium">
-              1Y predikce<br><span class="text-xs text-slate-400">(min / <b>avg</b> / max)</span>
-            </th>
-            <th class="text-right px-4 py-3 font-medium">Conf.</th>
-            <th class="px-4 py-3"></th>
+            <th class="th px-4 py-3">Symbol</th>
+            <th class="th px-4 py-3">Název</th>
+            <th class="th px-4 py-3 text-right">Cena</th>
+            <th class="th px-4 py-3 text-right">1D %</th>
+            <th class="th px-4 py-3 text-right">1W %</th>
+            <th class="th px-4 py-3 text-right">1Y predikce<br><span class="muted normal-case">min / avg / max</span></th>
+            <th class="th px-4 py-3 text-right">Conf.</th>
+            <th class="th px-4 py-3"></th>
           </tr>
         </thead>
-        <tbody id="rows" class="divide-y divide-slate-100 bg-white"></tbody>
+        <tbody id="rows" class="divide-y divide-slate-100 bg-white">
+          <!-- řádky doplní JS -->
+        </tbody>
       </table>
     </div>
 
-    <p class="text-xs text-slate-500 mt-3">* V demu jsou statická data. V ostré verzi bude AI teze + zprávy + živé ceny.</p>
+    <div class="mt-6">
+      <a class="btn" href="#" onclick="alert('V demu generujeme jen ukázkový markdown.'); return false;">Stáhnout report (MD)</a>
+    </div>
   </main>
 
-  <!-- Modal (Detail) -->
-  <div id="modal" class="fixed inset-0 z-50 hidden">
-    <div class="absolute inset-0 bg-slate-900/50" onclick="closeModal()"></div>
-    <div class="relative mx-auto mt-16 max-w-3xl w-[92%]">
-      <div class="card p-5">
-        <div class="flex items-start justify-between gap-4">
-          <div>
-            <h3 id="mTitle" class="text-xl font-semibold text-slate-900">Symbol — Detail</h3>
-            <p id="mSubtitle" class="text-slate-500 text-sm">Teze & podmínky neplatnosti</p>
+  <!-- Modal -->
+  <div id="modalMask" class="hidden modal-mask"></div>
+  <div id="modal" class="hidden modal" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <div class="flex items-center justify-between px-5 py-4 border-b border-slate-100">
+        <h3 id="modalTitle" class="text-lg font-semibold">Detail</h3>
+        <button id="closeModal" class="rounded-full p-2 hover:bg-slate-100" aria-label="Zavřít">✕</button>
+      </div>
+
+      <div class="grid gap-6 p-5 md:grid-cols-[1fr_240px]">
+        <!-- Graf + switch -->
+        <div>
+          <div class="flex items-center gap-4 mb-3">
+            <button id="tabForecast" class="chip bg-slate-900 text-white">Předpověď 1Y</button>
+            <button id="tabHistory" class="chip bg-slate-100 text-slate-700">Past 2Y</button>
+            <span class="muted ml-auto text-xs">*Demo data</span>
           </div>
-          <button class="pill bg-slate-100 text-slate-700" onclick="closeModal()">Zavřít</button>
+          <canvas id="detailChart" height="220"></canvas>
         </div>
 
-        <div class="mt-5 grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-5">
-          <!-- Graf -->
-          <div class="card p-4">
-            <div class="flex items-center justify-between mb-2">
-              <div class="text-sm text-slate-500">Historie + 1Y predikce</div>
-              <div class="text-xs text-slate-400">* Demo</div>
-            </div>
-            <canvas id="mChart" width="640" height="280"></canvas>
-          </div>
+        <!-- KPI panel -->
+        <aside class="card p-4 space-y-2 text-sm">
+          <div class="flex items-center justify-between"><span class="muted">Current</span><span id="kpiCur" class="font-medium"></span></div>
+          <div class="flex items-center justify-between"><span class="muted">Avg (1Y)</span><span id="kpiAvg" class="font-medium"></span></div>
+          <div class="flex items-center justify-between"><span class="muted">Max (1Y)</span><span id="kpiMax" class="font-medium"></span></div>
+          <div class="flex items-center justify-between"><span class="muted">Min (1Y)</span><span id="kpiMin" class="font-medium"></span></div>
+          <hr class="my-2">
+          <div class="flex items-center justify-between"><span class="muted">Confidence</span><span id="kpiConf" class="font-medium"></span></div>
+          <div class="flex items-center justify-between"><span class="muted">Analyst stance</span><span id="kpiStance" class="font-medium">Strong buy</span></div>
+        </aside>
 
-          <!-- Popis a čísla -->
-          <aside class="card p-4">
-            <div class="space-y-3">
-              <div>
-                <span class="pill pill-blue">Teze</span>
-                <p id="mThesis" class="mt-2 text-slate-700 text-sm"></p>
-              </div>
-              <div>
-                <span class="pill pill-amber">Neplatí, pokud</span>
-                <p id="mInvalid" class="mt-2 text-slate-700 text-sm"></p>
-              </div>
-              <hr class="my-2">
-              <dl class="grid grid-cols-2 gap-x-3 gap-y-1 text-sm">
-                <dt class="text-slate-500">Aktuální</dt><dd id="vCur" class="num text-right font-medium"></dd>
-                <dt class="text-slate-500">Avg (1Y)</dt><dd id="vAvg" class="num text-right"></dd>
-                <dt class="text-slate-500">Max (1Y)</dt><dd id="vMax" class="num text-right"></dd>
-                <dt class="text-slate-500">Min (1Y)</dt><dd id="vMin" class="num text-right"></dd>
-                <dt class="text-slate-500">Confidence</dt><dd id="vConf" class="num text-right"></dd>
-              </dl>
-            </div>
-          </aside>
+        <!-- Teze -->
+        <div class="md:col-span-2 card p-4">
+          <p class="muted text-xs mb-2">Teze &amp; podmínky (demo)</p>
+          <p class="mb-2"><span class="chip bg-emerald-50 text-emerald-700 mr-2">Teze</span><span id="thesis">—</span></p>
+          <p><span class="chip bg-rose-50 text-rose-700 mr-2">Neplatí, pokud</span><span id="invalid">—</span></p>
         </div>
       </div>
     </div>
   </div>
 
   <script>
-    // ---------- Demo data ----------
-    const data = [
+    // --- Demo data ----------------------------------------------------------
+    const DATA = [
       {
-        symbol: 'AAPL', name: 'Apple Inc.', type: 'stock',
+        symbol: "AAPL", name: "Apple Inc.", type: "stock",
         price: 219.85, d1: 1.26, w1: 2.10, conf: 0.72,
-        forecast: { min:165, avg:245, max:310 },
-        thesis: 'Růst služeb a ekosystému, stabilní marže. Re-rating po nové produktové linii.',
-        invalid: 'Neplatí při breakdownu pod 195 s objemy a slabé guidance.',
-        history: [180,188,191,195,192,199,204,207,210,206,212,219] // 12 bodů (past 2Y zjednodušeno)
+        forecast: { min: 165, avg: 245, max: 310, hist: [175,185,192,188,197,206,201,210] },
+        thesis: "Růst ekosystému, expanze marží, nové produkty.",
+        invalid: "Breakdown pod 195 s objemy a slabý guidance."
       },
       {
-        symbol: 'BTCUSD', name: 'Bitcoin', type: 'crypto',
+        symbol: "BTCUSD", name: "Bitcoin", type: "crypto",
         price: 67200, d1: 2.30, w1: 6.80, conf: 0.58,
-        forecast: { min:42000, avg:88000, max:120000 },
-        thesis: 'Poptávka přes ETF, halving + omezená nabídka, sílící narativ digitálního zlata.',
-        invalid: 'Neplatí při silném risk-off, regulační restrikci či útoku na síť.',
-        history: [52000,56000,59000,62000,60000,63000,65000,61000,64000,68000,66000,67200]
+        forecast: { min: 42000, avg: 88000, max: 120000, hist: [52000,56000,59000,57000,61000,65000,64000,67200] },
+        thesis: "ETF poptávka, halving, digitální zlato.",
+        invalid: "Regulační tlak, silný risk-off, útok na síť."
       },
       {
-        symbol: 'NVDA', name: 'NVIDIA Corporation', type: 'stock',
+        symbol: "NVDA", name: "NVIDIA Corporation", type: "stock",
         price: 241.80, d1: 1.85, w1: 4.10, conf: 0.72,
-        forecast: { min:128, avg:281, max:498 },
-        thesis: 'AI akceleruje poptávku, rozšíření do datacenter a edge; silná produktová roadmapa.',
-        invalid: 'Neplatí při prudkém poklesu poptávky po AI capexu a zhoršení marží.',
-        history: [180,194,205,198,202,216,228,235,240,232,238,242]
+        forecast: { min: 128, avg: 281, max: 498, hist: [150,165,172,168,183,199,205,242] },
+        thesis: "AI akceleruje poptávku, rozšíření portfolia.",
+        invalid: "Zpomalení datacenter / geopolitická rizika."
       }
     ];
 
-    // ---------- Helpers ----------
-    const fmt = new Intl.NumberFormat('cs-CZ');
-    const fmtPct = (v)=> (v>=0?'+':'') + v.toFixed(2) + '%';
-    const fmtMoney = (v)=> (v>=1000 ? fmt.format(Math.round(v)) : fmt.format(v.toFixed ? v.toFixed(2) : v));
-    const by = {
-      symbol: (a,b)=> a.symbol.localeCompare(b.symbol),
-      name:   (a,b)=> a.name.localeCompare(b.name),
-      price:  (a,b)=> a.price - b.price,
-      conf:   (a,b)=> a.conf - b.conf,
-    };
+    // --- Pomocné -----------------------------------------------------------
+    const fmtPrice = (v) =>
+      v >= 1000 ? v.toLocaleString("cs-CZ") : v.toLocaleString("cs-CZ", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const fmtPct = (v) => (v >= 0 ? `+${v.toFixed(2)}%` : `${v.toFixed(2)}%`);
+    const el = (sel) => document.querySelector(sel);
 
-    // ---------- Render table ----------
-    const rowsEl = document.getElementById('rows');
-    function render() {
-      const q = document.getElementById('q').value.trim().toLowerCase();
-      const type = document.getElementById('typeFilter').value;
-      const sort = document.getElementById('sortBy').value;
-
-      const filtered = data
-        .filter(x => (type==='all' || x.type===type))
-        .filter(x => !q || x.symbol.toLowerCase().includes(q) || x.name.toLowerCase().includes(q))
-        .sort(by[sort]);
-
-      rowsEl.innerHTML = filtered.map(x => rowHtml(x)).join('');
+    // --- Render tabulky ----------------------------------------------------
+    const $tbody = el("#rows");
+    function renderRows(list) {
+      $tbody.innerHTML = "";
+      list.forEach((r, i) => {
+        const tr = document.createElement("tr");
+        tr.className = "hover:bg-slate-50";
+        tr.innerHTML = `
+          <td class="td px-4 font-semibold">${r.symbol}</td>
+          <td class="td px-4">${r.name}</td>
+          <td class="td px-4 text-right tabular-nums">${fmtPrice(r.price)}</td>
+          <td class="td px-4 text-right tabular-nums ${r.d1>=0?'kpi-up':'kpi-down'}">${fmtPct(r.d1)}</td>
+          <td class="td px-4 text-right tabular-nums ${r.w1>=0?'kpi-up':'kpi-down'}">${fmtPct(r.w1)}</td>
+          <td class="td px-4 text-right tabular-nums">
+            ${fmtPrice(r.forecast.min)} <span class="muted">/</span>
+            <strong>${fmtPrice(r.forecast.avg)}</strong> <span class="muted">/</span>
+            ${fmtPrice(r.forecast.max)}
+          </td>
+          <td class="td px-4 text-right tabular-nums">${Math.round(r.conf*100)}%</td>
+          <td class="td px-4 text-right"><button class="chip bg-slate-900 text-white" data-idx="${i}">Detail</button></td>
+        `;
+        $tbody.appendChild(tr);
+      });
     }
 
-    function rowHtml(x){
-      const f = x.forecast;
-      return `
-        <tr class="hover:bg-slate-50">
-          <td class="px-4 py-3 font-medium text-slate-900">${x.symbol}</td>
-          <td class="px-4 py-3 text-slate-700">${x.name}</td>
-          <td class="px-4 py-3 text-right num">${fmtMoney(x.price)}</td>
-          <td class="px-4 py-3 text-right num ${x.d1>=0?'text-emerald-600':'text-rose-600'}">${fmtPct(x.d1)}</td>
-          <td class="px-4 py-3 text-right num ${x.w1>=0?'text-emerald-600':'text-rose-600'}">${fmtPct(x.w1)}</td>
-          <td class="px-4 py-3 text-right num">
-            ${fmtMoney(f.min)} <span class="text-slate-400">/</span>
-            <b>${fmtMoney(f.avg)}</b> <span class="text-slate-400">/</span>
-            ${fmtMoney(f.max)}
-          </td>
-          <td class="px-4 py-3 text-right num">${Math.round(x.conf*100)}%</td>
-          <td class="px-4 py-3 text-right">
-            <button class="pill pill-blue hover:bg-blue-100" onclick="openDetail('${x.symbol}')">Detail</button>
-          </td>
-        </tr>
-      `;
-    }
+    // počáteční render
+    renderRows(DATA);
 
-    // ---------- Modal + Chart ----------
-    let chart;
-    function openDetail(symbol){
-      const x = data.find(d=>d.symbol===symbol);
-      if(!x) return;
+    // --- Detail modal + Chart.js -------------------------------------------
+    let chart; // instance grafu
+    function openModal(row) {
+      el("#modalTitle").textContent = `${row.symbol} — Předpověď (demo)`;
+      el("#kpiCur").textContent = fmtPrice(row.price);
+      el("#kpiAvg").textContent = fmtPrice(row.forecast.avg);
+      el("#kpiMax").textContent = fmtPrice(row.forecast.max);
+      el("#kpiMin").textContent = fmtPrice(row.forecast.min);
+      el("#kpiConf").textContent = `${Math.round(row.conf*100)}%`;
+      el("#thesis").textContent = row.thesis;
+      el("#invalid").textContent = row.invalid;
 
-      document.getElementById('mTitle').textContent = `${x.symbol} — Predikce (demo)`;
-      document.getElementById('mSubtitle').textContent = x.name;
-      document.getElementById('mThesis').textContent = x.thesis;
-      document.getElementById('mInvalid').textContent = x.invalid;
-      document.getElementById('vCur').textContent = fmtMoney(x.price);
-      document.getElementById('vAvg').textContent = fmtMoney(x.forecast.avg);
-      document.getElementById('vMax').textContent = fmtMoney(x.forecast.max);
-      document.getElementById('vMin').textContent = fmtMoney(x.forecast.min);
-      document.getElementById('vConf').textContent = Math.round(x.conf*100)+'%';
+      // init / přepočet grafu
+      const ctx = document.getElementById("detailChart").getContext("2d");
+      if (chart) chart.destroy();
 
-      const labels = [...Array(x.history.length).keys()].map(i => ''); // skryté značky
-      labels.push('Now','1Y');
+      // defaultně předpověď 1Y (vějíř: min/avg/max + současná cena)
+      const xFuture = ["Nyní", "1Y"];
+      const dataAvg = [row.price, row.forecast.avg];
+      const dataMin = [row.price, row.forecast.min];
+      const dataMax = [row.price, row.forecast.max];
 
-      // poskládáme datasety: historie + tři „vějíře“ do 1Y
-      const last = x.history[x.history.length-1];
-      const datasets = [
-        {
-          label:'History',
-          data:[...x.history, last, null],
-          borderColor:'#2563eb',
-          backgroundColor:'transparent',
-          borderWidth:2,
-          tension:0.25,
-          pointRadius:0
+      chart = new Chart(ctx, {
+        type: "line",
+        data: {
+          labels: xFuture,
+          datasets: [
+            { label: "Avg", data: dataAvg, borderWidth: 2, tension: 0.25 },
+            { label: "Min", data: dataMin, borderDash: [6,4], borderWidth: 1.5, tension: 0.25 },
+            { label: "Max", data: dataMax, borderDash: [6,4], borderWidth: 1.5, tension: 0.25 },
+          ],
         },
-        {
-          label:'Avg',
-          data:[...Array(x.history.length).fill(null), last, x.forecast.avg],
-          borderColor:'#10b981',
-          borderWidth:2,
-          pointRadius:0,
-          tension:0,
-        },
-        {
-          label:'Max',
-          data:[...Array(x.history.length).fill(null), last, x.forecast.max],
-          borderColor:'#10b981',
-          borderDash:[6,4],
-          borderWidth:2,
-          pointRadius:0,
-          tension:0,
-        },
-        {
-          label:'Min',
-          data:[...Array(x.history.length).fill(null), last, x.forecast.min],
-          borderColor:'#ef4444',
-          borderDash:[6,4],
-          borderWidth:2,
-          pointRadius:0,
-          tension:0,
-        },
-      ];
-
-      const ctx = document.getElementById('mChart').getContext('2d');
-      if(chart) chart.destroy();
-      chart = new Chart(ctx,{
-        type:'line',
-        data:{ labels, datasets },
-        options:{
-          responsive:true,
-          maintainAspectRatio:false,
-          scales:{
-            x:{ display:false, grid:{display:false} },
-            y:{ display:false, grid:{display:false} }
-          },
-          plugins:{
-            legend:{ display:false },
-            tooltip:{
-              callbacks:{
-                label: (c)=> {
-                  const name = c.dataset.label;
-                  return `${name}: ${fmtMoney(c.parsed.y)}`;
-                }
-              }
-            }
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { grid: { display: false } },
+            y: { grid: { color: "rgba(0,0,0,0.05)" }, ticks: { callback: v => fmtPrice(v) } }
           }
         }
       });
 
-      document.getElementById('modal').classList.remove('hidden');
+      // přepínače Forecast / History
+      el("#tabForecast").onclick = () => { if (chart) chart.destroy(); openModal(row); };
+      el("#tabHistory").onclick = () => {
+        if (chart) chart.destroy();
+        chart = new Chart(ctx, {
+          type: "line",
+          data: {
+            labels: Array.from({length: row.forecast.hist.length}, (_,i)=>`-${row.forecast.hist.length-i}m`),
+            datasets: [{ label: "Price", data: row.forecast.hist, borderWidth: 2, tension: 0.25 }],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+              x: { grid: { display: false } },
+              y: { grid: { color: "rgba(0,0,0,0.05)" }, ticks: { callback: v => fmtPrice(v) } }
+            }
+          }
+        });
+      };
+
+      // zobraz modal
+      el("#modalMask").classList.remove("hidden");
+      el("#modal").classList.remove("hidden");
     }
 
-    function closeModal(){
-      document.getElementById('modal').classList.add('hidden');
-    }
+    // Delegace kliků na „Detail“
+    $tbody.addEventListener("click", (e) => {
+      const btn = e.target.closest("button[data-idx]");
+      if (!btn) return;
+      const idx = +btn.dataset.idx;
+      openModal(DATA[idx]);
+    });
 
-    // ---------- Wire up ----------
-    document.getElementById('q').addEventListener('input', render);
-    document.getElementById('typeFilter').addEventListener('change', render);
-    document.getElementById('sortBy').addEventListener('change', render);
-    render();
+    // Zavření modalu
+    const close = () => { el("#modalMask").classList.add("hidden"); el("#modal").classList.add("hidden"); if (chart) chart.destroy(); };
+    el("#closeModal").onclick = close;
+    el("#modalMask").onclick = close;
+
+    // --- Jednoduché filtrování/řazení (demo) -------------------------------
+    function applyFilters() {
+      const q = el("#q").value.trim().toLowerCase();
+      const t = el("#typeFilter").value;
+      const s = el("#sortBy").value;
+      let list = DATA.filter(r =>
+        (!t || r.type === t) &&
+        (!q || r.symbol.toLowerCase().includes(q) || r.name.toLowerCase().includes(q))
+      );
+      list.sort((a,b) => {
+        if (s === "price") return b.price - a.price;
+        if (s === "conf") return b.conf - a.conf;
+        return a.symbol.localeCompare(b.symbol);
+      });
+      renderRows(list);
+    }
+    ["#q","#typeFilter","#sortBy"].forEach(id => el(id).addEventListener("input", applyFilters));
   </script>
 </body>
 </html>
