@@ -16,7 +16,7 @@
     .pill{padding:.375rem .625rem;border-radius:9999px;border:1px solid rgba(15,23,42,.08)}
     .kbd{background:#f3f4f6;padding:.125rem .375rem;border-radius:.25rem;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Courier New",monospace;font-size:.75rem}
 
-    /* mini-graf pro detail (ponecháno připravené) */
+    /* mini-graf (ponecháno pro případné rozšíření detailu) */
     .spark path.avg{stroke:#2563eb;stroke-width:2;fill:none}
     .spark path.min,.spark path.max{stroke-width:2;fill:none;stroke-dasharray:4 4}
     .spark path.min{stroke:#ef4444}.spark path.max{stroke:#22c55e}
@@ -27,7 +27,7 @@
     .dot{width:.5rem;height:.5rem;border-radius:9999px;display:inline-block}
     .dot.max{background:#22c55e}.dot.avg{background:#2563eb}.dot.min{background:#ef4444}
 
-    /* tabulka – širší fixní sloupce pro Conf. a Akce + nowrap */
+    /* tabulka – fix sloupce, ať se nic nepřetéká */
     .table-grid{
       display:grid;
       grid-template-columns: 100px 1fr 120px 100px 100px 250px 80px 180px;
@@ -38,6 +38,14 @@
     @media (max-width: 1180px){
       .table-grid{ grid-template-columns: 90px 1fr 110px 95px 95px 260px 80px 150px; }
     }
+
+    /* Insights */
+    .badge{display:inline-flex;align-items:center;gap:.4rem;border:1px solid rgba(15,23,42,.12);border-radius:9999px;padding:.25rem .55rem;font-size:.75rem}
+    .impact-up{background:#ecfdf5;border-color:#a7f3d0;color:#065f46}
+    .impact-down{background:#fef2f2;border-color:#fecaca;color:#7f1d1d}
+    .impact-flat{background:#f1f5f9;border-color:#cbd5e1;color:#334155}
+    .tag{display:inline-block;padding:.15rem .5rem;border:1px solid #e2e8f0;border-radius:9999px;font-size:.7rem;color:#475569;background:#fff}
+    .ins-card{border:1px solid #e2e8f0;border-radius:1rem;background:white}
   </style>
 </head>
 <body class="bg-slate-50 text-slate-900">
@@ -90,7 +98,7 @@
       </select>
     </div>
 
-    <!-- Table (scroll wrapper) -->
+    <!-- Table -->
     <div class="mt-5 overflow-x-auto">
       <div class="min-w-[980px] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
         <!-- head -->
@@ -116,7 +124,43 @@
       </div>
     </div>
 
-    <p class="mt-4 text-xs text-slate-500">* Demo verze se statickými daty. V ostré verzi připojíme AI teze + zprávy + živé ceny.</p>
+    <!-- Insights / News-driven explanation -->
+    <section class="mt-8">
+      <div class="flex items-center justify-between gap-3 flex-wrap">
+        <h2 class="text-xl font-semibold">Rychlé výkazy ze zpráv (Insights)</h2>
+        <div class="flex items-center gap-2">
+          <input id="insSearch" class="px-3 py-2 rounded-lg border border-slate-200 bg-white outline-none w-56" placeholder="Hledej v titulcích…" />
+          <select id="insType" class="px-3 py-2 rounded-lg border border-slate-200 bg-white">
+            <option value="">Všechna aktiva</option>
+            <option value="stock">Akcie</option>
+            <option value="index">Indexy</option>
+            <option value="forex">Forex</option>
+            <option value="crypto">Krypto</option>
+            <option value="commodity">Komodity</option>
+            <option value="macro">Makro</option>
+          </select>
+          <select id="insSent" class="px-3 py-2 rounded-lg border border-slate-200 bg-white">
+            <option value="">Všechen sentiment</option>
+            <option value="up">Pozitivní (↑)</option>
+            <option value="down">Negativní (↓)</option>
+            <option value="flat">Neutrální (↔)</option>
+          </select>
+          <select id="insHorizon" class="px-3 py-2 rounded-lg border border-slate-200 bg-white">
+            <option value="D">Horizon: Dny</option>
+            <option value="W" selected>Horizon: Týdny</option>
+            <option value="M">Horizon: Měsíce</option>
+          </select>
+          <button id="insRefresh" class="px-4 py-2 rounded-xl border border-slate-300 bg-white hover:bg-slate-50">Aktualizovat</button>
+        </div>
+      </div>
+      <p class="text-xs text-slate-500 mt-1">Zde shrnujeme, co poslední zprávy <em>znamenají pro investory</em>, a jak mohou krátkodobě ovlivnit chování akcií, indexů a dalších tříd aktiv.</p>
+
+      <div id="insights" class="mt-4 grid md:grid-cols-2 gap-3"></div>
+
+      <div id="insEmpty" class="hidden mt-6 text-sm text-slate-500 text-center">Nic nenalezeno pro dané filtry.</div>
+    </section>
+
+    <p class="mt-6 text-xs text-slate-500">* Demo verze se statickými daty. V ostré verzi připojíme AI teze + zprávy + živé ceny.</p>
   </main>
 
   <noscript><div class="max-w-6xl mx-auto px-4 py-6 text-rose-700">Pro zobrazení dat povol JavaScript.</div></noscript>
@@ -134,24 +178,18 @@
       {type:'stock',symbol:'NVDA',name:'NVIDIA Corporation',price:241.80,d1:1.85,w1:4.10,forecast:{min:128,avg:281,max:498,conf:72}}
     ];
 
-    // Rozšířený seznam (více symbolů)
+    // Rozšířený seznam
     var extraRows = [
       {type:'stock',symbol:'MSFT',name:'Microsoft Corp.',price:432.2,d1:0.8,w1:2.5,forecast:{min:360,avg:480,max:560,conf:69}},
       {type:'stock',symbol:'AMZN',name:'Amazon.com, Inc.',price:176.8,d1:1.1,w1:3.2,forecast:{min:140,avg:210,max:260,conf:65}},
       {type:'stock',symbol:'GOOGL',name:'Alphabet Inc. (Class A)',price:162.4,d1:-0.3,w1:1.7,forecast:{min:130,avg:190,max:240,conf:63}},
       {type:'stock',symbol:'META',name:'Meta Platforms, Inc.',price:506.5,d1:1.9,w1:5.1,forecast:{min:380,avg:560,max:720,conf:66}},
       {type:'stock',symbol:'TSLA',name:'Tesla, Inc.',price:214.3,d1:-1.2,w1:4.4,forecast:{min:150,avg:260,max:340,conf:55}},
-      {type:'stock',symbol:'NFLX',name:'Netflix, Inc.',price:655.1,d1:0.9,w1:2.6,forecast:{min:540,avg:720,max:860,conf:61}},
-      {type:'stock',symbol:'AMD',name:'Advanced Micro Devices',price:168.7,d1:1.3,w1:3.9,forecast:{min:120,avg:210,max:310,conf:60}},
-      {type:'stock',symbol:'INTC',name:'Intel Corporation',price:38.9,d1:-0.5,w1:1.2,forecast:{min:30,avg:48,max:68,conf:48}},
-      {type:'stock',symbol:'TSM',name:'Taiwan Semiconductor',price:166.2,d1:0.7,w1:2.0,forecast:{min:120,avg:190,max:260,conf:62}},
-      {type:'stock',symbol:'JPM',name:'JPMorgan Chase & Co.',price:204.4,d1:0.2,w1:1.0,forecast:{min:170,avg:215,max:250,conf:57}},
       {type:'index',symbol:'SPX',name:'S&P 500 Index',price:5518,d1:0.30,w1:1.2,forecast:{min:5100,avg:5800,max:6300,conf:59}},
       {type:'index',symbol:'NDX',name:'NASDAQ 100',price:19980,d1:0.45,w1:1.6,forecast:{min:17500,avg:21000,max:23500,conf:60}},
       {type:'forex',symbol:'EURUSD',name:'Euro / US Dollar',price:1.086,d1:-0.12,w1:0.30,forecast:{min:1.04,avg:1.10,max:1.14,conf:52}},
       {type:'forex',symbol:'USDJPY',name:'US Dollar / Japanese Yen',price:152.2,d1:0.05,w1:-0.20,forecast:{min:146,avg:151,max:157,conf:50}},
       {type:'crypto',symbol:'ETHUSD',name:'Ethereum',price:3360,d1:1.9,w1:7.2,forecast:{min:2200,avg:4200,max:5600,conf:56}},
-      {type:'crypto',symbol:'SOLUSD',name:'Solana',price:152,d1:3.1,w1:9.4,forecast:{min:95,avg:210,max:320,conf:54}},
       {type:'commodity',symbol:'XAUUSD',name:'Gold (Spot)',price:2368,d1:-0.2,w1:0.5,forecast:{min:2100,avg:2400,max:2650,conf:58}},
       {type:'commodity',symbol:'WTI',name:'Crude Oil WTI',price:81.4,d1:0.6,w1:1.8,forecast:{min:70,avg:86,max:98,conf:55}}
     ];
@@ -220,8 +258,145 @@
       apply();
     });
 
+    // ===== Insights (news → co to znamená) =====
+    var insData = []; // bude naplněno z backendu nebo z mocku
+    var insContainer = document.getElementById('insights');
+    var insEmpty = document.getElementById('insEmpty');
+    var insSearch = document.getElementById('insSearch');
+    var insType = document.getElementById('insType');
+    var insSent = document.getElementById('insSent');
+    var insHorizon = document.getElementById('insHorizon');
+    var insRefresh = document.getElementById('insRefresh');
+
+    function impactBadge(sent){
+      if(sent==='up')   return '<span class="badge impact-up">↑ Pozitivní</span>';
+      if(sent==='down') return '<span class="badge impact-down">↓ Negativní</span>';
+      return '<span class="badge impact-flat">↔ Neutrální</span>';
+    }
+
+    function renderInsights(list){
+      insContainer.innerHTML='';
+      if(!list.length){ insEmpty.classList.remove('hidden'); return; }
+      insEmpty.classList.add('hidden');
+
+      list.forEach(function(n){
+        var card = document.createElement('article');
+        card.className = 'ins-card p-4';
+        card.innerHTML =
+          '<div class="flex items-start justify-between gap-3">'
+          +  '<div>'
+          +    '<div class="text-sm text-slate-500">'+n.source+' • '+n.time+'</div>'
+          +    '<h3 class="mt-0.5 font-semibold">'+n.title+'</h3>'
+          +  '</div>'
+          +  '<div class="text-right shrink-0">'
+          +    impactBadge(n.sentiment)
+          +    '<div class="text-xs text-slate-500 mt-1">Pravděpodobnost: <b>'+n.prob+'%</b></div>'
+          +  '</div>'
+          +'</div>'
+          +'<p class="mt-2 text-sm">'+n.explainer+'</p>'
+          + (n.take?('<ul class="mt-2 text-sm list-disc pl-5">'+n.take.map(function(t){return '<li>'+t+'</li>'}).join('')+'</ul>'):'')
+          +'<div class="mt-3 flex flex-wrap gap-2">'
+          +  (n.tags||[]).map(function(t){return '<span class="tag">'+t+'</span>'}).join('')
+          +'</div>';
+        insContainer.appendChild(card);
+      });
+    }
+
+    function filterInsights(){
+      var term = (insSearch.value||'').toLowerCase().trim();
+      var list = insData.filter(function(n){
+        var okType = !insType.value || n.type===insType.value;
+        var okSent = !insSent.value || n.sentiment===insSent.value;
+        var okText = !term || n.title.toLowerCase().indexOf(term)>=0;
+        return okType && okSent && okText;
+      });
+      renderInsights(list);
+    }
+
+    function mockInsights(){
+      // stručné, investor-first
+      return [
+        {
+          type:'macro', source:'Makro kalendář', time:'dnes', sentiment:'up', prob:65,
+          title:'Nižší než očekávaná inflace (CPI) – ochlazení jádrové složky',
+          explainer:'Slabší CPI zvyšuje šanci na dřívější uvolnění měnové politiky. Diskontní sazby klesají → vyšší valuace růstových titulů.',
+          take:['Pozitivní skew pro SPX/NDX v horizontu týdnů','Duration-sensitive: tech/AI outperform','USD může oslabit; zlato drží bid'],
+          tags:['Inflace','Sazby','Růstové akcie'], sentimentImpact:'+'
+        },
+        {
+          type:'stock', source:'Earnings • NVDA', time:'včera', sentiment:'up', prob:70,
+          title:'NVDA beat + zvýšený výhled DC/AI',
+          explainer:'Objednávky v datacentrech přetrvávají, backlog je robustní. Pravděpodobnost pokračování trendu je vyšší.',
+          take:['Pozitivní přelev pro polovodiče (AMD, TSM)','Index NDX citlivý na mega-cap tech'],
+          tags:['Earnings','AI','Semiconductors']
+        },
+        {
+          type:'crypto', source:'Regulace • USA', time:'dnes', sentiment:'down', prob:55,
+          title:'Přísnější rámec pro krypto burzy',
+          explainer:'Krátkodobě tlak na altcoiny kvůli compliance nákladům; BTC/ETH relativně odolnější díky institucionálním tokům.',
+          take:['Defenzivní rotace: BTC>ALT','Sledovat odliv z risk-on tokenů'],
+          tags:['Krypto','Regulace']
+        },
+        {
+          type:'commodity', source:'OPEC+', time:'tento týden', sentiment:'up', prob:58,
+          title:'Prodlužení dobrovolných škrtů těžby ropy',
+          explainer:'Tighter supply → vyšší podlaha cen WTI/Brent. Energetický sektor má zlepšený R:R.',
+          take:['XLE a servisní firmy profitují','Pozor na citlivost SPX na dražší energii'],
+          tags:['Ropa','OPEC','Energie']
+        },
+        {
+          type:'forex', source:'Fed speakers', time:'dnes', sentiment:'flat', prob:52,
+          title:'Smíšené komentáře členů Fedu',
+          explainer:'Krátkodobě vyšší volatilita USD. Bez jasného směru – range trading na EURUSD pravděpodobný.',
+          take:['Preferovat mean-reversion set-upy na hlavních párech'],
+          tags:['USD','Volatilita']
+        }
+      ];
+    }
+
+    function fetchInsights(){
+      // pokus o backend, fallback na mock
+      var params = new URLSearchParams({
+        horizon: insHorizon.value || 'W'
+      });
+      return fetch('/api/trader-ai/news?'+params.toString())
+        .then(function(r){ if(!r.ok) throw new Error('fail'); return r.json(); })
+        .catch(function(){ return mockInsights(); });
+    }
+
+    insRefresh.addEventListener('click', function(){
+      insRefresh.disabled = true; insRefresh.textContent = 'Načítám…';
+      fetchInsights().then(function(data){
+        // normalizace: pokud backend, mapuj na náš formát
+        insData = (Array.isArray(data)?data:[]).map(function(n){
+          return {
+            type: n.type || n.asset_type || '',
+            source: n.source || 'Zprávy',
+            time: n.time || n.when || 'nyní',
+            sentiment: n.sentiment || n.impact || 'flat',
+            prob: n.prob || n.probability || 55,
+            title: n.title || n.headline || '—',
+            explainer: n.explainer || n.summary || '',
+            take: n.take || n.actions || [],
+            tags: n.tags || []
+          };
+        });
+        filterInsights();
+      }).finally(function(){
+        insRefresh.disabled = false; insRefresh.textContent = 'Aktualizovat';
+      });
+    });
+
+    insSearch.addEventListener('input', filterInsights);
+    insType.addEventListener('change', filterInsights);
+    insSent.addEventListener('change', filterInsights);
+    insHorizon.addEventListener('change', function(){ /* jen pro backend */ });
+
     // init
     apply();
+    // načti počáteční mock
+    insData = mockInsights();
+    filterInsights();
   });
   </script>
 </body>
