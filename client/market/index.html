@@ -190,23 +190,50 @@
 
     var container = document.getElementById('rows');
 
-    function pathFrom(points,width, height, pad){
-      width = width||220; height = height||72; pad = pad||4;
-      var max=1, i; for(i=0;i<points.length;i++){ var a=Math.abs(points[i]); if(a>max) max=a; }
-      var step=(width-pad*2)/(points.length-1);
-      function scaleY(v){ return (height/2 - (v/max)*(height/2 - pad)); }
-      function scaleX(i){ return pad + i*step; }
-      var d='', x,y; for(i=0;i<points.length;i++){ x=scaleX(i); y=scaleY(points[i]); d+=(i===0?('M'+x+','+y):(' L'+x+','+y)); }
+    /* ===== MINI-GRAF zarovnán na Min/Avg/Max ===== */
+    function normalize01(arr){
+      var mn = Math.min.apply(null, arr);
+      var mx = Math.max.apply(null, arr);
+      var span = (mx - mn) || 1;
+      return arr.map(function(v){ return (v - mn) / span; });
+    }
+    function shiftEndTo(arr01, end){
+      var last = arr01[arr01.length-1];
+      var delta = end - last;
+      return arr01.map(function(v){
+        var x = v + delta;
+        return x < 0 ? 0 : (x > 1 ? 1 : x);
+      });
+    }
+    function linePathFrom01(arr01, w, h, pad){
+      var step = (w - pad*2) / (arr01.length - 1);
+      var d = '';
+      for (var i=0;i<arr01.length;i++){
+        var x = pad + i*step;
+        var y = pad + (1 - arr01[i]) * (h - 2*pad);
+        d += (i===0 ? ('M'+x+','+y) : (' L'+x+','+y));
+      }
       return d;
     }
-
     function sparkSVG(series,forecast){
-      var w=220,h=72,pad=4;
-      var dAvg=pathFrom(series.avg,w,h,pad);
-      var dMin=pathFrom(series.min,w,h,pad);
-      var dMax=pathFrom(series.max,w,h,pad);
-      var step=(w-pad*2)/(series.avg.length-1);
-      var guideX=pad+step*(series.avg.length-1);
+      var w=220,h=72,pad=6;
+
+      // cílové normované hodnoty pro koncové body
+      var span = Math.max(1, forecast.max - forecast.min);
+      var endAvg = (forecast.avg - forecast.min) / span;
+
+      // normalizace + posun konce na 0 / endAvg / 1
+      var avg01 = shiftEndTo(normalize01(series.avg), endAvg);
+      var min01 = shiftEndTo(normalize01(series.min), 0);
+      var max01 = shiftEndTo(normalize01(series.max), 1);
+
+      var dAvg = linePathFrom01(avg01, w, h, pad);
+      var dMin = linePathFrom01(min01, w, h, pad);
+      var dMax = linePathFrom01(max01, w, h, pad);
+
+      var step = (w - pad*2) / (avg01.length - 1);
+      var guideX = pad + step * (avg01.length - 1);
+
       return '<div class="spark-wrap">'
         + '<svg width="'+w+'" height="'+h+'" viewBox="0 0 '+w+' '+h+'" class="spark">'
         +   '<line class="guide" x1="'+guideX+'" y1="0" x2="'+guideX+'" y2="'+h+'"></line>'
@@ -220,6 +247,7 @@
         +   '<div class="b"><span class="dot min"></span><span>Min</span><strong>'+fmt.format(forecast.min)+'</strong></div>'
         + '</div></div>';
     }
+    /* ============================================ */
 
     function renderRow(r){
       var row=document.createElement('div'); row.className="row border-t border-slate-100";
