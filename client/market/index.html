@@ -3,23 +3,19 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>StrategyMind — Market Scanner (demo)</title>
+  <title>StrategyMind — Market Scanner (demo v2)</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
   <style>
-    :root { color-scheme: light; }
-    html,body{ font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji"; }
-    /* mini chart styling */
+    html,body{ font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial; }
     .spark path.avg   { stroke-width: 2; fill: none; }
     .spark path.min,
     .spark path.max   { stroke-width: 2; fill: none; stroke-dasharray: 4 4; }
     .row:hover { background: #f8fafc; }
-    .divider { height:1px; background: rgba(15,23,42,.06); }
-    .chip { font-size:.75rem; padding:.125rem .5rem; border-radius:9999px; background:#eef2ff; color:#3730a3; }
     .pill { padding:.375rem .625rem; border-radius:9999px; border:1px solid rgba(15,23,42,.08); }
-    .kbd { background:#f3f4f6; padding:.125rem .375rem; border-radius:.25rem; font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; font-size:.75rem; }
+    .kbd { background:#f3f4f6; padding:.125rem .375rem; border-radius:.25rem; font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Courier New", monospace; font-size:.75rem; }
   </style>
 </head>
 <body class="bg-slate-50 text-slate-900">
@@ -29,10 +25,11 @@
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" class="opacity-70"><path d="M15 6l-6 6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
         Zpět na klientskou sekci
       </a>
-      <div class="ml-auto flex gap-2">
+      <div class="ml-auto flex items-center gap-2">
         <a href="/client/market/" class="pill bg-white font-medium">Market Scanner</a>
         <a href="/client/real-estate/" class="pill">Real-Estate</a>
         <a href="/client/idea-lab/" class="pill">Idea Lab</a>
+        <span class="ml-2 text-xs text-slate-500 border border-slate-200 rounded-full px-2 py-1 select-none">v2</span>
       </div>
     </div>
   </header>
@@ -86,12 +83,12 @@
   </main>
 
   <script>
-    // --- Helpers
+    // helpers
     const fmt = new Intl.NumberFormat('cs-CZ', { maximumFractionDigits: 2 });
     const pct = v => (v >= 0 ? '+' : '') + v.toFixed(2) + '%';
     const cls = v => v >= 0 ? 'text-emerald-600' : 'text-rose-600';
 
-    // --- Demo dataset (snadno nahradíme voláním API)
+    // data (demo)
     const rows = [
       {
         type:'stock', symbol:'AAPL', name:'Apple Inc.',
@@ -99,8 +96,7 @@
         forecast: { min:165, avg:245, max:310, conf:72 },
         thesis: 'Růst služeb a ekosystému, stabilní marže. Re-rating po nové produktové linii.',
         invalid: 'Breakdown pod 195 s objemy a slabá guidance.',
-        // demo křivky pro mini-graf
-        path: { avg:[0,1,1.8,1.4,2.1,2.0,2.5], min:[0, -0.5,-0.2,-0.7,-0.4,-0.8,-1.1], max:[0, 1.6, 2.3, 1.9, 2.7, 2.5, 3.1] }
+        path: { avg:[0,1,1.8,1.4,2.1,2.0,2.5], min:[0,-0.5,-0.2,-0.7,-0.4,-0.8,-1.1], max:[0,1.6,2.3,1.9,2.7,2.5,3.1] }
       },
       {
         type:'crypto', symbol:'BTCUSD', name:'Bitcoin',
@@ -120,11 +116,9 @@
       }
     ];
 
-    // --- Render
     const container = document.getElementById('rows');
 
     function pathFrom(points, width=180, height=64, pad=4){
-      // normalize array 0..max
       const max = Math.max(...points.map(v=>Math.abs(v))) || 1;
       const step = (width - pad*2) / (points.length-1);
       const scaleY = (v)=> (height/2 - (v/max)*(height/2 - pad));
@@ -159,8 +153,8 @@
           <div class="font-semibold">${r.symbol}</div>
           <div class="text-slate-700">${r.name}</div>
           <div class="text-right tabular-nums">${fmt.format(r.price)}</div>
-          <div class="text-right tabular-nums ${cls(r.d1)}">${pct(r.d1)}</div>
-          <div class="text-right tabular-nums ${cls(r.w1)}">${pct(r.w1)}</div>
+          <div class="text-right tabular-nums ${r.d1>=0?'text-emerald-600':'text-rose-600'}">${pct(r.d1)}</div>
+          <div class="text-right tabular-nums ${r.w1>=0?'text-emerald-600':'text-rose-600'}">${pct(r.w1)}</div>
           <div class="text-center tabular-nums">
             ${fmt.format(r.forecast.min)} / <span class="font-semibold">${fmt.format(r.forecast.avg)}</span> / ${fmt.format(r.forecast.max)}
           </div>
@@ -195,7 +189,6 @@
       const panel = row.children[1];
       function toggle(){ panel.classList.toggle('hidden'); }
       head.addEventListener('click', (e)=>{
-        // neklikej na "Detail" dvakrát
         if(e.target.tagName.toLowerCase() === 'button') return;
         toggle();
       });
@@ -208,7 +201,6 @@
       list.forEach(renderRow);
     }
 
-    // --- Interakce: vyhledávání / filtry / třídění (nad demem)
     const q = document.getElementById('q');
     const typeFilter = document.getElementById('typeFilter');
     const sortBy = document.getElementById('sortBy');
@@ -233,8 +225,7 @@
     sortBy.addEventListener('change', apply);
     document.addEventListener('keydown', (e)=>{ if(e.key === '/') { e.preventDefault(); q.focus(); }});
 
-    // první render
-    apply();
+    apply(); // initial
   </script>
 </body>
 </html>
