@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>StrategyMind — Market Scanner (demo)</title>
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme:{extend:{
+        colors:{brand:"#0A2342", mint:"#2bd4a9"},
+        boxShadow:{sweet:"0 24px 70px -24px rgba(2,6,23,.15)"},
+        borderRadius:{"2xl":"1.25rem"}
+      }}
+    }
+  </script>
+  <style>
+    .tag{font-size:.72rem;border:1px solid #e5e7eb;border-radius:999px;padding:.15rem .5rem;background:#fff}
+    .cell{padding:.75rem 1rem}
+    .row{border-top:1px solid #e5e7eb}
+    .spark path.line{fill:none;stroke-width:2}
+    .spark line.target{stroke-dasharray:4 4;stroke-width:2}
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900">
+  <header class="sticky top-0 z-50 bg-white/80 backdrop-blur border-b">
+    <div class="mx-auto max-w-7xl px-4 py-3 flex items-center justify-between">
+      <a href="/client/" class="text-sm text-slate-600 hover:text-brand">← Zpět na homepage</a>
+      <nav class="flex gap-2">
+        <a href="/client/market/" class="tag">Market Scanner</a>
+        <a href="/client/real-estate/" class="tag">Real-Estate</a>
+        <a href="/client/ideas/" class="tag">Idea Lab</a>
+      </nav>
+      <a href="#" class="px-4 py-2 rounded-lg bg-brand text-white text-sm font-semibold">Stáhnout report (MD)</a>
+    </div>
+  </header>
+
+  <main class="mx-auto max-w-7xl px-4 py-6">
+    <h1 class="text-2xl font-extrabold">Market Scanner</h1>
+    <p class="mt-1 text-slate-600">
+      Vyhledávej a filtruj akcie, indexy a krypto. Rozklikni řádek pro <em>důvod predikce</em>, 
+      <em>podmínky neplatnosti</em> a mini graf. V ostré verzi napojíme živá data a zprávy.
+    </p>
+
+    <!-- Filtry -->
+    <div class="mt-4 flex flex-col sm:flex-row gap-3">
+      <input id="q" class="w-full sm:w-80 rounded-xl border px-3 py-2" placeholder="Hledej symbol / název…"/>
+      <select id="type" class="rounded-xl border px-3 py-2">
+        <option value="">Všechny typy</option>
+        <option>Akcie</option><option>Krypto</option><option>Index</option>
+      </select>
+      <select id="sort" class="rounded-xl border px-3 py-2">
+        <option value="symbol">Seřadit: Symbol</option>
+        <option value="predAvg">Seřadit: 1Y predikce (avg)</option>
+        <option value="conf">Seřadit: Důvěra</option>
+      </select>
+    </div>
+
+    <!-- Tabulka -->
+    <div class="mt-5 overflow-hidden rounded-2xl bg-white border shadow-sweet">
+      <div class="grid grid-cols-[110px_1fr_120px_110px_120px_120px_90px_90px] text-sm font-semibold bg-slate-50">
+        <div class="cell">Symbol</div>
+        <div class="cell">Název</div>
+        <div class="cell text-right">Cena</div>
+        <div class="cell text-right">1D %</div>
+        <div class="cell text-right">1W %</div>
+        <div class="cell text-right">1Y pred. (min/avg/max)</div>
+        <div class="cell text-right">Conf.</div>
+        <div class="cell text-right">Detail</div>
+      </div>
+      <div id="rows"></div>
+    </div>
+  </main>
+
+  <script>
+    // Demo data (statické — v produkci nahradíme API)
+    const data = [
+      {
+        symbol:"AAPL", name:"Apple Inc.", type:"Akcie",
+        price:219.85, d1:1.26, w1:2.10,
+        predMin:165, predAvg:245, predMax:310, conf:72,
+        thesis:"Růst služeb a ekosystému, stabilní marže. Re-rating po nové produktové linii.",
+        invalid:"Breakdown pod 195 s objemy a slabý guidance.",
+        history:[194,199,202,205,201,207,210,214,212,218,223,229] // mini sparkline
+      },
+      {
+        symbol:"BTCUSD", name:"Bitcoin", type:"Krypto",
+        price:67200, d1:2.30, w1:6.80,
+        predMin:42000, predAvg:88000, predMax:120000, conf:58,
+        thesis:"Poptávka přes ETF, halving + omezená nabídka, sílící narativ digitálního zlata.",
+        invalid:"Regulační tlak, silný risk-off, útok na síť.",
+        history:[51000,53000,56000,59000,57000,62000,64000,61000,66000,69000,71000,68000]
+      },
+      {
+        symbol:"NVDA", name:"NVIDIA Corp.", type:"Akcie",
+        price:189.11, d1:-0.82, w1:3.10,
+        predMin:100, predAvg:220, predMax:390, conf:65,
+        thesis:"Datacentra + AI akcelerátory, růst poptávky po inference, high-margin software.",
+        invalid:"Regulace exportu, zpoždění produktů, pokles capex u hyperscalerů.",
+        history:[140,150,160,155,162,170,176,182,178,185,190,189]
+      }
+    ];
+
+    // Helpers
+    const f = (n) => n.toLocaleString("cs-CZ");
+    const pct = (n) => `${n>0?"+":""}${n.toFixed(2)}%`;
+    const badge = (txt, cls="") => `<span class="tag ${cls}">${txt}</span>`;
+
+    function sparkline(values, min, avg, max){
+      const w=240, h=100, pad=8;
+      const maxVal = Math.max(...values, max);
+      const minVal = Math.min(...values, min);
+      const x = (i)=> pad + i*( (w-2*pad)/(values.length-1) );
+      const y = (v)=> h - pad - ( (v-minVal)/(maxVal-minVal) )*(h-2*pad);
+      let d="M"+x(0)+","+y(values[0]);
+      for(let i=1;i<values.length;i++) d+= " L"+x(i)+","+y(values[i]);
+      const lastX = x(values.length-1);
+      const avgY = y(avg);
+      const minY = y(min);
+      const maxY = y(max);
+      return `
+        <svg class="spark" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">
+          <rect x="0" y="0" width="${w}" height="${h}" fill="#fafafa" rx="10"/>
+          <path class="line" d="${d}" stroke="#2563eb"/>
+          <!-- dashed fan: min & max -->
+          <line class="target" x1="${lastX}" y1="${y(values.at(-1))}" x2="${w-pad}" y2="${minY}" stroke="#ef4444"/>
+          <line class="target" x1="${lastX}" y1="${y(values.at(-1))}" x2="${w-pad}" y2="${maxY}" stroke="#10b981"/>
+          <!-- avg solid guide -->
+          <line x1="${lastX}" y1="${y(values.at(-1))}" x2="${w-pad}" y2="${avgY}" stroke="#0ea5e9" stroke-width="2"/>
+        </svg>`;
+    }
+
+    function row(item){
+      const color1D = item.d1>=0 ? "text-emerald-600" : "text-rose-600";
+      const color1W = item.w1>=0 ? "text-emerald-600" : "text-rose-600";
+      return `
+      <div class="row">
+        <details>
+          <summary class="grid grid-cols-[110px_1fr_120px_110px_120px_120px_90px_90px] items-center text-sm cursor-pointer hover:bg-slate-50/60">
+            <div class="cell font-mono">${item.symbol}</div>
+            <div class="cell">${item.name}</div>
+            <div class="cell text-right">${f(item.price)}</div>
+            <div class="cell text-right ${color1D}">${pct(item.d1)}</div>
+            <div class="cell text-right ${color1W}">${pct(item.w1)}</div>
+            <div class="cell text-right">${f(item.predMin)} / <span class="font-semibold">${f(item.predAvg)}</span> / ${f(item.predMax)}</div>
+            <div class="cell text-right">${item.conf}%</div>
+            <div class="cell text-right"><span class="tag">Detail</span></div>
+          </summary>
+          <div class="px-4 pb-4 grid md:grid-cols-[1fr_260px] gap-4">
+            <div class="text-sm text-slate-700">
+              ${badge("Teze")} ${item.thesis}<br/>
+              ${badge("Neplatí pokud")} ${item.invalid}
+              <div class="mt-3 flex gap-2 text-xs text-slate-500">
+                ${badge(item.type)} ${badge("Demo")}
+              </div>
+            </div>
+            <div class="rounded-xl border bg-white p-2">
+              ${sparkline(item.history, item.predMin, item.predAvg, item.predMax)}
+              <div class="text-[11px] text-slate-500 text-center mt-1">*Čárkovaně min/max, plná čára průměr (demo)</div>
+            </div>
+          </div>
+        </details>
+      </div>`;
+    }
+
+    function render(){
+      const q = document.getElementById("q").value.toLowerCase().trim();
+      const typ = document.getElementById("type").value;
+      const sort = document.getElementById("sort").value;
+      let rows = data
+        .filter(d => (!typ || d.type===typ))
+        .filter(d => d.symbol.toLowerCase().includes(q) || d.name.toLowerCase().includes(q));
+      if(sort==="predAvg") rows.sort((a,b)=>b.predAvg-a.predAvg);
+      if(sort==="conf") rows.sort((a,b)=>b.conf-a.conf);
+      if(sort==="symbol") rows.sort((a,b)=>a.symbol.localeCompare(b.symbol));
+      document.getElementById("rows").innerHTML = rows.map(row).join("");
+    }
+
+    document.getElementById("q").addEventListener("input", render);
+    document.getElementById("type").addEventListener("change", render);
+    document.getElementById("sort").addEventListener("change", render);
+    render();
+  </script>
+</body>
+</html>
