@@ -46,6 +46,20 @@
     .impact-flat{background:#f1f5f9;border-color:#cbd5e1;color:#334155}
     .tag{display:inline-block;padding:.15rem .5rem;border:1px solid #e2e8f0;border-radius:9999px;font-size:.7rem;color:#475569;background:#fff}
     .ins-card{border:1px solid #e2e8f0;border-radius:1rem;background:white}
+
+    /* --- FIX ŠIPKY U SELECTU „Horizon“ --- */
+    .select-caret{
+      -webkit-appearance:none;
+      appearance:none;
+      background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none'><path d='M6 8l4 4 4-4' stroke='%236b7280' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+      background-repeat:no-repeat;
+      background-size:16px 16px;
+      /* posuň šipku víc doprava a vyrob jí prostor */
+      background-position:right 0.9rem center;
+      padding-right:2.4rem;
+    }
+    /* na iOS někdy pomůže i pevnější výška řádku */
+    .select-caret{line-height:1.25}
   </style>
 </head>
 <body class="bg-slate-50 text-slate-900">
@@ -145,7 +159,8 @@
             <option value="down">Negativní (↓)</option>
             <option value="flat">Neutrální (↔)</option>
           </select>
-          <select id="insHorizon" class="px-3 py-2 rounded-lg border border-slate-200 bg-white">
+          <!-- APPLY caret fix here -->
+          <select id="insHorizon" class="px-3 py-2 rounded-lg border border-slate-200 bg-white select-caret">
             <option value="D">Horizon: Dny</option>
             <option value="W" selected>Horizon: Týdny</option>
             <option value="M">Horizon: Měsíce</option>
@@ -314,38 +329,32 @@
     }
 
     function mockInsights(){
-      // stručné, investor-first
       return [
-        {
-          type:'macro', source:'Makro kalendář', time:'dnes', sentiment:'up', prob:65,
+        { type:'macro', source:'Makro kalendář', time:'dnes', sentiment:'up', prob:65,
           title:'Nižší než očekávaná inflace (CPI) – ochlazení jádrové složky',
           explainer:'Slabší CPI zvyšuje šanci na dřívější uvolnění měnové politiky. Diskontní sazby klesají → vyšší valuace růstových titulů.',
           take:['Pozitivní skew pro SPX/NDX v horizontu týdnů','Duration-sensitive: tech/AI outperform','USD může oslabit; zlato drží bid'],
-          tags:['Inflace','Sazby','Růstové akcie'], sentimentImpact:'+'
+          tags:['Inflace','Sazby','Růstové akcie']
         },
-        {
-          type:'stock', source:'Earnings • NVDA', time:'včera', sentiment:'up', prob:70,
+        { type:'stock', source:'Earnings • NVDA', time:'včera', sentiment:'up', prob:70,
           title:'NVDA beat + zvýšený výhled DC/AI',
           explainer:'Objednávky v datacentrech přetrvávají, backlog je robustní. Pravděpodobnost pokračování trendu je vyšší.',
           take:['Pozitivní přelev pro polovodiče (AMD, TSM)','Index NDX citlivý na mega-cap tech'],
           tags:['Earnings','AI','Semiconductors']
         },
-        {
-          type:'crypto', source:'Regulace • USA', time:'dnes', sentiment:'down', prob:55,
+        { type:'crypto', source:'Regulace • USA', time:'dnes', sentiment:'down', prob:55,
           title:'Přísnější rámec pro krypto burzy',
           explainer:'Krátkodobě tlak na altcoiny kvůli compliance nákladům; BTC/ETH relativně odolnější díky institucionálním tokům.',
           take:['Defenzivní rotace: BTC>ALT','Sledovat odliv z risk-on tokenů'],
           tags:['Krypto','Regulace']
         },
-        {
-          type:'commodity', source:'OPEC+', time:'tento týden', sentiment:'up', prob:58,
+        { type:'commodity', source:'OPEC+', time:'tento týden', sentiment:'up', prob:58,
           title:'Prodlužení dobrovolných škrtů těžby ropy',
           explainer:'Tighter supply → vyšší podlaha cen WTI/Brent. Energetický sektor má zlepšený R:R.',
           take:['XLE a servisní firmy profitují','Pozor na citlivost SPX na dražší energii'],
           tags:['Ropa','OPEC','Energie']
         },
-        {
-          type:'forex', source:'Fed speakers', time:'dnes', sentiment:'flat', prob:52,
+        { type:'forex', source:'Fed speakers', time:'dnes', sentiment:'flat', prob:52,
           title:'Smíšené komentáře členů Fedu',
           explainer:'Krátkodobě vyšší volatilita USD. Bez jasného směru – range trading na EURUSD pravděpodobný.',
           take:['Preferovat mean-reversion set-upy na hlavních párech'],
@@ -355,10 +364,7 @@
     }
 
     function fetchInsights(){
-      // pokus o backend, fallback na mock
-      var params = new URLSearchParams({
-        horizon: insHorizon.value || 'W'
-      });
+      var params = new URLSearchParams({ horizon: insHorizon.value || 'W' });
       return fetch('/api/trader-ai/news?'+params.toString())
         .then(function(r){ if(!r.ok) throw new Error('fail'); return r.json(); })
         .catch(function(){ return mockInsights(); });
@@ -367,7 +373,6 @@
     insRefresh.addEventListener('click', function(){
       insRefresh.disabled = true; insRefresh.textContent = 'Načítám…';
       fetchInsights().then(function(data){
-        // normalizace: pokud backend, mapuj na náš formát
         insData = (Array.isArray(data)?data:[]).map(function(n){
           return {
             type: n.type || n.asset_type || '',
@@ -394,7 +399,6 @@
 
     // init
     apply();
-    // načti počáteční mock
     insData = mockInsights();
     filterInsights();
   });
