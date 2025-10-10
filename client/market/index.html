@@ -3,240 +3,263 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>StrategyMind – Market Scanner</title>
-  <link rel="icon" href="/StrategyMind_App_Icon.jpg" />
-  <!-- Tailwind -->
+  <title>StrategyMind — Market Scanner</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Chart.js pro mini graf v rozbaleném detailu -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <style>
-    .card { @apply bg-white/80 backdrop-blur shadow-sm ring-1 ring-black/5 rounded-2xl; }
+    .card { @apply bg-white/70 backdrop-blur rounded-2xl shadow-sm ring-1 ring-black/5; }
+    .pill { @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium; }
     .muted { @apply text-slate-500; }
-    .chip  { @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium; }
-    .btn   { @apply inline-flex items-center gap-2 rounded-xl px-3 py-1.5 text-sm font-medium bg-slate-900 text-white hover:bg-slate-800; }
-    .th    { @apply text-left text-xs font-medium text-slate-500 uppercase tracking-wide; }
-    .td    { @apply py-3.5 align-middle; }
-    .kpi-up   { @apply text-emerald-600 font-medium; }
-    .kpi-down { @apply text-rose-600 font-medium; }
-    .caret { transition: transform .2s ease; }
-    .spark-wrap { width: 220px; height: 90px; }
+    .btn { @apply inline-flex items-center justify-center rounded-lg px-3 py-2 text-sm font-medium ring-1 ring-slate-300 hover:bg-slate-50; }
+    .num { font-variant-numeric: tabular-nums; }
+    .row-open { background-image: linear-gradient(to right, rgba(59,130,246,.05), transparent); }
+    /* malý sparkline */
+    .spark { width: 100%; height: 110px; }
+    .spark path.line { fill: none; stroke-width: 3; }
+    .spark line.dash { stroke-dasharray: 4 4; stroke-width: 3; }
   </style>
 </head>
-<body class="bg-slate-50 text-slate-900">
-  <header class="mx-auto max-w-6xl px-4 pt-6">
-    <a href="/client/" class="underline underline-offset-2 text-slate-700 hover:text-slate-900">&larr; Zpět na klientskou sekci</a>
+<body class="bg-slate-50 text-slate-800">
+  <!-- top nav (jednotný styl) -->
+  <header class="sticky top-0 z-10 bg-white/80 backdrop-blur border-b border-slate-200">
+    <div class="mx-auto max-w-6xl px-4 py-3 flex items-center gap-3">
+      <a href="/client/" class="btn">← Zpět na klientskou sekci</a>
+      <nav class="ml-auto flex gap-2">
+        <a href="/client/market/" class="btn bg-slate-900 text-white ring-slate-900 hover:bg-slate-800">Market Scanner</a>
+        <a href="/client/real-estate/" class="btn">Real-Estate</a>
+        <a href="/client/idea-lab/" class="btn">Idea Lab</a>
+      </nav>
+    </div>
   </header>
 
-  <main class="mx-auto max-w-6xl px-4 pb-24">
-    <div class="mt-6 mb-6">
-      <h1 class="text-3xl font-semibold tracking-tight">Market Scanner</h1>
-      <p class="muted mt-1">
-        Vyhledej a filtruj akcie, indexy a krypto. Řádek <strong>rozklikni</strong> pro tezi predikce,
-        podmínky neplatnosti a <strong>mini-graf</strong> s 1Y rozmezím (<em>min / avg / max</em>).
-        V demu jsou statická data.
+  <main class="mx-auto max-w-6xl px-4 py-8 space-y-6">
+    <section class="space-y-2">
+      <h1 class="text-3xl font-bold tracking-tight">Market Scanner</h1>
+      <p class="muted">
+        Vyhledej a filtruj akcie, indexy a krypto. Rozklikni řádek pro <em>tezi predikce</em>, podmínky <em>neplatnosti</em>
+        a mini-graf s 1Y rozmezím (<strong>min / avg / max</strong>). V demu níže jsou statická data; v ostré verzi napojíme živé ceny a zprávy.
       </p>
-    </div>
+    </section>
 
-    <!-- Filtry -->
-    <div class="mb-4 grid gap-3 md:grid-cols-3">
-      <input id="q" type="search" placeholder="Hledej symbol / název…" class="card w-full px-3 py-2" />
-      <select id="typeFilter" class="card px-3 py-2">
+    <!-- filtry -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+      <input id="q" placeholder="Hledej symbol / název…" class="card w-full px-3 py-2 focus:outline-none focus:ring-2 focus:ring-slate-300" />
+      <select id="type" class="card w-full px-3 py-2">
         <option value="">Všechny typy</option>
-        <option value="stock">Akcie</option>
-        <option value="crypto">Krypto</option>
-        <option value="index">Indexy</option>
+        <option>Akcie</option><option>Index</option><option>Krypto</option>
       </select>
-      <select id="sortBy" class="card px-3 py-2">
+      <select id="sort" class="card w-full px-3 py-2">
         <option value="symbol">Seřadit: Symbol</option>
-        <option value="price">Cena</option>
-        <option value="conf">Confidence</option>
+        <option value="name">Seřadit: Název</option>
+        <option value="price">Seřadit: Cena</option>
+        <option value="w1">Seřadit: 1W %</option>
       </select>
     </div>
 
-    <!-- Tabulka -->
+    <!-- tabulka -->
     <div class="card overflow-hidden">
-      <table class="w-full min-w-[820px]">
-        <thead class="bg-slate-50">
-          <tr>
-            <th class="th px-4 py-3"></th>
-            <th class="th px-4 py-3">Symbol</th>
-            <th class="th px-4 py-3">Název</th>
-            <th class="th px-4 py-3 text-right">Cena</th>
-            <th class="th px-4 py-3 text-right">1D %</th>
-            <th class="th px-4 py-3 text-right">1W %</th>
-            <th class="th px-4 py-3 text-right">1Y predikce<br><span class="muted normal-case">min / avg / max</span></th>
-            <th class="th px-4 py-3 text-right">Conf.</th>
+      <table class="w-full text-sm">
+        <thead class="bg-slate-100">
+          <tr class="text-left text-slate-600">
+            <th class="px-4 py-3">Symbol</th>
+            <th class="px-4 py-3">Název</th>
+            <th class="px-4 py-3">Cena</th>
+            <th class="px-4 py-3">1D %</th>
+            <th class="px-4 py-3">1W %</th>
+            <th class="px-4 py-3">1Y predikce<br><span class="text-xs muted">(min / <b>avg</b> / max)</span></th>
+            <th class="px-4 py-3">Conf.</th>
+            <th class="px-4 py-3"></th>
           </tr>
         </thead>
-        <tbody id="rows" class="divide-y divide-slate-100 bg-white"></tbody>
+        <tbody id="tbody" class="divide-y divide-slate-100 bg-white"></tbody>
       </table>
     </div>
 
-    <div class="mt-6">
-      <a class="btn" href="#" onclick="alert('V demu generujeme jen ukázkový markdown.'); return false;">Stáhnout report (MD)</a>
-    </div>
+    <p class="text-xs muted">* Ukázková data. V ostré verzi doplníme AI teze + zprávy + živé ceny a export reportu.</p>
   </main>
 
   <script>
-    // ---------------------- DEMO DATA ----------------------
+    // ---------- Demo dataset ----------
     const DATA = [
       {
-        symbol: "AAPL", name: "Apple Inc.", type: "stock",
-        price: 219.85, d1: 1.26, w1: 2.10, conf: 0.72,
-        forecast: { min: 165, avg: 245, max: 310, hist: [175,185,192,188,197,206,201,210] },
-        thesis: "Růst ekosystému, expanze marží, nové produkty.",
-        invalid: "Breakdown pod 195 s objemy a slabý guidance."
+        type: 'Akcie',
+        symbol: 'AAPL',
+        name: 'Apple Inc.',
+        price: 219.85, d1: 1.26, w1: 2.10,
+        pred: { min: 165, avg: 245, max: 310, conf: 72 },
+        thesis: 'Růst služeb a ekosystému, stabilní marže. Re-rating po nové produktové linii.',
+        invalid: 'Breakdown pod 195 s objemy a slabý guidance.',
+        history: [185,193,205,198,207,206,215,219.85]
       },
       {
-        symbol: "BTCUSD", name: "Bitcoin", type: "crypto",
-        price: 67200, d1: 2.30, w1: 6.80, conf: 0.58,
-        forecast: { min: 42000, avg: 88000, max: 120000, hist: [52000,56000,59000,57000,61000,65000,64000,67200] },
-        thesis: "ETF poptávka, halving, digitální zlato.",
-        invalid: "Regulační tlak, silný risk-off, útok na síť."
+        type: 'Krypto',
+        symbol: 'BTCUSD',
+        name: 'Bitcoin',
+        price: 67200, d1: 2.30, w1: 6.80,
+        pred: { min: 42000, avg: 88000, max: 120000, conf: 58 },
+        thesis: 'Poptávka přes ETF, halving + omezená nabídka, sílící narativ digitálního zlata.',
+        invalid: 'Regulační tlak, silný risk-off, útok na síť.',
+        history: [54000,59000,61000,58000,62000,65000,67000,67200]
       },
       {
-        symbol: "NVDA", name: "NVIDIA Corporation", type: "stock",
-        price: 241.80, d1: 1.85, w1: 4.10, conf: 0.72,
-        forecast: { min: 128, avg: 281, max: 498, hist: [150,165,172,168,183,199,205,242] },
-        thesis: "AI akceleruje poptávku, rozšíření portfolia.",
-        invalid: "Zpomalení datacenter / geopolitická rizika."
+        type: 'Akcie',
+        symbol: 'NVDA',
+        name: 'NVIDIA Corporation',
+        price: 241.80, d1: 1.85, w1: 4.10,
+        pred: { min: 128, avg: 281, max: 498, conf: 72 },
+        thesis: 'Růst datacenter GPU, objednávky hyperscalerů, expanze do ARM/PC.',
+        invalid: 'Ochlazení poptávky po AI, exportní restrikce, problémy v supply chainu.',
+        history: [190,205,198,210,215,220,235,241.8]
       }
     ];
 
-    // ---------------------- UTIL ----------------------
-    const el = (s) => document.querySelector(s);
-    const fmtPrice = v => v >= 1000 ? v.toLocaleString("cs-CZ") : v.toLocaleString("cs-CZ", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    const fmtPct   = v => (v >= 0 ? `+${v.toFixed(2)}%` : `${v.toFixed(2)}%`);
+    // ---------- Helpers ----------
+    const fmt = new Intl.NumberFormat('cs-CZ');
+    const pct = v => (v>=0? '+' : '') + v.toFixed(2).replace('.', ',') + '%';
+    const money = v => fmt.format(v);
+    const el = (t, cls='', html='') => {
+      const e = document.createElement(t);
+      if (cls) e.className = cls;
+      if (html) e.innerHTML = html;
+      return e;
+    };
 
-    // ---------------------- RENDER ROWS ----------------------
-    const $tbody = el("#rows");
-    function renderRows(list) {
-      $tbody.innerHTML = "";
-      list.forEach((r, idx) => {
-        // hlavní řádek
-        const tr = document.createElement("tr");
-        tr.className = "hover:bg-slate-50 cursor-pointer";
-        tr.dataset.idx = idx;
+    // Draw tiny sparkline with dashed min/max and solid avg
+    function drawSpark(container, history, pred) {
+      container.innerHTML = '';
+      const w = container.clientWidth || 520;
+      const h = container.clientHeight || 110;
+      const svg = el('svg','spark'); svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+
+      const all = [...history, pred.max, pred.min, pred.avg];
+      const minV = Math.min(...all);
+      const maxV = Math.max(...all);
+      const x = i => (i/(history.length-1))*(w-16)+8;
+      const y = v => h - ((v - minV)/(maxV - minV))*(h-20) - 10;
+
+      // line path
+      let d = '';
+      history.forEach((v,i)=>{ d += (i? 'L':'M') + x(i) + ' ' + y(v) + ' '; });
+      const path = el('path'); path.setAttribute('d', d);
+      path.setAttribute('class','line'); path.setAttribute('stroke','#2563eb'); // blue
+      svg.appendChild(path);
+
+      // dashed min / max on the right edge + solid avg
+      const xr = w - 10;
+      const lMax = el('line'); lMax.setAttribute('x1', xr); lMax.setAttribute('x2', xr);
+      lMax.setAttribute('y1', y(pred.max)); lMax.setAttribute('y2', y(history.at(-1)));
+      lMax.setAttribute('class','dash'); lMax.setAttribute('stroke','#16a34a'); // green
+      svg.appendChild(lMax);
+
+      const lMin = el('line'); lMin.setAttribute('x1', xr+8); lMin.setAttribute('x2', xr+8);
+      lMin.setAttribute('y1', y(pred.min)); lMin.setAttribute('y2', y(history.at(-1)));
+      lMin.setAttribute('class','dash'); lMin.setAttribute('stroke','#ef4444'); // red
+      svg.appendChild(lMin);
+
+      const lAvg = el('line'); lAvg.setAttribute('x1', xr-8); lAvg.setAttribute('x2', xr-8);
+      lAvg.setAttribute('y1', y(pred.avg)); lAvg.setAttribute('y2', y(history.at(-1)));
+      lAvg.setAttribute('stroke','#0ea5e9'); lAvg.setAttribute('stroke-width','3'); // solid cyan
+      svg.appendChild(lAvg);
+
+      container.appendChild(svg);
+    }
+
+    // ---------- Render table ----------
+    const tbody = document.getElementById('tbody');
+
+    function render(rows){
+      tbody.innerHTML = '';
+      rows.forEach((r, idx) => {
+        // main row
+        const tr = el('tr','hover:bg-slate-50');
         tr.innerHTML = `
-          <td class="td px-4 w-8"><span class="caret inline-block rotate-0">▸</span></td>
-          <td class="td px-4 font-semibold">${r.symbol}</td>
-          <td class="td px-4">${r.name}</td>
-          <td class="td px-4 text-right tabular-nums">${fmtPrice(r.price)}</td>
-          <td class="td px-4 text-right tabular-nums ${r.d1>=0?'kpi-up':'kpi-down'}">${fmtPct(r.d1)}</td>
-          <td class="td px-4 text-right tabular-nums ${r.w1>=0?'kpi-up':'kpi-down'}">${fmtPct(r.w1)}</td>
-          <td class="td px-4 text-right tabular-nums">
-            ${fmtPrice(r.forecast.min)} <span class="muted">/</span>
-            <strong>${fmtPrice(r.forecast.avg)}</strong> <span class="muted">/</span>
-            ${fmtPrice(r.forecast.max)}
+          <td class="px-4 py-3 font-semibold">${r.symbol}</td>
+          <td class="px-4 py-3">${r.name}</td>
+          <td class="px-4 py-3 num">${money(r.price)}</td>
+          <td class="px-4 py-3"><span class="num ${r.d1>=0?'text-emerald-600':'text-rose-600'}">${pct(r.d1)}</span></td>
+          <td class="px-4 py-3"><span class="num ${r.w1>=0?'text-emerald-600':'text-rose-600'}">${pct(r.w1)}</span></td>
+          <td class="px-4 py-3 num">
+            ${money(r.pred.min)} <span class="muted">/</span>
+            <b>${money(r.pred.avg)}</b> <span class="muted">/</span>
+            ${money(r.pred.max)}
           </td>
-          <td class="td px-4 text-right tabular-nums">${Math.round(r.conf*100)}%</td>
+          <td class="px-4 py-3"><span class="pill bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200">${r.pred.conf}%</span></td>
+          <td class="px-4 py-3 text-right">
+            <button class="btn" data-toggle="${idx}">Detail</button>
+          </td>
         `;
-        $tbody.appendChild(tr);
+        tbody.appendChild(tr);
 
-        // detail řádek (skrytý)
-        const dr = document.createElement("tr");
-        dr.className = "hidden bg-slate-50/60";
-        dr.dataset.detailFor = idx;
-        dr.innerHTML = `
-          <td></td>
-          <td colspan="7" class="px-4 pb-4">
-            <div class="mt-1 grid gap-4 md:grid-cols-[1fr_240px]">
-              <div class="card p-4">
-                <div class="flex items-center justify-between mb-2">
-                  <div class="text-sm font-medium">Mini-graf – 1Y (demo)</div>
-                  <div class="muted text-xs">Plná čára: avg • čárkovaně: min/max</div>
-                </div>
-                <div class="spark-wrap"><canvas id="spark-${idx}" width="220" height="90"></canvas></div>
-              </div>
-              <aside class="card p-4 text-sm space-y-2">
-                <p class="muted text-xs">Teze &amp; podmínky</p>
-                <p><span class="chip bg-emerald-50 text-emerald-700 mr-2">Teze</span>${r.thesis}</p>
-                <p><span class="chip bg-rose-50 text-rose-700 mr-2">Neplatí, pokud</span>${r.invalid}</p>
-              </aside>
-            </div>
-          </td>
+        // detail row (hidden)
+        const dtr = el('tr'); dtr.classList.add('hidden'); dtr.id = `detail-${idx}`;
+        const td = el('td','px-4 py-4 bg-slate-50/60 row-open', ''); td.colSpan = 8;
+
+        const box = el('div','grid grid-cols-1 md:grid-cols-2 gap-6 items-start');
+        // left – text
+        const left = el('div','space-y-3');
+        left.innerHTML = `
+          <div><span class="pill bg-slate-100 ring-1 ring-slate-200 mr-2">Teze</span><span>${r.thesis}</span></div>
+          <div><span class="pill bg-slate-100 ring-1 ring-slate-200 mr-2">Neplatí, pokud</span><span>${r.invalid}</span></div>
+          <div class="muted text-xs">* Demo sparkline z ukázkových dat. Čárkovaně min/max, plná čára avg.</div>
         `;
-        $tbody.appendChild(dr);
+        // right – sparkline + štítky
+        const right = el('div','card p-3');
+        right.innerHTML = `
+          <div class="flex items-center justify-between mb-2">
+            <div class="font-medium">${r.symbol} — mini-graf</div>
+            <div class="muted text-xs">1Y range</div>
+          </div>
+          <div class="w-full spark-box"><div class="spark"></div></div>
+          <div class="mt-3 grid grid-cols-2 gap-2 text-xs">
+            <div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-sky-500"></span>Avg: <b class="num">${money(r.pred.avg)}</b></div>
+            <div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-emerald-500"></span>Max: <span class="num">${money(r.pred.max)}</span></div>
+            <div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-rose-500"></span>Min: <span class="num">${money(r.pred.min)}</span></div>
+            <div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-blue-600"></span>Aktuální: <span class="num">${money(r.price)}</span></div>
+          </div>
+        `;
+        box.appendChild(left); box.appendChild(right);
+        td.appendChild(box); dtr.appendChild(td);
+        tbody.appendChild(dtr);
+
+        // toggle
+        tr.querySelector('[data-toggle]').addEventListener('click', () => {
+          // zavři ostatní
+          document.querySelectorAll('tr[id^="detail-"]').forEach(x => {
+            if (x !== dtr) x.classList.add('hidden');
+          });
+          dtr.classList.toggle('hidden');
+          if (!dtr.classList.contains('hidden')) {
+            const svgHost = dtr.querySelector('.spark');
+            drawSpark(svgHost, r.history, r.pred);
+          }
+        });
       });
     }
 
-    renderRows(DATA);
+    // init + jednoduché filtrování/řazení
+    let rows = [...DATA];
 
-    // ---------------------- TOGGLE DETAIL + DRAW SPARK ----------------------
-    const charts = {}; // cache Chart.js instancí
-    function drawSpark(idx, row) {
-      if (charts[idx]) return; // už vykresleno
-      const ctx = document.getElementById(`spark-${idx}`);
-      if (!ctx) return;
+    function apply() {
+      const q = document.getElementById('q').value.trim().toLowerCase();
+      const type = document.getElementById('type').value;
+      const sort = document.getElementById('sort').value;
 
-      const labels = ["Nyní", "1Y"];
-      const avg = [row.price, row.forecast.avg];
-      const min = [row.price, row.forecast.min];
-      const max = [row.price, row.forecast.max];
-
-      charts[idx] = new Chart(ctx, {
-        type: "line",
-        data: {
-          labels,
-          datasets: [
-            { label: "Avg", data: avg, borderWidth: 2, tension: 0.25 },
-            { label: "Min", data: min, borderDash: [6,4], borderWidth: 1.5, tension: 0.25 },
-            { label: "Max", data: max, borderDash: [6,4], borderWidth: 1.5, tension: 0.25 },
-          ]
-        },
-        options: {
-          responsive: false,
-          maintainAspectRatio: false,
-          plugins: { legend: { display: false }, tooltip: { enabled: false } },
-          scales: {
-            x: { display: false },
-            y: { display: false }
-          },
-          elements: { point: { radius: 0 } }
-        }
-      });
-    }
-
-    // klik na řádek – toggle detail
-    $tbody.addEventListener("click", (e) => {
-      const tr = e.target.closest("tr[data-idx]");
-      if (!tr) return;
-      const idx = +tr.dataset.idx;
-      const caret = tr.querySelector(".caret");
-      const detail = $tbody.querySelector(`tr[data-detail-for="${idx}"]`);
-      const isOpen = !detail.classList.contains("hidden");
-      // zavři/otevři
-      if (isOpen) {
-        detail.classList.add("hidden");
-        caret.style.transform = "rotate(0deg)";
-      } else {
-        detail.classList.remove("hidden");
-        caret.style.transform = "rotate(90deg)";
-        // vykresli mini-graf při prvním otevření
-        drawSpark(idx, DATA[idx]);
-      }
-    });
-
-    // ---------------------- FILTRY/ŘAZENÍ ----------------------
-    function applyFilters() {
-      const q = el("#q").value.trim().toLowerCase();
-      const t = el("#typeFilter").value;
-      const s = el("#sortBy").value;
-      let list = DATA.filter(r =>
-        (!t || r.type === t) &&
+      rows = DATA.filter(r =>
+        (!type || r.type === type) &&
         (!q || r.symbol.toLowerCase().includes(q) || r.name.toLowerCase().includes(q))
       );
-      list.sort((a,b) => {
-        if (s === "price") return b.price - a.price;
-        if (s === "conf")  return b.conf  - a.conf;
+      rows.sort((a,b)=>{
+        if (sort==='name') return a.name.localeCompare(b.name);
+        if (sort==='price') return a.price-b.price;
+        if (sort==='w1') return b.w1-a.w1;
         return a.symbol.localeCompare(b.symbol);
       });
-      renderRows(list);
-      // zahoď staré chart instance (re-render tabulky)
-      Object.values(charts).forEach(ch => ch.destroy());
-      Object.keys(charts).forEach(k => delete charts[k]);
+      render(rows);
     }
-    ["#q","#typeFilter","#sortBy"].forEach(id => el(id).addEventListener("input", applyFilters));
+
+    document.getElementById('q').addEventListener('input', apply);
+    document.getElementById('type').addEventListener('change', apply);
+    document.getElementById('sort').addEventListener('change', apply);
+    apply();
   </script>
 </body>
 </html>
