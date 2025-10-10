@@ -3,30 +3,36 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>StrategyMind — Market Scanner (demo v2)</title>
+  <title>StrategyMind — Market Scanner</title>
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
   <style>
     html,body{ font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial; }
-    .row:hover { background: #f8fafc; }
+    .row:hover { background:#f8fafc; }
     .pill { padding:.375rem .625rem; border-radius:9999px; border:1px solid rgba(15,23,42,.08); }
     .kbd { background:#f3f4f6; padding:.125rem .375rem; border-radius:.25rem; font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Courier New", monospace; font-size:.75rem; }
-    /* Mini-graf */
-    .spark path.avg   { stroke:#2563eb; stroke-width: 2; fill: none; }
+
+    /* mini-graf */
+    .spark path.avg   { stroke:#2563eb; stroke-width:2; fill:none; }
     .spark path.min,
-    .spark path.max   { stroke-width: 2; fill: none; stroke-dasharray: 4 4; }
+    .spark path.max   { stroke-width:2; fill:none; stroke-dasharray:4 4; }
     .spark path.min   { stroke:#ef4444; }
     .spark path.max   { stroke:#22c55e; }
     .spark line.guide { stroke:#94a3b8; stroke-dasharray:4 4; opacity:.6; }
-    .spark-wrap { display:flex; align-items:center; gap:.75rem; }
-    .target-badges { display:flex; flex-direction:column; gap:.2rem; font-size:.75rem; line-height:1.1; }
-    .target-badges .b { display:flex; align-items:center; gap:.4rem; white-space:nowrap; }
-    .dot { width:.5rem; height:.5rem; border-radius:9999px; display:inline-block; }
-    .dot.max { background:#22c55e; } .dot.avg { background:#2563eb; } .dot.min { background:#ef4444; }
-    .skeleton { background:linear-gradient(90deg,#f3f4f6 25%,#e5e7eb 37%,#f3f4f6 63%); background-size:400% 100%; animation:sh 1.2s ease-in-out infinite; }
-    @keyframes sh{0%{background-position:100% 0}100%{background-position:0 0}}
+    .spark-wrap{ display:flex; align-items:center; gap:.75rem; }
+    .target-badges{ display:flex; flex-direction:column; gap:.2rem; font-size:.75rem; line-height:1.1; }
+    .target-badges .b{ display:flex; align-items:center; gap:.4rem; white-space:nowrap; }
+    .dot{ width:.5rem; height:.5rem; border-radius:9999px; display:inline-block; }
+    .dot.max{ background:#22c55e; } .dot.avg{ background:#2563eb; } .dot.min{ background:#ef4444; }
+
+    /* AI Edge panel */
+    .overlay{ background:rgba(2,6,23,.45); }
+    .fade-enter{ opacity:0; transform: translateY(6px); }
+    .fade-enter-active{ opacity:1; transform:none; transition: all .18s ease; }
+    .drop-active{ border-color:#0ea5e9 !important; background:rgba(14,165,233,.05); }
   </style>
 </head>
 <body class="bg-slate-50 text-slate-900">
@@ -46,16 +52,28 @@
   </header>
 
   <main class="max-w-6xl mx-auto px-4 py-8">
-    <h1 class="text-3xl font-semibold tracking-tight">Market Scanner</h1>
-    <p class="mt-2 text-slate-600 max-w-3xl">
-      Vyhledej a filtruj akcie, indexy, forex, krypto a komodity. Řádek <strong>rozklikni</strong> pro tezi predikce,
-      podmínky neplatnosti a <strong>mini-graf</strong> s 1Y rozmezím (<em>min / avg / max</em>) + štítky cílových hodnot.
-      V demu jsou statická data, ale tickery se načítají z <code>assets/universe-lite.json</code>.
-    </p>
+    <div class="flex items-start flex-wrap gap-3 justify-between">
+      <div>
+        <h1 class="text-3xl font-semibold tracking-tight">Market Scanner</h1>
+        <p class="mt-2 text-slate-600 max-w-3xl">
+          Vyhledej a filtruj akcie, indexy, forex, krypto a komodity.
+          Řádek <strong>rozklikni</strong> pro tezi, podmínky neplatnosti a <strong>mini-graf</strong>
+          s 1Y rozmezím (<em>min / avg / max</em>) + štítky cílových hodnot.
+        </p>
+      </div>
+
+      <!-- WOW CTA -->
+      <div class="w-full md:w-auto">
+        <button id="openAIEdgeTop" class="w-full md:w-auto inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-cyan-600 text-white shadow-sm hover:bg-cyan-700">
+          ⚡ AI Edge — Osobní predikce
+        </button>
+        <div class="text-xs text-slate-500 mt-1 md:text-right">Nahrát screenshot nebo zadat symbol. Okamžitý směr + úrovně + důvody.</div>
+      </div>
+    </div>
 
     <!-- Toolbar -->
-    <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-3">
-      <div class="relative">
+    <div class="mt-6 grid grid-cols-1 md:grid-cols-4 gap-3">
+      <div class="relative md:col-span-2">
         <input id="q" class="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white outline-none focus:ring-2 focus:ring-slate-200"
                placeholder="Hledej symbol / název…" />
         <div class="absolute inset-y-0 right-2 flex items-center text-slate-400 pointer-events-none">
@@ -65,9 +83,9 @@
       <select id="typeFilter" class="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white outline-none focus:ring-2 focus:ring-slate-200">
         <option value="">Všechny typy</option>
         <option value="stock">Akcie</option>
+        <option value="crypto">Krypto</option>
         <option value="index">Index</option>
         <option value="forex">Forex</option>
-        <option value="crypto">Krypto</option>
         <option value="commodity">Komodita</option>
       </select>
       <select id="sortBy" class="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white outline-none focus:ring-2 focus:ring-slate-200">
@@ -80,7 +98,7 @@
 
     <!-- Table -->
     <div class="mt-5 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-      <div class="grid grid-cols-[110px,1fr,120px,110px,110px,230px,90px,90px] px-4 py-2 text-sm font-medium text-slate-500 bg-slate-50">
+      <div class="grid grid-cols-[100px,1fr,120px,110px,110px,230px,90px,110px] px-4 py-2 text-sm font-medium text-slate-500 bg-slate-50">
         <div>Symbol</div>
         <div>Název</div>
         <div class="text-right">Cena</div>
@@ -88,29 +106,112 @@
         <div class="text-right">1W %</div>
         <div class="text-center">1Y predikce <span class="text-slate-400">(min / avg / max)</span></div>
         <div class="text-right">Conf.</div>
-        <div></div>
+        <div class="text-right">Akce</div>
       </div>
       <div id="rows"></div>
-      <div id="loading" class="px-4 py-6 hidden">
-        <div class="h-6 w-2/3 rounded skeleton mb-3"></div>
-        <div class="h-6 w-full rounded skeleton mb-2"></div>
-        <div class="h-6 w-full rounded skeleton mb-2"></div>
-        <div class="h-6 w-3/4 rounded skeleton"></div>
-      </div>
     </div>
 
     <p class="mt-3 text-xs text-slate-500">* Demo verze se statickými daty. V ostré verzi připojíme AI teze + zprávy + živé ceny.</p>
   </main>
 
+  <!-- ===================== AI EDGE PANEL ===================== -->
+  <div id="edgeOverlay" class="hidden fixed inset-0 z-50 overlay"></div>
+  <section id="edgePanel" class="hidden fixed inset-0 z-50 p-4 md:p-8 overflow-y-auto">
+    <div class="fade-enter max-w-5xl mx-auto rounded-2xl border border-slate-200 bg-white shadow-lg overflow-hidden">
+      <div class="px-5 py-4 flex items-center justify-between bg-slate-50 border-b border-slate-200">
+        <div class="flex items-center gap-3">
+          <span class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-cyan-600 text-white">⚡</span>
+          <div>
+            <h2 class="text-lg font-semibold">AI Edge — Osobní predikce</h2>
+            <div class="text-xs text-slate-500">Symbol: <b id="edgeSymbolLabel">—</b></div>
+          </div>
+        </div>
+        <button id="edgeClose" class="px-3 py-1.5 rounded-lg border border-slate-300 hover:bg-slate-100">Zavřít</button>
+      </div>
+
+      <div class="p-5 grid lg:grid-cols-2 gap-6">
+        <!-- left -->
+        <div>
+          <label class="text-sm font-medium text-slate-600">Symbol (nebo nech předvyplněný)</label>
+          <input id="edgeSymbol" class="mt-1 w-full px-3 py-2 rounded-lg border border-slate-200" placeholder="AAPL, NVDA, BTCUSD…" />
+
+          <label class="mt-4 block text-sm font-medium text-slate-600">Screenshot grafu (volitelně: PNG/JPG nebo PDF)</label>
+          <div id="edgeDrop" class="mt-2 rounded-xl border border-dashed border-slate-300 p-6 text-center cursor-pointer">
+            <input id="edgeFile" type="file" accept="image/*,.pdf" class="hidden" />
+            <p class="text-slate-500">Přetáhni sem soubor nebo <span class="text-cyan-700 underline">vyber</span></p>
+            <p class="mt-1 text-xs text-slate-400">Max ~10 MB</p>
+            <img id="edgePreview" class="hidden mt-4 max-h-56 mx-auto rounded-lg border border-slate-200" alt="Náhled" />
+            <canvas id="edgeCanvas" class="hidden"></canvas>
+          </div>
+
+          <label class="mt-4 block text-sm font-medium text-slate-600">Poznámka / úmysl (volitelně)</label>
+          <textarea id="edgeNote" rows="3" class="mt-2 w-full rounded-lg border border-slate-300 p-3" placeholder="Např.: Hledám breakout nad 245 s targetem 310 a SL 195…"></textarea>
+
+          <div class="mt-3 flex items-center gap-4">
+            <label class="inline-flex items-center gap-2 text-sm">
+              <input id="edgeUseWeb" type="checkbox" class="rounded border-slate-300 text-cyan-600 focus:ring-cyan-500">
+              Prohledat web (zprávy, earnings, sentiment)
+            </label>
+            <label class="inline-flex items-center gap-2 text-sm">
+              <input id="edgeExplain" type="checkbox" class="rounded border-slate-300 text-cyan-600 focus:ring-cyan-500" checked>
+              Vysvětlit klíčové úrovně
+            </label>
+          </div>
+
+          <div class="mt-4 flex items-center gap-3">
+            <button id="edgeRun" class="px-4 py-2 rounded-xl bg-cyan-600 text-white hover:bg-cyan-700 shadow-sm disabled:opacity-60 disabled:cursor-not-allowed">
+              Spustit AI predikci
+            </button>
+            <button id="edgeClear" class="px-3 py-2 rounded-xl border border-slate-300 hover:bg-slate-100">
+              Vyčistit
+            </button>
+          </div>
+
+          <p class="mt-3 text-xs text-slate-500">
+            Backend API: <code>POST /api/trader-ai/analyze</code> (multipart). Pokud není dostupné, zapne se demo-mock.
+          </p>
+        </div>
+
+        <!-- right -->
+        <div>
+          <div class="flex items-center justify-between">
+            <h3 class="text-sm font-semibold text-slate-600">Výstup</h3>
+            <button id="edgeSave" class="text-sm px-3 py-1.5 rounded-lg border border-slate-300 hover:bg-slate-100" disabled>Uložit</button>
+          </div>
+          <div id="edgeResult" class="mt-2 rounded-xl border border-slate-200 p-4 min-h-[220px]">
+            <p class="text-slate-500 text-sm">Zatím nic. Zadej symbol nebo nahraj graf a spusť AI.</p>
+          </div>
+          <h4 class="mt-6 text-sm font-semibold text-slate-600">Historie (lokálně)</h4>
+          <div id="edgeHistory" class="mt-2 space-y-2 text-sm"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- =================== /AI EDGE PANEL =================== -->
+
   <script>
-    // ===== Helpers =====
+    // ========================= Helpers =========================
     const fmt = new Intl.NumberFormat('cs-CZ', { maximumFractionDigits: 2 });
     const pct = v => (v >= 0 ? '+' : '') + v.toFixed(2) + '%';
-    const rowsEl = document.getElementById('rows');
-    const loadingEl = document.getElementById('loading');
 
-    // převod bodů do SVG path
-    function pathFrom(points, width=180, height=64, pad=4){
+    // Demo data (zůstává minimalistické)
+    const rows = [
+      { type:'stock',  symbol:'AAPL',    name:'Apple Inc.',            price:219.85, d1:1.26, w1:2.10,  forecast:{min:165, avg:245, max:310, conf:72},
+        thesis:'Růst služeb a ekosystému, stabilní marže. Re-rating po nové produktové linii.',
+        invalid:'Breakdown pod 195 s objemy a slabá guidance.',
+        path:{ avg:[0,1,1.8,1.4,2.1,2.0,2.5], min:[0,-0.5,-0.2,-0.7,-0.4,-0.8,-1.1], max:[0,1.6,2.3,1.9,2.7,2.5,3.1]} },
+      { type:'crypto', symbol:'BTCUSD',  name:'Bitcoin',               price:67200,  d1:2.30, w1:6.80,  forecast:{min:42000, avg:88000, max:120000, conf:58},
+        thesis:'Poptávka přes ETF, halving + omezená nabídka, sílící narativ „digitální zlato“.', invalid:'Regulační tlak, silný risk-off, útok na síť.',
+        path:{ avg:[0,1.1,1.0,1.3,1.45,1.42,1.55], min:[0,0.2,0.1,0.15,0.1,0.05,0], max:[0,1.7,1.9,2.2,2.4,2.5,2.8]} },
+      { type:'stock',  symbol:'NVDA',    name:'NVIDIA Corporation',    price:241.80, d1:1.85, w1:4.10,  forecast:{min:128, avg:281, max:498, conf:72},
+        thesis:'Udržitelná poptávka po AI akcelerátorech, expanze do datacenter a softwaru.',
+        invalid:'Cyklus investic do DC se zpomalí, regulace vývozu čipů.',
+        path:{ avg:[0,0.6,0.9,0.7,1.2,1.6,1.9], min:[0,-0.3,-0.4,-0.5,-0.7,-0.8,-1.0], max:[0,1.2,1.6,1.5,2.0,2.6,3.0]} },
+    ];
+
+    const container = document.getElementById('rows');
+
+    function pathFrom(points, width=220, height=72, pad=4){
       const max = Math.max(...points.map(v=>Math.abs(v))) || 1;
       const step = (width - pad*2) / (points.length-1);
       const scaleY = (v)=> (height/2 - (v/max)*(height/2 - pad));
@@ -123,7 +224,6 @@
       return d;
     }
 
-    // mini-graf s „dnes“ čárou a štítky napravo
     function sparkSVG(series, forecast){
       const w=220,h=72,pad=4;
       const dAvg = pathFrom(series.avg, w, h, pad);
@@ -147,72 +247,11 @@
         </div>`;
     }
 
-    // ===== Demo generátor pro tickery z JSONu =====
-    function rand(a,b){ return a + Math.random()*(b-a); }
-    function choice(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
-
-    function demoFromUniverseItem(u){
-      // základní cena podle typu, jen aby to působilo realisticky
-      const basePriceByType = { stock: rand(10,400), index: rand(1000,6000), forex: rand(0.5,1.5), crypto: rand(0.02,90000), commodity: rand(20,250) };
-      const price = basePriceByType[u.type] || rand(10,500);
-      const d1 = rand(-3,3);
-      const w1 = rand(-8,8);
-
-      // forecast vychází z price ± rozpětí
-      const spread = Math.max(0.15*price, 0.05*price + Math.abs(w1)*0.01*price);
-      const avg = price * (1 + rand(-0.05, 0.20));
-      const min = Math.max( avg - spread, avg*0.2 );
-      const max = avg + spread;
-      const conf = Math.round(rand(50,85));
-
-      // mini-graf – avg mezi min a max, závěr blízko ‚avg‘
-      const steps = 8, avgSeries=[], minSeries=[], maxSeries=[];
-      let curAvg=0, curMin=0, curMax=0;
-      for(let i=0;i<steps;i++){
-        curAvg += rand(-0.3,0.5);
-        curMin  = curAvg - rand(0.6,1.2);
-        curMax  = curAvg + rand(0.6,1.2);
-        avgSeries.push(curAvg);
-        minSeries.push(curMin);
-        maxSeries.push(curMax);
-      }
-      // posuň poslední bod avg tak, aby vizuálně odpovídal „mezi“ min/max
-      avgSeries[steps-1] = (minSeries[steps-1] + maxSeries[steps-1]) / 2;
-
-      // jednoduché teze podle typu
-      const thesisByType = {
-        stock: 'Růst služeb/produktů, stabilní marže, expanze.',
-        index: 'Makro trend, earnings sezóna, riziková prémie.',
-        forex: 'Úrokový diferenciál, inflace, risk-on/off flow.',
-        crypto:'ETF/přítok kapitálu, narativ digitálního aktiva.',
-        commodity:'Nabídka/poptávka, zásoby, geopolitika.'
-      };
-      const invalidByType = {
-        stock: 'Breakdown pod klíčovou úroveň s objemy a slabá guidance.',
-        index: 'Silný risk-off, geopolitický šok, slabé earnings.',
-        forex: 'Nečekaný obrat politiky CB, intervence, recese.',
-        crypto:'Regulační tlak, útok na síť, risk-off panika.',
-        commodity:'Nadprůměrné zásoby, vyšší nabídka, slabá poptávka.'
-      };
-
-      return {
-        type: u.type,
-        symbol: u.symbol,
-        name: u.name,
-        price, d1, w1,
-        forecast: { min, avg, max, conf },
-        thesis: thesisByType[u.type] || 'Tržní teze (demo).',
-        invalid: invalidByType[u.type] || 'Podmínky neplatnosti (demo).',
-        path: { avg: avgSeries, min: minSeries, max: maxSeries }
-      };
-    }
-
-    // ===== UI rendering =====
     function renderRow(r){
       const row = document.createElement('div');
       row.className = "row";
       row.innerHTML = `
-        <div class="grid grid-cols-[110px,1fr,120px,110px,110px,230px,90px,90px] items-center px-4 py-3 border-t border-slate-100 cursor-pointer">
+        <div class="grid grid-cols-[100px,1fr,120px,110px,110px,230px,90px,110px] items-center px-4 py-3 border-t border-slate-100 cursor-pointer">
           <div class="font-semibold">${r.symbol}</div>
           <div class="text-slate-700">${r.name}</div>
           <div class="text-right tabular-nums">${fmt.format(r.price)}</div>
@@ -222,17 +261,16 @@
             ${fmt.format(r.forecast.min)} / <span class="font-semibold">${fmt.format(r.forecast.avg)}</span> / ${fmt.format(r.forecast.max)}
           </div>
           <div class="text-right tabular-nums">${r.forecast.conf}%</div>
-          <div class="text-right">
-            <button class="px-3 py-1.5 text-sm rounded-lg border border-slate-200 hover:bg-slate-50">Detail</button>
+          <div class="text-right flex justify-end">
+            <button class="mr-2 px-3 py-1.5 text-sm rounded-lg border border-slate-200 hover:bg-slate-50">Detail</button>
+            <button class="px-3 py-1.5 text-sm rounded-lg bg-cyan-600 text-white hover:bg-cyan-700" data-ai-edge>AI predikce</button>
           </div>
         </div>
         <div class="hidden px-4 pb-4">
           <div class="grid md:grid-cols-[300px,1fr,1fr] gap-6 mt-3 rounded-xl border border-slate-100 bg-slate-50 p-4">
             <div>
               <div class="text-xs text-slate-500 mb-1">Mini-graf — 1Y (demo)</div>
-              <div class="rounded-lg border border-slate-200 bg-white p-2">
-                ${sparkSVG(r.path, r.forecast)}
-              </div>
+              <div class="rounded-lg border border-slate-200 bg-white p-2">${sparkSVG(r.path, r.forecast)}</div>
               <div class="mt-1 text-[11px] text-slate-500">Plná čára: <b>avg</b> · čárkovaně: <b>min/max</b> · tečkovaná: <b>dnes</b></div>
             </div>
             <div class="text-sm">
@@ -245,31 +283,27 @@
               <div class="mt-3 text-xs text-slate-500">*Ukázková data, demo verze.</div>
             </div>
           </div>
-        </div>
-      `;
+        </div>`;
       const head = row.querySelector('.grid');
       const detailBtn = row.querySelector('button');
+      const aiBtn = row.querySelector('[data-ai-edge]');
       const panel = row.children[1];
       function toggle(){ panel.classList.toggle('hidden'); }
-      head.addEventListener('click', (e)=>{ if(e.target.tagName.toLowerCase() === 'button') return; toggle(); });
+      head.addEventListener('click', (e)=>{ if(e.target.tagName.toLowerCase()==='button') return; toggle(); });
       detailBtn.addEventListener('click', (e)=>{ e.stopPropagation(); toggle(); });
-      rowsEl.appendChild(row);
+      aiBtn.addEventListener('click', (e)=>{ e.stopPropagation(); openEdge(r.symbol); });
+      container.appendChild(row);
     }
 
-    function render(list){
-      rowsEl.innerHTML = '';
-      list.forEach(renderRow);
-    }
+    function render(list){ container.innerHTML = ''; list.forEach(renderRow); }
 
-    // ===== Filtry / třídění =====
     const q = document.getElementById('q');
     const typeFilter = document.getElementById('typeFilter');
     const sortBy = document.getElementById('sortBy');
-    let ROWS = []; // naplní se po fetchi
 
     function apply(){
       const term = q.value.trim().toLowerCase();
-      let out = ROWS.filter(r =>
+      let out = rows.filter(r =>
         (!typeFilter.value || r.type === typeFilter.value) &&
         (!term || r.symbol.toLowerCase().includes(term) || r.name.toLowerCase().includes(term))
       );
@@ -281,35 +315,215 @@
       }
       render(out);
     }
-
     q.addEventListener('input', apply);
     typeFilter.addEventListener('change', apply);
     sortBy.addEventListener('change', apply);
     document.addEventListener('keydown', (e)=>{ if(e.key === '/') { e.preventDefault(); q.focus(); }});
+    apply();
 
-    // ===== Načtení tickerů z assets/universe-lite.json =====
-    async function bootstrap(){
-      loadingEl.classList.remove('hidden');
-      try {
-        const res = await fetch('/assets/universe-lite.json', {cache:'no-store'});
-        const data = await res.json();
-        const uni = Array.isArray(data) ? data : (data.universe || []);
+    // ================== AI Edge panel logic ==================
+    const edgeOverlay = document.getElementById('edgeOverlay');
+    const edgePanel   = document.getElementById('edgePanel');
+    const edgeClose   = document.getElementById('edgeClose');
+    const edgeTopBtn  = document.getElementById('openAIEdgeTop');
 
-        // necháme cca 500 položek (když jich bude víc), a z každé uděláme demo řádek
-        ROWS = uni.slice(0, 500).map(demoFromUniverseItem);
+    const edgeSymbolLabel = document.getElementById('edgeSymbolLabel');
+    const edgeSymbol = document.getElementById('edgeSymbol');
+    const edgeDrop   = document.getElementById('edgeDrop');
+    const edgeFile   = document.getElementById('edgeFile');
+    const edgePreview= document.getElementById('edgePreview');
+    const edgeCanvas = document.getElementById('edgeCanvas');
+    const edgeRun    = document.getElementById('edgeRun');
+    const edgeClear  = document.getElementById('edgeClear');
+    const edgeResult = document.getElementById('edgeResult');
+    const edgeNote   = document.getElementById('edgeNote');
+    const edgeUseWeb = document.getElementById('edgeUseWeb');
+    const edgeExplain= document.getElementById('edgeExplain');
+    const edgeSave   = document.getElementById('edgeSave');
+    const edgeHistory= document.getElementById('edgeHistory');
 
-        apply();
-      } catch (e){
-        rowsEl.innerHTML = `<div class="p-6 text-sm text-rose-700 bg-rose-50 border border-rose-200 rounded-xl">
-          Nepodařilo se načíst <code>assets/universe-lite.json</code>. Zkontroluj cestu / nasazení.
-        </div>`;
-        console.error(e);
-      } finally {
-        loadingEl.classList.add('hidden');
+    function openEdge(symbol=''){
+      edgeOverlay.classList.remove('hidden');
+      edgePanel.classList.remove('hidden');
+      edgePanel.querySelector('.fade-enter')?.classList.add('fade-enter-active');
+      edgeSymbol.value = symbol || '';
+      edgeSymbolLabel.textContent = symbol || '—';
+    }
+    function closeEdge(){
+      edgeOverlay.classList.add('hidden');
+      edgePanel.classList.add('hidden');
+    }
+    edgeTopBtn.addEventListener('click', ()=>openEdge());
+    edgeClose.addEventListener('click', closeEdge);
+    edgeOverlay.addEventListener('click', closeEdge);
+    document.addEventListener('keydown', (e)=>{ if(e.key==='Escape' && !edgePanel.classList.contains('hidden')) closeEdge(); });
+
+    // Drag & drop
+    ['dragenter','dragover'].forEach(ev => edgeDrop.addEventListener(ev, e=>{e.preventDefault(); e.stopPropagation(); edgeDrop.classList.add('drop-active');}));
+    ['dragleave','drop'].forEach(ev => edgeDrop.addEventListener(ev, e=>{e.preventDefault(); e.stopPropagation(); edgeDrop.classList.remove('drop-active');}));
+    edgeDrop.addEventListener('click', ()=>edgeFile.click());
+    edgeDrop.addEventListener('drop', e => { const f = e.dataTransfer.files?.[0]; if (f) loadEdgeFile(f); });
+    edgeFile.addEventListener('change', e => { const f = e.target.files?.[0]; if (f) loadEdgeFile(f); });
+
+    function loadEdgeFile(f){
+      if(!f) return;
+      if(!/image\/|pdf$/.test(f.type)) { alert('Podporujeme obrázky (PNG/JPG) a PDF.'); return; }
+      const url = URL.createObjectURL(f);
+      if(f.type==='application/pdf'){
+        edgePreview.classList.add('hidden');
+        edgeCanvas.classList.remove('hidden');
+        const ctx = edgeCanvas.getContext('2d'); edgeCanvas.width=600; edgeCanvas.height=80;
+        ctx.fillStyle = '#0f172a'; ctx.fillRect(0,0,600,80);
+        ctx.fillStyle = '#e2e8f0'; ctx.font = '16px Inter, sans-serif';
+        ctx.fillText('PDF přiloženo:', 12, 30);
+        ctx.fillText(f.name + ' ('+Math.round(f.size/1024)+' kB)', 12, 55);
+        edgeFile._file = f;
+      } else {
+        edgeCanvas.classList.add('hidden');
+        edgePreview.classList.remove('hidden');
+        edgePreview.src = url;
+        edgeFile._file = f;
       }
+      edgeSave.disabled = true;
+      edgeResult.innerHTML = '<p class="text-sm text-slate-500">Soubor připraven. Klikni <b>Spustit AI predikci</b>.</p>';
     }
 
-    bootstrap();
+    function renderEdgeOutput(p){
+      const { direction, confidence, reasons=[], levels={}, risk={}, summary } = p;
+      edgeResult.innerHTML = `
+        <div class="space-y-3">
+          <div class="flex items-center gap-3">
+            <span class="px-2 py-1 rounded-lg text-xs border ${direction==='long'?'border-emerald-300 text-emerald-700 bg-emerald-50':direction==='short'?'border-rose-300 text-rose-700 bg-rose-50':'border-slate-300 text-slate-700 bg-slate-50'}">
+              ${direction==='long'?'LONG 📈':direction==='short'?'SHORT 📉':'SIDEWAYS ⚖️'}
+            </span>
+            <span class="text-sm text-slate-500">Confidence: <b>${confidence}%</b></span>
+          </div>
+          ${summary ? `<p class="text-sm">${summary}</p>`:''}
+          <div class="grid sm:grid-cols-2 gap-3">
+            <div class="rounded-lg border border-slate-200 p-3">
+              <div class="text-xs font-medium text-slate-500 mb-1">Klíčové úrovně</div>
+              <ul class="text-sm space-y-1">
+                ${levels.entry?`<li>Entry: <b>${levels.entry}</b></li>`:''}
+                ${levels.target?`<li>Target: <b>${levels.target}</b></li>`:''}
+                ${levels.stop?`<li>Stop: <b>${levels.stop}</b></li>`:''}
+              </ul>
+            </div>
+            <div class="rounded-lg border border-slate-200 p-3">
+              <div class="text-xs font-medium text-slate-500 mb-1">Risk & Management</div>
+              <ul class="text-sm space-y-1">
+                ${risk.rr?`<li>R:R: <b>${risk.rr}</b></li>`:''}
+                ${risk.pos?`<li>Velikost pozice: <b>${risk.pos}</b></li>`:''}
+                ${risk.note?`<li>${risk.note}</li>`:''}
+              </ul>
+            </div>
+          </div>
+          ${reasons.length?`
+            <div class="rounded-lg border border-slate-200 p-3">
+              <div class="text-xs font-medium text-slate-500 mb-2">Důvody</div>
+              <ul class="list-disc pl-5 space-y-1 text-sm">
+                ${reasons.map(r=>`<li>${r}</li>`).join('')}
+              </ul>
+            </div>`:''}
+        </div>`;
+      edgeSave.disabled = false;
+    }
+
+    async function mockAnalyze({symbol, note}){
+      const t=(note||'').toLowerCase();
+      let direction='long';
+      if(t.includes('short')||t.includes('breakdown')) direction='short';
+      else if(t.includes('range')||t.includes('side')) direction='sideways';
+      const confidence = direction==='sideways'?58:(direction==='long'?68:62);
+      const levels = direction==='long'
+        ? { entry:`${symbol}: nad lokálním HH ~ +0.5%`, target:'+3–5%', stop:'-1% pod swingem' }
+        : direction==='short'
+          ? { entry:`${symbol}: pod lokálním LL ~ -0.5%`, target:'-3–5%', stop:'+1% nad swingem' }
+          : { entry:'uprostřed range', target:'horní/spodní hrana', stop:'mimo range' };
+      const reasons = [
+        direction==='long'?'Vyšší minima + odraz od MA':'Odmítnutí rezistence + slabý objem',
+        'Konfluence horizontálních úrovní',
+        edgeExplain.checked ? 'R:R dává smysl při navržených úrovních' : null
+      ].filter(Boolean);
+      const risk = { rr: direction==='sideways'?'~1.0':'~2.0', pos:'1–2% účtu', note:'Nejedná se o investiční doporučení.' };
+      const summary = 'Demo výstup (bez backendu). V live verzi se použije CV + TA + zprávy.';
+      return { direction, confidence, reasons, levels, risk, summary };
+    }
+
+    async function callBackend(file, note, symbol){
+      const form = new FormData();
+      if(file) form.append('file', file);
+      form.append('note', note||'');
+      form.append('symbol', symbol||'');
+      form.append('use_web', edgeUseWeb.checked ? 'true':'false');
+      form.append('explain_levels', edgeExplain.checked ? 'true':'false');
+      const res = await fetch('/api/trader-ai/analyze', { method:'POST', body: form });
+      if(!res.ok) throw new Error('API returned '+res.status);
+      return await res.json();
+    }
+
+    edgeRun.addEventListener('click', async ()=>{
+      const symbol = edgeSymbol.value.trim().toUpperCase();
+      if(!symbol){ alert('Zadej prosím symbol (např. AAPL, NVDA, BTCUSD).'); return; }
+      edgeRun.disabled = true; edgeRun.textContent='Analyzuji…';
+      edgeResult.innerHTML='<div class="text-sm text-slate-500">Probíhá analýza…</div>';
+      try{
+        let payload;
+        try { payload = await callBackend(edgeFile._file, edgeNote.value, symbol); }
+        catch { payload = await mockAnalyze({symbol, note: edgeNote.value}); }
+        renderEdgeOutput(payload);
+      } catch(e){
+        edgeResult.innerHTML = '<p class="text-rose-600 text-sm">Analýza selhala. Zkus to znovu.</p>';
+      } finally {
+        edgeRun.disabled = false; edgeRun.textContent='Spustit AI predikci';
+      }
+    });
+
+    edgeClear.addEventListener('click', ()=>{
+      edgeFile.value=''; edgeFile._file=null;
+      edgePreview.src=''; edgePreview.classList.add('hidden');
+      edgeCanvas.classList.add('hidden');
+      edgeNote.value=''; edgeResult.innerHTML='<p class="text-slate-500 text-sm">Zatím nic. Zadej symbol nebo nahraj graf a spusť AI.</p>';
+      edgeSave.disabled=true;
+    });
+
+    // historie localStorage
+    function loadEdgeHistory(){
+      const items = JSON.parse(localStorage.getItem('sm-edge-history')||'[]');
+      edgeHistory.innerHTML = items.length ? '' : '<p class="text-slate-500">Prázdné.</p>';
+      items.slice().reverse().forEach((it, idx)=>{
+        const div = document.createElement('div');
+        div.className='rounded-lg border border-slate-200 p-3 flex items-start justify-between gap-3';
+        div.innerHTML = `
+          <div>
+            <div class="text-xs text-slate-500">${new Date(it.ts).toLocaleString()}</div>
+            <div class="text-sm"><b>${it.symbol}</b> — ${it.direction.toUpperCase()} (${it.confidence}%)</div>
+            ${it.summary?`<div class="text-xs mt-1">${it.summary}</div>`:''}
+          </div>
+          <button data-idx="${idx}" class="rm text-xs px-2 py-1 rounded border border-slate-300 hover:bg-slate-100">Smazat</button>`;
+        edgeHistory.appendChild(div);
+      });
+      edgeHistory.querySelectorAll('.rm').forEach(btn=>{
+        btn.addEventListener('click', ()=>{
+          const items = JSON.parse(localStorage.getItem('sm-edge-history')||'[]');
+          const realIndex = items.length - 1 - parseInt(btn.dataset.idx,10);
+          items.splice(realIndex,1);
+          localStorage.setItem('sm-edge-history', JSON.stringify(items));
+          loadEdgeHistory();
+        });
+      });
+    }
+    edgeSave.addEventListener('click', ()=>{
+      if(edgeResult.textContent.includes('Zatím nic')) return;
+      const extract = /Confidence: <b>(\d+)%<\/b>/; const conf = extract.exec(edgeResult.innerHTML)?.[1]||'';
+      const dir = /LONG|SHORT|SIDEWAYS/.exec(edgeResult.innerHTML)?.[0]?.toLowerCase() || '';
+      const summaryMatch = edgeResult.innerHTML.match(/<p class="text-sm">(.*?)<\/p>/);
+      const summary = summaryMatch ? summaryMatch[1] : '';
+      const items = JSON.parse(localStorage.getItem('sm-edge-history')||'[]');
+      items.push({ ts: Date.now(), symbol: edgeSymbol.value.trim().toUpperCase(), direction: dir, confidence: parseInt(conf||'0',10), summary });
+      localStorage.setItem('sm-edge-history', JSON.stringify(items));
+      loadEdgeHistory();
+    });
+    loadEdgeHistory();
   </script>
 </body>
 </html>
