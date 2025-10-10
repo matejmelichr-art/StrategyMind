@@ -11,16 +11,23 @@
     tailwind.config = {
       theme: {
         extend: {
-          colors: {
-            brand: {600: "#06b6d4"},
-          },
-          boxShadow: {
-            soft: "0 10px 25px rgba(15,23,42,.08)"
-          }
+          colors: { brand: { 600: "#06b6d4" } },
+          boxShadow: { soft: "0 10px 25px rgba(15,23,42,.08)" }
         }
       }
     }
   </script>
+
+  <style>
+    /* Mini graf – rozměry a vyhlazení */
+    .spark { width: 160px; height: 46px; }
+    .spark svg { width: 100%; height: 100%; display: block; }
+    .spark path { fill: none; stroke-width: 2; }
+    .spark .avg { stroke: #06b6d4; }           /* tyrkys – AVG čára */
+    .spark .min { stroke: #ef4444; stroke-dasharray: 4 3; } /* čárkovaně */
+    .spark .max { stroke: #10b981; stroke-dasharray: 4 3; } /* čárkovaně */
+    .num { font-variant-numeric: tabular-nums; } /* krásné zarovnání čísel */
+  </style>
 </head>
 
 <body class="bg-slate-50 text-slate-800 antialiased">
@@ -48,24 +55,23 @@
       <a href="#" class="px-4 py-2 rounded-lg bg-slate-900 text-white hover:bg-black shadow-soft">Stáhnout report (MD)</a>
     </div>
 
-    <!-- Search filters -->
+    <!-- Filtry (zatím vizuální) -->
     <div class="flex flex-wrap gap-3 mb-5">
-      <input type="text" placeholder="Hledej symbol / název..." class="px-3 py-2 rounded-lg border border-slate-300 bg-white shadow-sm flex-1 min-w-[180px]" />
-      <select class="px-3 py-2 rounded-lg border border-slate-300 bg-white shadow-sm">
-        <option>Všechny typy</option>
-        <option>Akcie</option>
-        <option>Indexy</option>
-        <option>Krypto</option>
+      <input id="q" type="text" placeholder="Hledej symbol / název…" class="px-3 py-2 rounded-lg border border-slate-300 bg-white shadow-sm flex-1 min-w-[180px]" oninput="render()" />
+      <select id="type" class="px-3 py-2 rounded-lg border border-slate-300 bg-white shadow-sm" onchange="render()">
+        <option value="all">Všechny typy</option>
+        <option value="equity">Akcie</option>
+        <option value="crypto">Krypto</option>
       </select>
-      <select class="px-3 py-2 rounded-lg border border-slate-300 bg-white shadow-sm">
-        <option>Seřadit: Symbol</option>
-        <option>Seřadit: Cena</option>
-        <option>Seřadit: 1D %</option>
-        <option>Seřadit: Conf.</option>
+      <select id="sort" class="px-3 py-2 rounded-lg border border-slate-300 bg-white shadow-sm" onchange="render()">
+        <option value="symbol">Seřadit: Symbol</option>
+        <option value="price">Seřadit: Cena</option>
+        <option value="d1">Seřadit: 1D %</option>
+        <option value="conf">Seřadit: Conf.</option>
       </select>
     </div>
 
-    <!-- Table -->
+    <!-- Tabulka -->
     <div class="overflow-x-auto rounded-2xl bg-white border border-slate-200 shadow-soft">
       <table class="w-full text-sm text-left">
         <thead class="bg-slate-50 border-b border-slate-200 text-slate-500 font-medium">
@@ -80,67 +86,12 @@
             <th class="px-4 py-3 text-center">Detail</th>
           </tr>
         </thead>
-
-        <tbody class="divide-y divide-slate-100">
-          <!-- Row 1 -->
-          <tr class="hover:bg-slate-50 transition">
-            <td class="px-4 py-3 font-semibold">AAPL</td>
-            <td class="px-4 py-3">Apple Inc.</td>
-            <td class="px-4 py-3 text-right">219.85</td>
-            <td class="px-4 py-3 text-right text-emerald-600 font-medium">+1.26%</td>
-            <td class="px-4 py-3 text-right text-emerald-600 font-medium">+2.10%</td>
-            <td class="px-4 py-3 text-center">
-              <span class="text-slate-500">165 /</span>
-              <span class="font-semibold">245</span>
-              <span class="text-slate-500">/ 310</span>
-            </td>
-            <td class="px-4 py-3 text-center font-medium text-slate-700">72%</td>
-            <td class="px-4 py-3 text-center">
-              <button onclick="openModal('AAPL')" class="text-brand-600 hover:underline font-medium">Detail</button>
-            </td>
-          </tr>
-
-          <!-- Row 2 -->
-          <tr class="hover:bg-slate-50 transition">
-            <td class="px-4 py-3 font-semibold">BTCUSD</td>
-            <td class="px-4 py-3">Bitcoin</td>
-            <td class="px-4 py-3 text-right">67 200</td>
-            <td class="px-4 py-3 text-right text-emerald-600 font-medium">+2.30%</td>
-            <td class="px-4 py-3 text-right text-emerald-600 font-medium">+6.80%</td>
-            <td class="px-4 py-3 text-center">
-              <span class="text-slate-500">42 000 /</span>
-              <span class="font-semibold">88 000</span>
-              <span class="text-slate-500">/ 120 000</span>
-            </td>
-            <td class="px-4 py-3 text-center font-medium text-slate-700">58%</td>
-            <td class="px-4 py-3 text-center">
-              <button onclick="openModal('BTCUSD')" class="text-brand-600 hover:underline font-medium">Detail</button>
-            </td>
-          </tr>
-
-          <!-- Row 3 -->
-          <tr class="hover:bg-slate-50 transition">
-            <td class="px-4 py-3 font-semibold">NVDA</td>
-            <td class="px-4 py-3">NVIDIA Corporation</td>
-            <td class="px-4 py-3 text-right">241.80</td>
-            <td class="px-4 py-3 text-right text-emerald-600 font-medium">+1.85%</td>
-            <td class="px-4 py-3 text-right text-emerald-600 font-medium">+4.10%</td>
-            <td class="px-4 py-3 text-center">
-              <span class="text-slate-500">128 /</span>
-              <span class="font-semibold">281</span>
-              <span class="text-slate-500">/ 498</span>
-            </td>
-            <td class="px-4 py-3 text-center font-medium text-slate-700">72%</td>
-            <td class="px-4 py-3 text-center">
-              <button onclick="openModal('NVDA')" class="text-brand-600 hover:underline font-medium">Detail</button>
-            </td>
-          </tr>
-        </tbody>
+        <tbody id="rows" class="divide-y divide-slate-100"></tbody>
       </table>
     </div>
 
     <p class="mt-4 text-sm text-slate-500">
-      *V demu zobrazena statická data. V ostré verzi budou živá data, zprávy a AI predikce.
+      *V demu jsou statická data + demo grafy. V ostré verzi budou živá data, zprávy a AI predikce.
     </p>
   </main>
 
@@ -149,23 +100,164 @@
     <div class="bg-white rounded-2xl max-w-lg w-full shadow-xl p-6 relative">
       <button onclick="closeModal()" class="absolute top-3 right-3 text-slate-400 hover:text-slate-600">✕</button>
       <h2 id="modalTitle" class="text-xl font-semibold mb-3">Detail</h2>
-      <div id="modalContent" class="text-slate-700 text-sm space-y-3">
-        <p><strong>Teze:</strong> Růst ekosystému, expanze marží, nové produkty.</p>
-        <p><strong>Neplatí, pokud:</strong> Dojde k výraznému poklesu pod klíčovou úroveň / ztrátě objemů.</p>
-        <p class="text-slate-500 text-xs">*Ukázková data, demo verze.</p>
-      </div>
+      <div id="modalContent" class="text-slate-700 text-sm space-y-3"></div>
     </div>
   </div>
 
   <script>
-    function openModal(symbol) {
-      document.getElementById('modalTitle').innerText = `${symbol} — Predikce (demo)`;
-      document.getElementById('detailModal').classList.remove('hidden');
-      document.getElementById('detailModal').classList.add('flex');
+    // ---------- Data (demo) ----------
+    const DATA = [
+      {
+        type: "equity",
+        symbol: "AAPL",
+        name: "Apple Inc.",
+        price: 219.85,
+        d1: 0.0126,
+        w1: 0.0210,
+        forecast: { min:165, avg:245, max:310 },
+        conf: 0.72,
+        thesis: "Růst služeb a ekosystému, stabilní marže. Re-rating po nové produktové linii.",
+        invalidIf: "Breakdown pod 195 s objemy a slabá guidance."
+      },
+      {
+        type: "crypto",
+        symbol: "BTCUSD",
+        name: "Bitcoin",
+        price: 67200,
+        d1: 0.0230,
+        w1: 0.0680,
+        forecast: { min:42000, avg:88000, max:120000 },
+        conf: 0.58,
+        thesis: "Poptávka přes ETF, halving + omezená nabídka, sílící narativ digitálního zlata.",
+        invalidIf: "Silný risk-off a regulace, ztráta klíčového trendu."
+      },
+      {
+        type: "equity",
+        symbol: "NVDA",
+        name: "NVIDIA Corporation",
+        price: 241.80,
+        d1: 0.0185,
+        w1: 0.0410,
+        forecast: { min:128, avg:281, max:498 },
+        conf: 0.72,
+        thesis: "Dominance v AI akceleraci, rozšiřující se TAM, dlouhý backlog.",
+        invalidIf: "Výrazné uvolnění poptávky po AI čipech / regulační zásahy."
+      }
+    ];
+
+    // ---------- Utility formátování ----------
+    const fmtNum = new Intl.NumberFormat("cs-CZ");
+    const fmtPrice = (n) => fmtNum.format(n);
+    const fmtPct = (x) => (x>=0? "+" : "") + (x*100).toFixed(2).replace(".", ",") + "%";
+    const pctClass = (x) => x>0 ? "text-emerald-600" : x<0 ? "text-rose-600" : "text-slate-600";
+
+    // ---------- Sparkline kreslení (min/avg/max) ----------
+    function sparkline(container, series, min, avg, max){
+      const w = container.clientWidth || 160, h = container.clientHeight || 46;
+      const svgNS = "http://www.w3.org/2000/svg";
+      const svg = document.createElementNS(svgNS, "svg");
+      svg.setAttribute("viewBox", `0 0 ${w} ${h}`);
+
+      // škály
+      const xs = (i)=> i/(series.length-1) * (w-10) + 5;
+      const minY = Math.min(...series), maxY = Math.max(...series);
+      const ys = (v)=> h - 6 - ( (v - minY) / Math.max(1e-6, (maxY - minY)) ) * (h-12);
+
+      // hlavní linie (avg proxy – historie ceny)
+      const path = document.createElementNS(svgNS, "path");
+      path.setAttribute("class","avg");
+      path.setAttribute("d", "M " + series.map((v,i)=> `${xs(i)} ${ys(v)}`).join(" L "));
+      svg.appendChild(path);
+
+      // vertikální značky min / avg / max na konci
+      const xEnd = w-8;
+      const addV = (cls, yValue) => {
+        const p = document.createElementNS(svgNS, "path");
+        p.setAttribute("class", cls);
+        const y = ys(yValue);
+        p.setAttribute("d", `M ${xEnd} ${y-14} L ${xEnd} ${y+14}`);
+        svg.appendChild(p);
+      };
+      addV("min", min);
+      addV("avg", avg);
+      addV("max", max);
+
+      container.innerHTML = "";
+      container.appendChild(svg);
     }
-    function closeModal() {
-      document.getElementById('detailModal').classList.add('hidden');
+
+    // demo historie (škálovaná kolem avg)
+    function demoSeries(avg){
+      const base = [0.88,0.93,0.97,0.95,1.02,1.00,1.05,1.08];
+      return base.map(x => avg * x);
     }
+
+    // ---------- Render tabulky ----------
+    function render(){
+      const q = (document.getElementById("q").value || "").toLowerCase();
+      const t = document.getElementById("type").value;
+      const s = document.getElementById("sort").value;
+
+      let rows = DATA.filter(d =>
+        (t==="all" || d.type===t) &&
+        (d.symbol.toLowerCase().includes(q) || d.name.toLowerCase().includes(q))
+      );
+
+      rows.sort((a,b)=>{
+        if(s==="price") return b.price - a.price;
+        if(s==="d1") return b.d1 - a.d1;
+        if(s==="conf") return b.conf - a.conf;
+        return a.symbol.localeCompare(b.symbol,"cs");
+      });
+
+      const tbody = document.getElementById("rows");
+      tbody.innerHTML = rows.map(d => `
+        <tr class="hover:bg-slate-50 transition">
+          <td class="px-4 py-3 font-semibold">${d.symbol}</td>
+          <td class="px-4 py-3">${d.name}</td>
+          <td class="px-4 py-3 text-right num">${fmtPrice(d.price)}</td>
+          <td class="px-4 py-3 text-right num ${pctClass(d.d1)}">${fmtPct(d.d1).replace(".",",")}</td>
+          <td class="px-4 py-3 text-right num ${pctClass(d.w1)}">${fmtPct(d.w1).replace(".",",")}</td>
+          <td class="px-2 py-2 text-center">
+            <div class="mx-auto spark" id="sp-${d.symbol}"></div>
+            <div class="mt-1 text-[12px] text-slate-600 num">
+              ${fmtPrice(d.forecast.min)} /
+              <span class="font-semibold text-slate-800">${fmtPrice(d.forecast.avg)}</span> /
+              ${fmtPrice(d.forecast.max)}
+            </div>
+          </td>
+          <td class="px-4 py-3 text-center font-medium text-slate-700 num">${Math.round(d.conf*100)}%</td>
+          <td class="px-4 py-3 text-center">
+            <button onclick="openModal('${d.symbol}')" class="text-brand-600 hover:underline font-medium">Detail</button>
+          </td>
+        </tr>
+      `).join("");
+
+      // po vykreslení tabulky vykreslit i grafy
+      rows.forEach(d=>{
+        const el = document.getElementById(`sp-${d.symbol}`);
+        sparkline(el, demoSeries(d.forecast.avg), d.forecast.min, d.forecast.avg, d.forecast.max);
+      });
+    }
+
+    // ---------- Modal ----------
+    function openModal(symbol){
+      const d = DATA.find(x=>x.symbol===symbol);
+      document.getElementById("modalTitle").innerText = `${d.symbol} — Predikce (demo)`;
+      document.getElementById("modalContent").innerHTML = `
+        <p><strong>Teze:</strong> ${d.thesis}</p>
+        <p><strong>Neplatí, pokud:</strong> ${d.invalidIf}</p>
+        <p class="text-slate-500 text-xs">*Ukázková data, demo verze (min/avg/max: ${fmtPrice(d.forecast.min)} / ${fmtPrice(d.forecast.avg)} / ${fmtPrice(d.forecast.max)}).</p>
+      `;
+      const m = document.getElementById("detailModal");
+      m.classList.remove("hidden"); m.classList.add("flex");
+    }
+    function closeModal(){
+      document.getElementById("detailModal").classList.add("hidden");
+    }
+
+    // první render
+    window.addEventListener("load", render);
   </script>
 </body>
 </html>
