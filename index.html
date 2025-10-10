@@ -7,7 +7,6 @@
   <meta name="description" content="StrategyMind spojuje chytré otázky, AI doporučení a přehledné formuláře. Od nápadu k akčním krokům s měřitelnými výsledky.">
 
   <!-- Tailwind -->
-  <link rel="preconnect" href="https://cdn.tailwindcss.com">
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -21,7 +20,7 @@
     }
   </script>
 
-  <!-- Ikony -->
+  <!-- LOGO: preload + favicon + touch ikonka -->
   <link rel="preload" href="StrategyMind_App_Icon.jpg" as="image" fetchpriority="high">
   <link rel="icon" href="StrategyMind_App_Icon.jpg">
   <link rel="apple-touch-icon" href="StrategyMind_App_Icon.jpg">
@@ -36,9 +35,18 @@
     .badge{font-size:.7rem;border:1px solid #e5e7eb;border-radius:999px;padding:.25rem .6rem;background:#fff}
     .blur-blob{filter:blur(46px);opacity:.16}
     html{scroll-behavior:smooth}
-    .logo-float{width:160px;height:160px;border-radius:1.3rem;object-fit:cover;background:#fff;border:1px solid rgba(229,231,235,.9);
-      box-shadow:0 28px 54px -24px rgba(2,6,23,.28),0 2px 6px rgba(2,6,23,.06),inset 0 1px 0 rgba(255,255,255,.65)}
-    @media(min-width:768px){.logo-float{width:200px;height:200px}}
+
+    /* větší plovoucí ikona v hero */
+    .logo-float{
+      width:140px;height:140px;border-radius:1.2rem;
+      object-fit:cover;background:#fff;border:1px solid rgba(229,231,235,.9);
+      box-shadow:
+        0 28px 54px -24px rgba(2,6,23,.28),
+        0 2px 6px rgba(2,6,23,.06),
+        inset 0 1px 0 rgba(255,255,255,.65);
+    }
+    @media (min-width:768px){ .logo-float{width:180px;height:180px;border-radius:1.35rem} }
+    @media (min-width:1024px){ .logo-float{width:200px;height:200px;border-radius:1.45rem} }
   </style>
 </head>
 <body class="bg-slate-50 text-slate-900 selection:bg-mint/20 selection:text-ink">
@@ -67,15 +75,13 @@
       <a href="#funkce" class="hover:text-brand">Funkce</a>
       <a href="#trhy" class="hover:text-brand">Trhy</a>
       <a href="#nemovitosti" class="hover:text-brand">Nemovitosti</a>
-      <a href="#money" class="hover:text-brand">Finance</a>
       <a href="#cenik" class="hover:text-brand">Ceník</a>
       <a href="#faq" class="hover:text-brand">FAQ</a>
-      <!-- ➜ Přímý vstup do klientské části -->
+      <!-- 🔗 Klientská sekce – směřuje na /client/ -->
       <a href="/client/" class="hover:text-brand font-semibold">Klientská sekce</a>
     </nav>
     <div class="flex items-center gap-2">
       <button id="dlBtn" class="pill hidden sm:inline-flex">Stáhnout aplikaci</button>
-      <!-- ➜ CTA jde do klientské části (demo) -->
       <a href="/client/" class="btn btn-brand">Vyzkoušet zdarma</a>
     </div>
   </div>
@@ -103,7 +109,6 @@
           <button id="dlBtn2" class="btn btn-ghost">Stáhnout aplikaci</button>
           <div class="flex items-stretch gap-2">
             <input class="w-64 rounded-xl border px-3" placeholder="email@domain.com" />
-            <!-- ➜ posíláme do klienta = demo -->
             <a href="/client/" class="btn btn-brand">Zaslat demo</a>
           </div>
         </div>
@@ -112,7 +117,7 @@
         </div>
       </div>
 
-      <!-- Pravý sloupec -->
+      <!-- Pravý sloupec: větší plovoucí ikona -->
       <div class="relative flex items-center justify-center">
         <div class="absolute inset-0 blur-blob bg-mint rounded-full"></div>
         <img src="StrategyMind_App_Icon.jpg" alt="StrategyMind App"
@@ -181,19 +186,35 @@
         <li>• Backtest SMA crossover (rychlý sanity check)</li>
       </ul>
       <div class="mt-5 flex gap-3">
-        <a class="btn btn-brand" href="/client/">Market Scanner (demo)</a>
-        <a class="pill" href="/client/">AI nápady pro trading</a>
+        <a class="btn btn-brand" href="/client/#market">Otevřít Market Scanner</a>
+        <a class="pill" href="/client/">Klientská sekce</a>
       </div>
     </div>
     <div class="card p-5">
       <div class="text-sm text-slate-500 mb-2">Ukázka dlaždic (preview)</div>
       <div class="grid sm:grid-cols-2 gap-3">
-        <div class="border rounded-2xl p-4"><div class="text-xs text-slate-500">AAPL</div><div class="font-semibold text-lg">219.85 <span class="text-emerald-600 text-sm">+1.26%</span></div><div class="text-xs mt-1">Intraday ▲ 227.3 (74%)</div></div>
-        <div class="border rounded-2xl p-4"><div class="text-xs text-slate-500">NVDA</div><div class="font-semibold text-lg">108.20 <span class="text-rose-600 text-sm">-0.82%</span></div><div class="text-xs mt-1">Swing ▲ 121.0 (68%)</div></div>
-        <div class="border rounded-2xl p-4"><div class="text-xs text-slate-500">SPY</div><div class="font-semibold text-lg">520.10 <span class="text-emerald-600 text-sm">+0.41%</span></div><div class="text-xs mt-1">Long ▲ 585.0 (72%)</div></div>
-        <div class="border rounded-2xl p-4"><div class="text-xs text-slate-500">BTCUSD</div><div class="font-semibold text-lg">67 200 <span class="text-emerald-600 text-sm">+2.3%</span></div><div class="text-xs mt-1">Volatilita: 4.2%</div></div>
+        <div class="border rounded-2xl p-4">
+          <div class="text-xs text-slate-500">AAPL</div>
+          <div class="font-semibold text-lg">219.85 <span class="text-emerald-600 text-sm">+1.26%</span></div>
+          <div class="text-xs mt-1">Intraday ▲ 227.3 (74%)</div>
+        </div>
+        <div class="border rounded-2xl p-4">
+          <div class="text-xs text-slate-500">NVDA</div>
+          <div class="font-semibold text-lg">108.20 <span class="text-rose-600 text-sm">-0.82%</span></div>
+          <div class="text-xs mt-1">Swing ▲ 121.0 (68%)</div>
+        </div>
+        <div class="border rounded-2xl p-4">
+          <div class="text-xs text-slate-500">SPY</div>
+          <div class="font-semibold text-lg">520.10 <span class="text-emerald-600 text-sm">+0.41%</span></div>
+          <div class="text-xs mt-1">Long ▲ 585.0 (72%)</div>
+        </div>
+        <div class="border rounded-2xl p-4">
+          <div class="text-xs text-slate-500">BTCUSD</div>
+          <div class="font-semibold text-lg">67 200 <span class="text-emerald-600 text-sm">+2.3%</span></div>
+          <div class="text-xs mt-1">Volatilita: 4.2%</div>
+        </div>
       </div>
-      <div class="mt-4 text-xs text-slate-500">*Data jsou ilustrační. V ostré verzi je nahradí živý screener a grafy.</div>
+      <div class="mt-4 text-xs text-slate-500">*Data jsou ilustrační. V ostré verzi nahradí živý screener a grafy.</div>
     </div>
   </div>
 </section>
@@ -205,9 +226,14 @@
       <span class="badge">Real-Estate Lab</span>
       <h2 class="mt-2 text-2xl font-bold">Nemovitosti &amp; nápady s ROI</h2>
       <p class="mt-2 text-slate-600">Z popisu lokality a typu (pozemek/byt/komerce) navrhneme varianty využití s odhadem capex/opex a yieldu. Přidáme srovnání (comps) a odkazy do registrů/katastrů.</p>
+      <ul class="mt-4 space-y-2 text-sm">
+        <li>• Využití: rezidenční, parkoviště, self-storage, retail…</li>
+        <li>• ROI scénáře 3/5/10 let + první kroky due-diligence</li>
+        <li>• Doporučení pro financování a cash-flow</li>
+      </ul>
       <div class="mt-5 flex gap-3">
-        <a class="btn btn-brand" href="/client/">Real-Estate Feed (demo)</a>
-        <a class="pill" href="/client/">Reality check</a>
+        <a class="btn btn-brand" href="/client/#realestate">Otevřít Real-Estate Analyzer</a>
+        <a class="pill" href="/client/">Klientská sekce</a>
       </div>
     </div>
     <div class="card p-5">
@@ -228,13 +254,24 @@
       <span class="badge">Money Management</span>
       <h2 class="mt-2 text-2xl font-bold">Rozpočet 50/30/20 &amp; kalkulačky</h2>
       <p class="mt-2 text-slate-600">Doporučené rozdělení rozpočtu podle profilu, koláčové zobrazení, složené úročení a další užitečné nástroje pro běžné i podnikatele.</p>
+      <ul class="mt-4 space-y-2 text-sm">
+        <li>• Rychlý přehled „Needs / Wants / Invest“</li>
+        <li>• Simulace složeného úročení (vklad, % p.a., čas)</li>
+        <li>• AI poradce pro specifické situace</li>
+      </ul>
     </div>
     <div class="card p-6">
       <div class="text-sm text-slate-500">Ukázkový koláč</div>
       <div class="mt-3 grid grid-cols-3 gap-2">
-        <div class="rounded-xl bg-sky-100 p-4 text-center"><div class="text-xs">Needs</div><div class="text-lg font-semibold">50%</div></div>
-        <div class="rounded-xl bg-emerald-100 p-4 text-center"><div class="text-xs">Wants</div><div class="text-lg font-semibold">30%</div></div>
-        <div class="rounded-xl bg-amber-100 p-4 text-center"><div class="text-xs">Invest</div><div class="text-lg font-semibold">20%</div></div>
+        <div class="rounded-xl bg-sky-100 p-4 text-center">
+          <div class="text-xs">Needs</div><div class="text-lg font-semibold">50%</div>
+        </div>
+        <div class="rounded-xl bg-emerald-100 p-4 text-center">
+          <div class="text-xs">Wants</div><div class="text-lg font-semibold">30%</div>
+        </div>
+        <div class="rounded-xl bg-amber-100 p-4 text-center">
+          <div class="text-xs">Invest</div><div class="text-lg font-semibold">20%</div>
+        </div>
       </div>
     </div>
   </div>
@@ -248,8 +285,8 @@
       <h2 class="mt-2 text-2xl font-bold">Nápady → plán → realizace</h2>
       <p class="mt-2 text-slate-600">AI pomocník navrhne MVP, akviziční kanály, monetizaci, KPI, timeline a rizika. Výstup snadno vyexportuješ do Markdownu či Notionu.</p>
       <div class="mt-5 flex gap-3">
-        <a class="btn btn-brand" href="/client/">Otevřít demo</a>
-        <a class="pill" href="#faq">Jak funguje AI</a>
+        <a class="btn btn-brand" href="/client/#ideas">Vyzkoušet demo</a>
+        <a class="pill" href="/client/">Klientská sekce</a>
       </div>
     </div>
     <div class="card p-5">
@@ -309,10 +346,22 @@
 <section id="faq" class="mx-auto max-w-7xl px-5 py-16">
   <h2 class="text-2xl font-bold">FAQ</h2>
   <div class="mt-6 grid md:grid-cols-2 gap-5">
-    <div class="card p-5"><div class="font-semibold">Je to investiční poradenství?</div><p class="mt-1 text-slate-600 text-sm">Ne. StrategyMind slouží jako nástroj pro ideaci, vzdělávání a plánování. Data mohou být zpožděná a bez záruky.</p></div>
-    <div class="card p-5"><div class="font-semibold">Kdy bude mobilní aplikace?</div><p class="mt-1 text-slate-600 text-sm">Brzy. Zatím můžeš používat webovou verzi na mobilu. Tlačítko „Stáhnout aplikaci“ zobrazuje „Coming soon“.</p></div>
-    <div class="card p-5"><div class="font-semibold">Jak funguje AI?</div><p class="mt-1 text-slate-600 text-sm">Každá sekce má vlastního „specialistu“ (trhy, reality, finance, nápady). Modely vrací přehledné odpovědi a kroky.</p></div>
-    <div class="card p-5"><div class="font-semibold">Co bezpečnost a soukromí?</div><p class="mt-1 text-slate-600 text-sm">Respektujeme GDPR a ukládáme pouze to, co je nutné. Citlivé klíče zůstávají na serveru.</p></div>
+    <div class="card p-5">
+      <div class="font-semibold">Je to investiční poradenství?</div>
+      <p class="mt-1 text-slate-600 text-sm">Ne. StrategyMind slouží jako nástroj pro ideaci, vzdělávání a plánování. Data mohou být zpožděná a bez záruky.</p>
+    </div>
+    <div class="card p-5">
+      <div class="font-semibold">Kdy bude mobilní aplikace?</div>
+      <p class="mt-1 text-slate-600 text-sm">Brzy. Zatím můžeš používat webovou verzi na mobilu. Tlačítko „Stáhnout aplikaci“ zobrazuje „Coming soon“.</p>
+    </div>
+    <div class="card p-5">
+      <div class="font-semibold">Jak funguje AI?</div>
+      <p class="mt-1 text-slate-600 text-sm">Každá sekce má vlastního „specialistu“ (trhy, reality, finance, nápady). Modely vrací přehledné odpovědi a kroky.</p>
+    </div>
+    <div class="card p-5">
+      <div class="font-semibold">Co bezpečnost a soukromí?</div>
+      <p class="mt-1 text-slate-600 text-sm">Respektujeme GDPR a ukládáme pouze to, co je nutné. Citlivé klíče zůstávají na serveru.</p>
+    </div>
   </div>
 </section>
 
@@ -331,7 +380,6 @@
     <div class="flex gap-4 text-sm">
       <a href="#faq" class="hover:text-brand">Podmínky</a>
       <a href="#faq" class="hover:text-brand">Soukromí</a>
-      <a href="#funkce" class="hover:text-brand">Funkce</a>
       <a href="/client/" class="hover:text-brand font-semibold">Klientská sekce</a>
     </div>
   </div>
@@ -341,8 +389,9 @@
 <dialog id="soon" class="rounded-2xl p-0 w-[92%] max-w-md backdrop:bg-black/30">
   <div class="card p-5">
     <div class="text-lg font-semibold">Aplikace brzy!</div>
-    <p class="mt-1 text-slate-600 text-sm">Mobilní appku finišujeme. Nech nám email v hero sekci a pošleme ti přístup mezi prvními.</p>
-    <div class="mt-4 flex justify-end">
+    <p class="mt-1 text-slate-600 text-sm">Mobilní appku finišujeme. Běž do <strong>Klientské sekce</strong> a vyzkoušej demo modulů už teď.</p>
+    <div class="mt-4 flex justify-end gap-2">
+      <a href="/client/" class="btn btn-brand">Klientská sekce</a>
       <button id="soonClose" class="pill">OK</button>
     </div>
   </div>
