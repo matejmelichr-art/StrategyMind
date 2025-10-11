@@ -1,7 +1,11 @@
 name: Scaffold Market Structure
 
 on:
-  workflow_dispatch: {}   # spouštíš ručně v GitHub Actions
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  pull-requests: write
 
 jobs:
   scaffold:
@@ -28,11 +32,13 @@ jobs:
           - scripts/: entrypoint + moduly
           - components/: HTML partialy (volitelné)
           - data/: demo/mock data
+          - images/: statická média
+          - tests/: testy (později)
           MD
 
           # 3) styles
           [ -f client/market/styles/market.css ] || cat > client/market/styles/market.css <<'CSS'
-          /* Lokální styly pro Market Scanner – sem patří drobné přepisy Tailwind */
+          /* Lokální styly pro Market Scanner – drobné přepisy Tailwindu */
           .spark { display:inline-block; vertical-align:middle; }
           CSS
 
@@ -106,7 +112,7 @@ jobs:
           });
           JS
 
-          # 7) Jemná úprava client/market/index.html (jen pokud existuje a nemá mount a import)
+          # 7) Vložit mount + import do existujícího client/market/index.html (nepřepisuje obsah)
           if [ -f client/market/index.html ]; then
             grep -q 'id="market-table"' client/market/index.html || \
               sed -i 's#</main>#  <div id="market-table" class="mt-2"></div>\n</main>#' client/market/index.html
@@ -115,23 +121,13 @@ jobs:
               sed -i 's#</body>#  <link rel="stylesheet" href="./styles/market.css">\n  <script type="module" src="./scripts/market.js"></script>\n</body>#' client/market/index.html
           fi
 
-      - name: Commit changes to a branch
-        run: |
-          set -e
-          git config user.name  "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git checkout -b chore/scaffold-market
-          git add -A
-          # pokud není co commitnout, skonči tiše
-          git diff --cached --quiet && echo "No changes" && exit 0
-          git commit -m "chore(market): scaffold folders and starter files"
-          git push -u origin chore/scaffold-market
-
-      - name: Open Pull Request (if changes)
-        if: ${{ success() }}
+      - name: Create Pull Request
         uses: peter-evans/create-pull-request@v6
         with:
-          branch: chore/scaffold-market
+          commit-message: "chore(market): scaffold folders and starter files"
           title: "Scaffold market subfolders"
           body: "Adds modular structure under client/market and wires a minimal entrypoint. Safe & idempotent."
+          branch: chore/scaffold-market-${{ github.run_id }}
+          base: ${{ github.ref_name }}
           labels: scaffold, market
+          delete-branch: true
