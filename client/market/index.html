@@ -170,7 +170,8 @@
     </section>
 
     <p class="mt-6 text-xs text-slate-500">* Demo data. V ostré verzi: AI teze + zprávy + živé ceny + alerty serverem.</p>
-  </main>
+    <div id="market-table" class="mt-2"></div>
+</main>
 
   <!-- ALERT MODAL -->
   <div id="alertOverlay" class="hidden fixed inset-0 z-50 overlay"></div>
@@ -539,5 +540,7 @@
     filterInsights();
   });
   </script>
+  <link rel="stylesheet" href="./styles/market.css">
+  <script type="module" src="./scripts/market.js"></script>
 </body>
 </html>
