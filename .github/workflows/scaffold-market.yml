@@ -1,0 +1,137 @@
+name: Scaffold Market Structure
+
+on:
+  workflow_dispatch: {}   # spouštíš ručně v GitHub Actions
+
+jobs:
+  scaffold:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Create market subfolders & starter files (idempotent)
+        shell: bash
+        run: |
+          set -e
+
+          # 1) složky
+          mkdir -p client/market/{styles,scripts/modules,components,data,images,tests,docs}
+
+          # 2) .gitkeep / docs
+          [ -f client/market/images/.gitkeep ] || touch client/market/images/.gitkeep
+          [ -f client/market/tests/.gitkeep ]  || touch client/market/tests/.gitkeep
+          [ -f client/market/docs/architecture.md ] || cat > client/market/docs/architecture.md <<'MD'
+          # Market Scanner – struktura
+          - styles/: lokální CSS
+          - scripts/: entrypoint + moduly
+          - components/: HTML partialy (volitelné)
+          - data/: demo/mock data
+          MD
+
+          # 3) styles
+          [ -f client/market/styles/market.css ] || cat > client/market/styles/market.css <<'CSS'
+          /* Lokální styly pro Market Scanner – sem patří drobné přepisy Tailwind */
+          .spark { display:inline-block; vertical-align:middle; }
+          CSS
+
+          # 4) data (demo)
+          [ -f client/market/data/demo.js ] || cat > client/market/data/demo.js <<'JS'
+          export const data = [
+            {type:'stock',symbol:'AAPL',name:'Apple Inc.',price:219.85,d1:1.26,w1:2.10,forecast:{min:165,avg:245,max:310,conf:72}},
+            {type:'crypto',symbol:'BTCUSD',name:'Bitcoin',price:67200,d1:2.30,w1:6.80,forecast:{min:42000,avg:88000,max:120000,conf:58}},
+            {type:'stock',symbol:'NVDA',name:'NVIDIA Corporation',price:241.80,d1:1.85,w1:4.10,forecast:{min:128,avg:281,max:498,conf:72}}
+          ];
+          JS
+
+          # 5) JS moduly
+          [ -f client/market/scripts/modules/sparkline.js ] || cat > client/market/scripts/modules/sparkline.js <<'JS'
+          export function sparkline(r){
+            let {min, avg, max} = r?.forecast || {};
+            const now = Number(r?.price);
+            min = Number(min); avg = Number(avg); max = Number(max);
+
+            if (!isFinite(min) || !isFinite(avg) || !isFinite(max)) { min=0; avg=1; max=2; }
+            if (max <= min) max = min + 1;
+            if (avg <  min) avg = min;
+            if (avg >  max) avg = max;
+
+            const w=220, h=24, p=10, inner=w-2*p, y=Math.round(h/2);
+            const x = v => p + ((v - min) / (max - min)) * inner;
+            const xMin=x(min), xAvg=x(avg), xMax=x(max), xNow=x(Math.min(Math.max(now,min),max));
+
+            return `
+          <svg class="spark" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" aria-label="1Y spark">
+            <line x1="${xMin}" y1="${y}" x2="${xMax}" y2="${y}" stroke="#cbd5e1" opacity=".7"/>
+            <line x1="${xMin}" y1="${y}" x2="${xAvg}" y2="${y}" stroke="#2563eb" stroke-width="3" stroke-linecap="round"/>
+            <line x1="${xAvg}" y1="${y}" x2="${xMax}" y2="${y}" stroke="#22c55e" stroke-width="3" stroke-linecap="round" stroke-dasharray="6 6"/>
+            <line x1="${xNow}" y1="${y-6}" x2="${xNow}" y2="${y+6}" stroke="#0ea5e9" stroke-width="2"/>
+          </svg>`;
+          }
+          JS
+
+          [ -f client/market/scripts/modules/render-table.js ] || cat > client/market/scripts/modules/render-table.js <<'JS'
+          import { sparkline } from './sparkline.js';
+
+          export function renderTable(root, rows) {
+            if (!root) return;
+            const fmt = new Intl.NumberFormat('cs-CZ',{maximumFractionDigits:2});
+            const pct = v => (v>=0?'+':'') + v.toFixed(2) + '%';
+
+            root.innerHTML = rows.map(r => `
+              <div class="row border-t border-slate-100 px-4 py-3 grid"
+                   style="grid-template-columns:90px 1fr 120px 100px 100px 250px 80px 150px;align-items:center;">
+                <div class="font-semibold">${r.symbol}</div>
+                <div class="text-slate-700 truncate">${r.name}</div>
+                <div class="text-right tabular-nums">${fmt.format(r.price)}</div>
+                <div class="text-right ${r.d1>=0?'text-emerald-600':'text-rose-600'}">${pct(r.d1)}</div>
+                <div class="text-right ${r.w1>=0?'text-emerald-600':'text-rose-600'}">${pct(r.w1)}</div>
+                <div class="text-center"><div class="inline-block">${sparkline(r)}</div></div>
+                <div class="text-right">${r.forecast.conf}%</div>
+                <div class="text-right"><button class="px-3 py-1 rounded-lg bg-cyan-600 text-white">AI predikce</button></div>
+              </div>
+            `).join('');
+          }
+          JS
+
+          # 6) Entrypoint
+          [ -f client/market/scripts/market.js ] || cat > client/market/scripts/market.js <<'JS'
+          import { renderTable } from './modules/render-table.js';
+          import { data } from '../data/demo.js';
+
+          document.addEventListener('DOMContentLoaded', () => {
+            const mount = document.getElementById('market-table');
+            if (mount) renderTable(mount, data);
+          });
+          JS
+
+          # 7) Jemná úprava client/market/index.html (jen pokud existuje a nemá mount a import)
+          if [ -f client/market/index.html ]; then
+            grep -q 'id="market-table"' client/market/index.html || \
+              sed -i 's#</main>#  <div id="market-table" class="mt-2"></div>\n</main>#' client/market/index.html
+
+            grep -q 'scripts/market.js' client/market/index.html || \
+              sed -i 's#</body>#  <link rel="stylesheet" href="./styles/market.css">\n  <script type="module" src="./scripts/market.js"></script>\n</body>#' client/market/index.html
+          fi
+
+      - name: Commit changes to a branch
+        run: |
+          set -e
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b chore/scaffold-market
+          git add -A
+          # pokud není co commitnout, skonči tiše
+          git diff --cached --quiet && echo "No changes" && exit 0
+          git commit -m "chore(market): scaffold folders and starter files"
+          git push -u origin chore/scaffold-market
+
+      - name: Open Pull Request (if changes)
+        if: ${{ success() }}
+        uses: peter-evans/create-pull-request@v6
+        with:
+          branch: chore/scaffold-market
+          title: "Scaffold market subfolders"
+          body: "Adds modular structure under client/market and wires a minimal entrypoint. Safe & idempotent."
+          labels: scaffold, market
