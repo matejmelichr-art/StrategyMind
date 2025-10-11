@@ -51,7 +51,8 @@
     .details{display:none}
     .row.open + .details{display:block}
 
-    /* ===== mini-graf (opraveno) ===== */
+    /* ===== mini-graf (zoom + full-width) ===== */
+    .spark *{vector-effect:non-scaling-stroke}
     .spark .avg{stroke:#2563eb;stroke-width:4;fill:none;stroke-linecap:round}         /* min → avg */
     .spark .max{stroke:#22c55e;stroke-width:4;fill:none;stroke-dasharray:6 6;stroke-linecap:round} /* avg → max */
     .spark .guide{stroke:#cbd5e1;opacity:.6}
@@ -59,6 +60,7 @@
     .spark .marker.min{fill:#ef4444}
     .spark .marker.avg{fill:#2563eb}
     .spark .marker.max{fill:#22c55e}
+    .spark .marker.now{fill:#0ea5e9}
     .targets{display:flex;gap:.5rem;flex-wrap:wrap;justify-content:center}
     .tg{display:inline-flex;align-items:center;gap:.4rem;border:1px solid #e2e8f0;border-radius:9999px;padding:.2rem .5rem;font-size:.75rem;background:#fff}
     .tg .dot{width:.5rem;height:.5rem;border-radius:9999px}
@@ -272,33 +274,41 @@
     function starSVG(active){return '<svg class="star '+(active?'active':'')+'" viewBox="0 0 24 24" fill="currentColor"><path d="M12 17.3l-5.6 3 1.1-6.4L3 9.8l6.4-.9L12 3l2.6 5.9 6.4.9-4.5 4.1 1.1 6.4z"/></svg>'}
     function bellSVG(){return '<svg class="w-[18px] h-[18px] text-slate-600" viewBox="0 0 24 24" fill="none"><path d="M15 17H5l2-2v-3a5 5 0 0 1 10 0v3l2 2h-4m-6 0a3 3 0 0 0 6 0" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>'; }
 
-    /* === OPRAVENÝ MINI-GRAF === */
+    /* === MINI-GRAF (zoom + full width + clamp) === */
     function sparkSVG(r){
-      var min = Number(r.forecast.min), avg = Number(r.forecast.avg), max = Number(r.forecast.max), now = Number(r.price);
+      let min = Number(r.forecast.min),
+          avg = Number(r.forecast.avg),
+          max = Number(r.forecast.max),
+          now = Number(r.price);
 
-      // sanity & edge cases
       if(!isFinite(min)||!isFinite(avg)||!isFinite(max)){ min=0;avg=1;max=2; }
-      if(max <= min){ max = min + 1; }
-      if(avg < min) avg = min;
-      if(avg > max) avg = max;
+      if(max<=min) max=min+1;
+      if(avg<min) avg=min; if(avg>max) avg=max;
 
-      var w=680, h=90, p=28;
-      var inner = w - 2*p;
-      var y = Math.round(h/2);
+      const span = max - min;
+      const pad = span * 0.08;                 // ~8 % okraj pro „zoom dovnitř“
+      const zMin = min - pad, zMax = max + pad;
 
-      function x(val){ return p + ((val - min) / (max - min)) * inner; }
-      var xMin = x(min), xAvg = x(avg), xMax = x(max);
-      var xNow = x(Math.min(Math.max(now, min), max)); // clamp
+      const isMobile = window.innerWidth < 768;
+      const w = 680, h = 90, p = isMobile ? 14 : 24;
+      const inner = w - 2*p, y = Math.round(h/2);
+
+      const clamp = (v,a,b)=>Math.min(Math.max(v,a),b);
+      const x = (val)=> p + ((val - zMin) / (zMax - zMin)) * inner;
+
+      const xMin = x(min), xAvg = x(avg), xMax = x(max), xNow = x(clamp(now,zMin,zMax));
 
       return `
-<svg class="spark w-full" viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg" aria-label="1Y forecast sparkline">
+<svg class="spark w-full" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none"
+     xmlns="http://www.w3.org/2000/svg" aria-label="1Y forecast sparkline">
   <line class="guide" x1="${xMin}" y1="${y}" x2="${xMax}" y2="${y}" />
-  <line class="avg"  x1="${xMin}" y1="${y}" x2="${xAvg}" y2="${y}" />
-  <line class="max"  x1="${xAvg}" y1="${y}" x2="${xMax}" y2="${y}" />
+  <line class="avg"   x1="${xMin}" y1="${y}" x2="${xAvg}" y2="${y}" />
+  <line class="max"   x1="${xAvg}" y1="${y}" x2="${xMax}" y2="${y}" />
   <circle class="marker min" cx="${xMin}" cy="${y}" r="4" />
   <circle class="marker avg" cx="${xAvg}" cy="${y}" r="4" />
   <circle class="marker max" cx="${xMax}" cy="${y}" r="4" />
-  <line class="now"  x1="${xNow}" y1="${y-20}" x2="${xNow}" y2="${y+20}" />
+  <line class="now" x1="${xNow}" y1="${y-18}" x2="${xNow}" y2="${y+18}" />
+  <circle class="marker now" cx="${xNow}" cy="${y}" r="4" />
 </svg>`;
     }
 
@@ -422,7 +432,7 @@
     // ===== Insights (stejné) =====
     var insData=[], insContainer=el('#insights'), insEmpty=el('#insEmpty'),
         insSearch=el('#insSearch'), insType=el('#insType'), insSent=el('#insSent'),
-        insHorizon=el('#insHorizon'), insRefresh=el('#insRefresh');
+        insHorizon=el('#insHorizon'), insRefresh=el('#insRefresh']);
 
     function impactBadge(sent){ if(sent==='up')return'<span class="badge impact-up">↑ Pozitivní</span>'; if(sent==='down')return'<span class="badge impact-down">↓ Negativní</span>'; return'<span class="badge impact-flat">↔ Neutrální</span>'; }
 
