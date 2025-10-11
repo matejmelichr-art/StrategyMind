@@ -5,21 +5,70 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>StrategyMind — Market Scanner</title>
 
-  <!-- Fonts + Tailwind -->
+  <!-- Fonts + Tailwind CDN -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
 
-  <!-- Lokální přepisy pro Market (nová struktura) -->
-  <link rel="stylesheet" href="./styles/market.css">
-
   <style>
     html,body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial}
+    .row:hover{background:#f8fafc}
     .pill{padding:.375rem .625rem;border-radius:9999px;border:1px solid rgba(15,23,42,.08)}
     .kbd{background:#f3f4f6;padding:.125rem .375rem;border-radius:.25rem;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Courier New",monospace;font-size:.75rem}
-    .table-grid{display:grid;grid-template-columns:90px 1fr 120px 100px 100px 250px 80px 150px;align-items:center}
-    @media (max-width:1180px){.table-grid{grid-template-columns:80px 1fr 110px 95px 95px 240px 70px 140px}}
+
+    /* tabulka – sloupce (v řádku zůstalo jen tlačítko AI) */
+    .table-grid{
+      display:grid; grid-template-columns: 90px 1fr 120px 100px 100px 250px 80px 150px; align-items:center;
+    }
+    .cell-nowrap{white-space:nowrap}
+    .actions{display:flex;justify-content:flex-end;gap:.5rem}
+    @media (max-width:1180px){ .table-grid{grid-template-columns:80px 1fr 110px 95px 95px 240px 70px 140px} }
+
+    /* insights */
+    .badge{display:inline-flex;align-items:center;gap:.35rem;border:1px solid rgba(15,23,42,.12);border-radius:9999px;padding:.25rem .55rem;font-size:.75rem}
+    .impact-up{background:#ecfdf5;border-color:#a7f3d0;color:#065f46}
+    .impact-down{background:#fef2f2;border-color:#fecaca;color:#7f1d1d}
+    .impact-flat{background:#f1f5f9;border-color:#cbd5e1;color:#334155}
+    .tag{display:inline-block;padding:.15rem .5rem;border:1px solid #e2e8f0;border-radius:9999px;font-size:.7rem;color:#475569;background:#fff}
+    .ins-card{border:1px solid #e2e8f0;border-radius:1rem;background:white}
+
+    /* buttons */
+    .overlay{background:rgba(2,6,23,.45)}
+    .fade-enter{opacity:0;transform:translateY(6px)} .fade-enter-active{opacity:1;transform:none;transition:all .18s ease}
+    .btn{display:inline-flex;align-items:center;gap:.5rem;border-radius:.75rem;padding:.5rem .9rem}
+    .btn-primary{background:#06b6d4;color:#fff} .btn-primary:hover{background:#0891b2}
+    .btn-ghost{border:1px solid #e2e8f0;background:#fff} .btn-ghost:hover{background:#f8fafc}
+
+    /* ikonová mini tlačítka v detailu (hvězda/zvonek) */
+    .iconbtn{width:36px;height:36px;border:1px solid #e2e8f0;border-radius:9999px;display:inline-flex;align-items:center;justify-content:center;background:#fff}
+    .iconbtn:hover{background:#f8fafc}
+    .star{width:18px;height:18px;color:#94a3b8} .star.active{color:#f59e0b}
+
+    /* detail řádku */
+    .row-head{cursor:pointer}
+    .chev{transition:transform .18s ease}
+    .row.open .chev{transform:rotate(180deg)}
+    .details{display:none}
+    .row.open + .details{display:block}
+
+    /* ===== mini-graf (fan chart) ===== */
+    .spark { overflow: visible }
+    .spark .guide{stroke:#e2e8f0}
+    .spark .past{stroke:#0ea5e9;stroke-width:3;fill:none;stroke-linecap:round;opacity:.8}
+    .spark .median{stroke:#2563eb;stroke-width:3;fill:none;stroke-dasharray:6 6;stroke-linecap:round}
+    .spark .fan-up{fill:#22c55e;opacity:.18}
+    .spark .fan-down{fill:#ef4444;opacity:.16}
+    .spark .edge{stroke:#94a3b8;stroke-width:1}
+    .spark .label{font-size:12px;fill:#334155}
+    .spark .badge{paint-order:stroke;stroke:#cbd5e1;stroke-width:1;rx:6;ry:6;fill:#fff}
+    .spark .dot{fill:#0ea5e9;stroke:#fff;stroke-width:2}
+    .spark .tick{stroke:#cbd5e1}
+    .spark .ticktext{font-size:11px;fill:#64748b}
+    .targets{display:flex;gap:.5rem;flex-wrap:wrap;justify-content:center}
+    .tg{display:inline-flex;align-items:center;gap:.4rem;border:1px solid #e2e8f0;border-radius:9999px;padding:.2rem .5rem;font-size:.75rem;background:#fff}
+    .tg .dot{width:.5rem;height:.5rem;border-radius:9999px}
+    .dot.min{background:#ef4444}.dot.avg{background:#2563eb}.dot.max{background:#22c55e}.dot.now{background:#0ea5e9}
   </style>
 </head>
 <body class="bg-slate-50 text-slate-900">
@@ -40,7 +89,6 @@
   </header>
 
   <main class="max-w-6xl mx-auto px-4 py-8">
-    <!-- Intro + CTA -->
     <div class="flex items-start flex-wrap gap-3 justify-between">
       <div>
         <h1 class="text-3xl font-semibold tracking-tight">Market Scanner</h1>
@@ -49,14 +97,12 @@
         </p>
       </div>
       <div class="w-full md:w-auto">
-        <button id="openAIEdgeTop" class="w-full md:w-auto inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-cyan-600 text-white shadow-sm hover:bg-cyan-700">
-          ⚡ AI Edge — Osobní predikce
-        </button>
+        <button id="openAIEdgeTop" class="w-full md:w-auto inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-cyan-600 text-white shadow-sm hover:bg-cyan-700">⚡ AI Edge — Osobní predikce</button>
         <div class="text-xs text-slate-500 mt-1 md:text-right">Screenshot nebo symbol → směr + úrovně + důvody.</div>
       </div>
     </div>
 
-    <!-- Presety & Watchlist (statický UI – logiku doplníme modulárně později) -->
+    <!-- Presety & Watchlist -->
     <div class="mt-4 flex items-center gap-2 flex-wrap">
       <div id="watchlistBar" class="hidden items-center gap-2 flex-wrap">
         <span class="text-sm text-slate-600">Watchlist:</span>
@@ -83,42 +129,28 @@
         <div class="absolute inset-y-0 right-2 flex items-center text-slate-400 pointer-events-none"><span class="kbd">/</span></div>
       </div>
       <select id="typeFilter" class="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white outline-none focus:ring-2 focus:ring-slate-200">
-        <option value="">Všechny typy</option>
-        <option value="stock">Akcie</option>
-        <option value="crypto">Krypto</option>
-        <option value="index">Index</option>
-        <option value="forex">Forex</option>
-        <option value="commodity">Komodita</option>
+        <option value="">Všechny typy</option><option value="stock">Akcie</option><option value="crypto">Krypto</option><option value="index">Index</option><option value="forex">Forex</option><option value="commodity">Komodita</option>
       </select>
       <select id="sortBy" class="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white outline-none focus:ring-2 focus:ring-slate-200">
-        <option value="symbol">Seřadit: Symbol</option>
-        <option value="price">Seřadit: Cena</option>
-        <option value="w1">Seřadit: 1W %</option>
-        <option value="conf">Seřadit: Confidence</option>
+        <option value="symbol">Seřadit: Symbol</option><option value="price">Seřadit: Cena</option><option value="w1">Seřadit: 1W %</option><option value="conf">Seřadit: Confidence</option>
       </select>
     </div>
 
-    <!-- Table (HEADER + MOUNT POINT) -->
+    <!-- Table -->
     <div class="mt-5 overflow-x-auto">
       <div class="min-w-[980px] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-        <!-- Hlavička tabulky -->
         <div class="table-grid px-4 py-2 text-sm font-medium text-slate-500 bg-slate-50">
-          <div></div>
-          <div>Název</div>
-          <div class="text-right">Cena</div>
-          <div class="text-right">1D %</div>
-          <div class="text-right">1W %</div>
-          <div class="text-center">1Y predikce <span class="text-slate-400">(min / avg / max)</span></div>
-          <div class="text-right">Conf.</div>
-          <div class="text-right">Akce</div>
+          <div></div><div>Název</div><div class="text-right">Cena</div><div class="text-right">1D %</div><div class="text-right">1W %</div><div class="text-center">1Y predikce <span class="text-slate-400">(min / avg / max)</span></div><div class="text-right">Conf.</div><div class="text-right">Akce</div>
         </div>
-
-        <!-- Sem se vyrenderují řádky pomocí ES modulu -->
-        <div id="market-table"></div>
+        <div id="rows"></div>
+      </div>
+      <div class="flex items-center justify-between mt-3">
+        <div id="countLabel" class="text-xs text-slate-500"></div>
+        <button id="moreBtn" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-300 bg-white hover:bg-slate-50">Zobrazit vše</button>
       </div>
     </div>
 
-    <!-- Insights (zatím UI placeholder) -->
+    <!-- Insights -->
     <section class="mt-8">
       <div class="flex items-center justify-between gap-3 flex-wrap">
         <h2 class="text-xl font-semibold">Rychlé výkazy ze zpráv (Insights)</h2>
@@ -144,11 +176,53 @@
     <p class="mt-6 text-xs text-slate-500">* Demo data. V ostré verzi: AI teze + zprávy + živé ceny + alerty serverem.</p>
   </main>
 
-  <noscript>
-    <div class="max-w-6xl mx-auto px-4 py-6 text-rose-700">Pro zobrazení dat povol JavaScript.</div>
-  </noscript>
+  <!-- ALERT MODAL -->
+  <div id="alertOverlay" class="hidden fixed inset-0 z-50 overlay"></div>
+  <section id="alertModal" class="hidden fixed inset-0 z-50 p-4 md:p-8 overflow-y-auto">
+    <div class="fade-enter max-w-lg mx-auto rounded-2xl border border-slate-200 bg-white shadow-lg overflow-hidden">
+      <div class="px-5 py-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+        <h3 class="font-semibold">Vytvořit alert</h3>
+        <button id="alertClose" class="btn btn-ghost">Zavřít</button>
+      </div>
+      <div class="p-5 space-y-3">
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="text-sm text-slate-600">Symbol</label>
+            <input id="alertSymbol" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" readonly>
+          </div>
+          <div>
+            <label class="text-sm text-slate-600">Akt. cena (demo)</label>
+            <input id="alertPriceNow" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" readonly>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="text-sm text-slate-600">Cílová cena</label>
+            <input id="alertTarget" type="number" step="0.01" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" placeholder="např. 250">
+          </div>
+          <div>
+            <label class="text-sm text-slate-600">Podmínka</label>
+            <select id="alertCond" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2">
+              <option value="above">Když cena > cílová</option>
+              <option value="below">Když cena &lt; cílová</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label class="text-sm text-slate-600">Poznámka (volitelné)</label>
+          <input id="alertNote" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" placeholder="např. vstup/exit…">
+        </div>
+        <div class="flex justify-end gap-2 pt-2">
+          <button id="alertSave" class="btn btn-primary">Uložit alert</button>
+        </div>
+        <p class="text-xs text-slate-500">* Demo ukládá do localStorage. Pro napojení na TradingView/TV alerts použijeme jejich webhook/API.</p>
+      </div>
+    </div>
+  </section>
 
-  <!-- ES modul s renderem tabulky (nová struktura) -->
-  <script type="module" src="./scripts/market.js"></script>
+  <noscript><div class="max-w-6xl mx-auto px-4 py-6 text-rose-700">Pro zobrazení dat povol JavaScript.</div></noscript>
+
+  <!-- App Script -->
+  <script src="./market.js"></script>
 </body>
 </html>
