@@ -49,7 +49,8 @@
         <div class="space-y-2">
           <button data-view="news" class="w-full pill bg-white hover:bg-slate-50 text-left">📰 News rozbor</button>
           <button data-view="market" class="w-full pill bg-white hover:bg-slate-50 text-left">📈 Market</button>
-          <button data-view="ai" class="w-full pill bg-white hover:bg-slate-50 text-left">🤖 Jarvis (osobní)</button>
+          <!-- Jarvis je samostatná stránka -->
+          <a href="/client/market/ai.html" class="w-full inline-block pill bg-white hover:bg-slate-50 text-left">🤖 Jarvis AI</a>
         </div>
       </div>
       <p class="text-xs text-slate-500 mt-3">Tip: dlouhý popis a poznámky k symbolu najdeš v News a v Jarvisovi.</p>
@@ -108,29 +109,6 @@
           </svg>
         </div>
         <div class="grid md:grid-cols-3 gap-3 mt-3" id="scenarios"></div>
-      </article>
-
-      <!-- AI (Jarvis) -->
-      <article id="view-ai" class="rounded-2xl border border-slate-200 bg-white p-4 hidden">
-        <div class="flex items-center justify-between">
-          <h2 class="text-lg font-semibold">🤖 Jarvis — osobní predikce</h2>
-          <button id="runJarvis" class="pill bg-brand-600 text-white hover:bg-brand-700 text-sm">Spustit analýzu</button>
-        </div>
-        <p class="text-sm text-slate-600 mt-1">Spojuje news + graf + risk. Výstup: směr, úrovně, důvody, invalidace.</p>
-        <div class="mt-3 grid gap-3">
-          <div class="rounded-xl border border-slate-200 p-3">
-            <h3 class="font-medium">Směr & úrovně</h3>
-            <div id="aiLevels" class="text-sm text-slate-700 mt-1">—</div>
-          </div>
-          <div class="rounded-xl border border-slate-200 p-3">
-            <h3 class="font-medium">Důvody (top-3)</h3>
-            <ul id="aiReasons" class="list-disc pl-5 text-sm text-slate-700 mt-1"></ul>
-          </div>
-          <div class="rounded-xl border border-slate-200 p-3">
-            <h3 class="font-medium">Podmínky neplatnosti</h3>
-            <ul id="aiInvalid" class="list-disc pl-5 text-sm text-slate-700 mt-1"></ul>
-          </div>
-        </div>
       </article>
     </section>
   </main>
@@ -199,12 +177,13 @@
   renderList(); $('#q').addEventListener('input', e=>renderList(e.target.value));
   pickSymbol(DATA[0].symbol);
 
-  // ===== VIEW SWITCHER =======================================================
+  // ===== VIEW SWITCHER (jen News/Market) ====================================
   document.querySelectorAll('[data-view]').forEach(btn=>{
     btn.addEventListener('click',()=>{
       const target = btn.getAttribute('data-view');
-      ['news','market','ai'].forEach(v=>{
-        $('#view-'+v).classList.toggle('hidden', v!==target);
+      ['news','market'].forEach(v=>{
+        const el = document.getElementById('view-'+v);
+        if (el) el.classList.toggle('hidden', v!==target);
       });
     })
   });
@@ -308,24 +287,6 @@
       box.appendChild(el);
     });
   }
-
-  // ===== JARVIS (kombinace) ==================================================
-  $('#runJarvis').onclick = () => {
-    if(!current) return;
-    const reasons = [
-      current.news[0] || 'Makro tailwind',
-      current.news[1] || 'Fundamenty stabilní',
-      `Technika: pásmo ${i18n.format(current.forecast.min)}–${i18n.format(current.forecast.max)}`
-    ];
-    const levels = `Směr: ${(current.forecast.avg>=current.price)?'↑ býčí':'↔/↓ opatrně'} • Target (base): ${i18n.format(current.forecast.avg)} • Optimistic: ${i18n.format(current.forecast.max)} • Defensive: ${i18n.format(current.forecast.min)}`;
-    const invalid = [
-      `Break pod ${i18n.format(current.forecast.min)} (uzavření 2×D).`,
-      'Výrazně horší makro / guidance (earnings).'
-    ];
-    $('#aiLevels').textContent = levels;
-    $('#aiReasons').innerHTML = reasons.map(r=>`<li>${r}</li>`).join('');
-    $('#aiInvalid').innerHTML = invalid.map(r=>`<li>${r}</li>`).join('');
-  };
   </script>
 </body>
 </html>
