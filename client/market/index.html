@@ -324,7 +324,6 @@
         span: current.forecast,
         context: { source: 'market-console' }
       });
-      // očekáváme: {direction, confidence, span:{min,avg,max}, reasons:[...]}
       if(res.span){
         current.forecast = res.span;
         $('#forecastBadge').textContent = `1Y: ${i18n.format(res.span.min)} / ${i18n.format(res.span.avg)} / ${i18n.format(res.span.max)}`;
@@ -354,7 +353,6 @@
         horizon: 'W',
         locale: 'cs'
       });
-      // očekáváme: { summary: string, bullets: string[] }
       const bullets = (res.bullets||[]).map(b=>`<li>${b}</li>`).join('');
       const html = `
         <div class="text-sm text-slate-700">Ticker: <b>${current.symbol}</b> • ${current.name}</div>
