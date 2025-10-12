@@ -1,20 +1,64 @@
-import { withCORS } from "../_cors";
+import { withCORS } from '../_cors';
 
-export const onRequest = withCORS(async ({ request }) => {
-  if (request.method !== "POST") return new Response("Use POST", { status: 405 });
-  const { symbol="AAPL", price=200, span={min:165,avg:245,max:310}, context={} } =
-    await request.json().catch(() => ({}));
+const SYS_PROMPT = `You are a disciplined market analyst. 
+Return JSON with fields: direction ("up"|"down"|"flat"), confidence (0-100), 
+span {min,avg,max}, and reasons (string[3]). Keep it short and actionable.`;
 
-  const mid = (span.min + span.max) / 2;
-  const direction = span.avg > mid ? "up" : span.avg < mid ? "down" : "flat";
-  const confidence = Math.max(35, Math.min(90, Math.round(60 + (span.max - span.min) * -0.05)));
-  const reasons = [
-    context.macroNote || "Makro neutrální až mírně podpůrné.",
-    context.newsNote || "Firemní zprávy bez zásadních negativ.",
-    `Technická pásma ${span.min}-${span.max}, střed ${span.avg}.`
-  ];
+export const onRequest = withCORS(async ({ request, env }) => {
+  if (request.method !== 'POST') {
+    return new Response('Use POST', { status: 405 });
+  }
+  const { symbol = 'AAPL', price, span = {} } = await request.json().catch(()=> ({}));
 
-  return new Response(JSON.stringify({ symbol, price, direction, confidence, span, reasons, model:"demo-rule" }), {
-    headers: { "content-type": "application/json" }
+  // --- fallback demo bez API klíče ---
+  if (!env.OPENAI_API_KEY) {
+    const avg = span.avg ?? price ?? 200;
+    const out = {
+      direction: avg >= (price ?? avg) ? 'up' : 'flat',
+      confidence: span.conf ?? 60,
+      span: { min: span.min ?? Math.round(avg*0.7), avg, max: span.max ?? Math.round(avg*1.3) },
+      reasons: [
+        'Demo: bez LLM vracím rule-based výstup.',
+        `Základní pásmo z UI: ${span.min ?? '-'} / ${avg} / ${span.max ?? '-'}.`,
+        'Zapni OPENAI_API_KEY pro skutečný AI výpočet.'
+      ]
+    };
+    return json(out);
+  }
+
+  // --- reálné volání OpenAI (Cloudflare fetch) ---
+  const body = {
+    model: 'gpt-4o-mini',
+    messages: [
+      { role: 'system', content: SYS_PROMPT },
+      { role: 'user', content: `Symbol: ${symbol}\nPoslední cena: ${price}\nSpan z UI: ${JSON.stringify(span)}` }
+    ],
+    response_format: { type: 'json_object' }
+  };
+
+  const r = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${env.OPENAI_API_KEY}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(body)
   });
+
+  if (!r.ok) {
+    const msg = await r.text();
+    return json({ error: 'openai_failed', details: msg }, 502);
+  }
+
+  const data = await r.json();
+  // výsledek je v data.choices[0].message.content jako JSON string
+  const parsed = JSON.parse(data.choices?.[0]?.message?.content || '{}');
+  return json(parsed);
 });
+
+function json(obj, status = 200) {
+  return new Response(JSON.stringify(obj), {
+    status,
+    headers: { 'content-type': 'application/json' }
+  });
+}
