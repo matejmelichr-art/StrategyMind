@@ -3,236 +3,329 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>StrategyMind — Market Scanner</title>
+  <title>StrategyMind — Market Console</title>
 
-  <!-- Fonts + Tailwind CDN -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
-
+  <script>
+    tailwind.config = { theme:{ extend:{ colors:{ brand:{ 50:"#ECFEFF",100:"#CFFAFE",200:"#A5F3FC",300:"#67E8F9",400:"#22D3EE",500:"#06B6D4",600:"#0891B2",700:"#0E7490",800:"#155E75",900:"#164E63"} }}}};
+  </script>
   <style>
     html,body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial}
-    .row:hover{background:#f8fafc}
-    .pill{padding:.375rem .625rem;border-radius:9999px;border:1px solid rgba(15,23,42,.08)}
-    .kbd{background:#f3f4f6;padding:.125rem .375rem;border-radius:.25rem;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Courier New",monospace;font-size:.75rem}
-
-    /* tabulka – sloupce (v řádku zůstalo jen tlačítko AI) */
-    .table-grid{
-      display:grid; grid-template-columns: 90px 1fr 120px 100px 100px 250px 80px 150px; align-items:center;
-    }
-    .cell-nowrap{white-space:nowrap}
-    .actions{display:flex;justify-content:flex-end;gap:.5rem}
-    @media (max-width:1180px){ .table-grid{grid-template-columns:80px 1fr 110px 95px 95px 240px 70px 140px} }
-
-    /* insights */
-    .badge{display:inline-flex;align-items:center;gap:.35rem;border:1px solid rgba(15,23,42,.12);border-radius:9999px;padding:.25rem .55rem;font-size:.75rem}
-    .impact-up{background:#ecfdf5;border-color:#a7f3d0;color:#065f46}
-    .impact-down{background:#fef2f2;border-color:#fecaca;color:#7f1d1d}
-    .impact-flat{background:#f1f5f9;border-color:#cbd5e1;color:#334155}
-    .tag{display:inline-block;padding:.15rem .5rem;border:1px solid #e2e8f0;border-radius:9999px;font-size:.7rem;color:#475569;background:#fff}
-    .ins-card{border:1px solid #e2e8f0;border-radius:1rem;background:white}
-
-    /* buttons */
-    .overlay{background:rgba(2,6,23,.45)}
-    .fade-enter{opacity:0;transform:translateY(6px)} .fade-enter-active{opacity:1;transform:none;transition:all .18s ease}
-    .btn{display:inline-flex;align-items:center;gap:.5rem;border-radius:.75rem;padding:.5rem .9rem}
-    .btn-primary{background:#06b6d4;color:#fff} .btn-primary:hover{background:#0891b2}
-    .btn-ghost{border:1px solid #e2e8f0;background:#fff} .btn-ghost:hover{background:#f8fafc}
-
-    /* ikonová mini tlačítka v detailu (hvězda/zvonek) */
-    .iconbtn{width:36px;height:36px;border:1px solid #e2e8f0;border-radius:9999px;display:inline-flex;align-items:center;justify-content:center;background:#fff}
-    .iconbtn:hover{background:#f8fafc}
-    .star{width:18px;height:18px;color:#94a3b8} .star.active{color:#f59e0b}
-
-    /* detail řádku */
-    .row-head{cursor:pointer}
-    .chev{transition:transform .18s ease}
-    .row.open .chev{transform:rotate(180deg)}
-    .details{display:none}
-    .row.open + .details{display:block}
-
-    /* ===== mini-graf (fan chart) ===== */
-    .spark { overflow: visible }
-    .spark .guide{stroke:#e2e8f0}
-    .spark .past{stroke:#0ea5e9;stroke-width:3;fill:none;stroke-linecap:round;opacity:.8}
-    .spark .median{stroke:#2563eb;stroke-width:3;fill:none;stroke-dasharray:6 6;stroke-linecap:round}
-    .spark .fan-up{fill:#22c55e;opacity:.18}
-    .spark .fan-down{fill:#ef4444;opacity:.16}
-    .spark .edge{stroke:#94a3b8;stroke-width:1}
-    .spark .label{font-size:12px;fill:#334155}
-    .spark .badge{paint-order:stroke;stroke:#cbd5e1;stroke-width:1;rx:6;ry:6;fill:#fff}
-    .spark .dot{fill:#0ea5e9;stroke:#fff;stroke-width:2}
-    .spark .tick{stroke:#cbd5e1}
-    .spark .ticktext{font-size:11px;fill:#64748b}
-    .targets{display:flex;gap:.5rem;flex-wrap:wrap;justify-content:center}
-    .tg{display:inline-flex;align-items:center;gap:.4rem;border:1px solid #e2e8f0;border-radius:9999px;padding:.2rem .5rem;font-size:.75rem;background:#fff}
-    .tg .dot{width:.5rem;height:.5rem;border-radius:9999px}
-    .dot.min{background:#ef4444}.dot.avg{background:#2563eb}.dot.max{background:#22c55e}.dot.now{background:#0ea5e9}
+    .glass{backdrop-filter:blur(10px);background:linear-gradient(180deg,rgba(255,255,255,.75),rgba(255,255,255,.55))}
+    .pill{padding:.35rem .6rem;border:1px solid #e2e8f0;border-radius:9999px}
+    /* --- mini chart --- */
+    .chart .axis{stroke:#CBD5E1}
+    .chart .past{stroke:#0ea5e9;stroke-width:2.5;fill:none}
+    .chart .base{stroke:#2563eb;stroke-width:2;stroke-dasharray:6 6;fill:none}
+    .chart .bull{stroke:#22c55e;stroke-width:2;fill:none;opacity:.7}
+    .chart .bear{stroke:#ef4444;stroke-width:2;fill:none;opacity:.7}
+    .chart .future{marker-end:url(#arrow)}
+    .chart .label{font-size:12px;fill:#334155}
   </style>
 </head>
 <body class="bg-slate-50 text-slate-900">
   <!-- Header -->
-  <header class="sticky top-0 z-20 backdrop-blur bg-white/80 border-b border-slate-200">
-    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center gap-3">
-      <a href="/client/" class="text-sm text-slate-600 hover:text-slate-900 flex items-center gap-2">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" class="opacity-70"><path d="M15 6l-6 6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  <header class="sticky top-0 z-20 bg-white/80 backdrop-blur border-b border-slate-200">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center gap-3">
+      <a href="/client/" class="text-slate-600 hover:text-slate-900 flex items-center gap-2">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M15 6l-6 6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
         Zpět na klientskou sekci
       </a>
-      <div class="ml-auto flex flex-wrap items-center gap-2 overflow-x-auto">
-        <a href="/client/market/" class="pill bg-white font-medium whitespace-nowrap">Market Scanner</a>
-        <a href="/client/real-estate/" class="pill whitespace-nowrap">Real-Estate</a>
-        <a href="/client/idea-lab/" class="pill whitespace-nowrap">Idea Lab</a>
-        <span class="ml-2 text-xs text-slate-500 border border-slate-200 rounded-full px-2 py-1 select-none whitespace-nowrap">v2</span>
+      <div class="ml-auto flex items-center gap-2">
+        <span class="px-2 py-1 text-xs border border-slate-200 rounded-full">Market Console • v0.1</span>
       </div>
     </div>
   </header>
 
-  <main class="max-w-6xl mx-auto px-4 py-8">
-    <div class="flex items-start flex-wrap gap-3 justify-between">
-      <div>
-        <h1 class="text-3xl font-semibold tracking-tight">Market Scanner</h1>
-        <p class="mt-2 text-slate-600 max-w-3xl">
-          Vyhledej a filtruj akcie, indexy, forex, krypto a komodity. <b>Řádek rozklikni</b> pro tezi, podmínky neplatnosti a <b>mini-graf</b> s 1Y rozmezím.
-        </p>
-      </div>
-      <div class="w-full md:w-auto">
-        <button id="openAIEdgeTop" class="w-full md:w-auto inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-cyan-600 text-white shadow-sm hover:bg-cyan-700">⚡ AI Edge — Osobní predikce</button>
-        <div class="text-xs text-slate-500 mt-1 md:text-right">Screenshot nebo symbol → směr + úrovně + důvody.</div>
-      </div>
-    </div>
-
-    <!-- Presety & Watchlist -->
-    <div class="mt-4 flex items-center gap-2 flex-wrap">
-      <div id="watchlistBar" class="hidden items-center gap-2 flex-wrap">
-        <span class="text-sm text-slate-600">Watchlist:</span>
-        <div id="watchlistChips" class="flex items-center gap-2 flex-wrap"></div>
-      </div>
-      <label class="ml-auto inline-flex items-center gap-2 text-sm text-slate-600">
-        <input id="wlOnly" type="checkbox" class="rounded text-cyan-600 border-slate-300"> Filtrovat na watchlist
-      </label>
-    </div>
-
-    <div class="mt-3 flex items-center gap-2 flex-wrap">
-      <span class="text-sm text-slate-600">Hot set-upy:</span>
-      <button class="pill bg-white hover:bg-slate-50 text-sm" data-setup="breakout">Breakout</button>
-      <button class="pill bg-white hover:bg-slate-50 text-sm" data-setup="mean">Mean-reversion</button>
-      <button class="pill bg-white hover:bg-slate-50 text-sm" data-setup="earn">Earnings soon</button>
-      <button class="pill bg-white hover:bg-slate-50 text-sm" data-setup="vol">Objem ↑</button>
-      <button class="pill bg-slate-100 text-sm" data-setup="">Reset</button>
-    </div>
-
-    <!-- Toolbar -->
-    <div class="mt-4 grid grid-cols-1 md:grid-cols-4 gap-3">
-      <div class="relative md:col-span-2">
-        <input id="q" class="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white outline-none focus:ring-2 focus:ring-slate-200" placeholder="Hledej symbol / název…" />
-        <div class="absolute inset-y-0 right-2 flex items-center text-slate-400 pointer-events-none"><span class="kbd">/</span></div>
-      </div>
-      <select id="typeFilter" class="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white outline-none focus:ring-2 focus:ring-slate-200">
-        <option value="">Všechny typy</option><option value="stock">Akcie</option><option value="crypto">Krypto</option><option value="index">Index</option><option value="forex">Forex</option><option value="commodity">Komodita</option>
-      </select>
-      <select id="sortBy" class="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white outline-none focus:ring-2 focus:ring-slate-200">
-        <option value="symbol">Seřadit: Symbol</option><option value="price">Seřadit: Cena</option><option value="w1">Seřadit: 1W %</option><option value="conf">Seřadit: Confidence</option>
-      </select>
-    </div>
-
-    <!-- Table -->
-    <div class="mt-5 overflow-x-auto">
-      <div class="min-w-[980px] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-        <div class="table-grid px-4 py-2 text-sm font-medium text-slate-500 bg-slate-50">
-          <div></div><div>Název</div><div class="text-right">Cena</div><div class="text-right">1D %</div><div class="text-right">1W %</div><div class="text-center">1Y predikce <span class="text-slate-400">(min / avg / max)</span></div><div class="text-right">Conf.</div><div class="text-right">Akce</div>
-        </div>
-        <div id="rows"></div>
-      </div>
-      <div class="flex items-center justify-between mt-3">
-        <div id="countLabel" class="text-xs text-slate-500"></div>
-        <button id="moreBtn" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-300 bg-white hover:bg-slate-50">Zobrazit vše</button>
-      </div>
-    </div>
-
-    <!-- Insights -->
-    <section class="mt-8">
-      <div class="flex items-center justify-between gap-3 flex-wrap">
-        <h2 class="text-xl font-semibold">Rychlé výkazy ze zpráv (Insights)</h2>
-        <div class="flex items-center gap-2">
-          <input id="insSearch" class="px-3 py-2 rounded-lg border border-slate-200 bg-white outline-none w-56" placeholder="Hledej v titulcích…" />
-          <select id="insType" class="px-3 py-2 rounded-lg border border-slate-200 bg-white">
-            <option value="">Všechna aktiva</option><option value="stock">Akcie</option><option value="index">Indexy</option><option value="forex">Forex</option><option value="crypto">Krypto</option><option value="commodity">Komodity</option><option value="macro">Makro</option>
-          </select>
-          <select id="insSent" class="px-3 py-2 rounded-lg border border-slate-200 bg-white">
-            <option value="">Všechen sentiment</option><option value="up">Pozitivní (↑)</option><option value="down">Negativní (↓)</option><option value="flat">Neutrální (↔)</option>
-          </select>
-          <select id="insHorizon" class="px-3 py-2 rounded-lg border border-slate-200 bg-white">
-            <option value="D">Horizon: Dny</option><option value="W" selected>Horizon: Týdny</option><option value="M">Horizon: Měsíce</option>
-          </select>
-          <button id="insRefresh" class="px-4 py-2 rounded-xl border border-slate-300 bg-white hover:bg-slate-50">Aktualizovat</button>
+  <main class="max-w-7xl mx-auto px-4 py-6 grid grid-cols-12 gap-5">
+    <!-- Sidebar / knihovna -->
+    <aside class="col-span-12 md:col-span-3">
+      <div class="glass rounded-2xl border border-white/50 p-4">
+        <h3 class="font-semibold">Knihovna</h3>
+        <input id="q" class="mt-3 w-full rounded-lg border-slate-200" placeholder="Hledej symbol / název…" />
+        <div class="mt-3 space-y-2" id="tickerList"></div>
+        <hr class="my-4">
+        <div class="space-y-2">
+          <button data-view="news" class="w-full pill bg-white hover:bg-slate-50 text-left">📰 News rozbor</button>
+          <button data-view="market" class="w-full pill bg-white hover:bg-slate-50 text-left">📈 Market</button>
+          <button data-view="ai" class="w-full pill bg-white hover:bg-slate-50 text-left">🤖 Jarvis (osobní)</button>
         </div>
       </div>
-      <p class="text-xs text-slate-500 mt-1">Zde shrnujeme, co poslední zprávy <em>znamenají pro investory</em>, a jak mohou krátkodobě ovlivnit chování akcií a dalších aktiv.</p>
-      <div id="insights" class="mt-4 grid md:grid-cols-2 gap-3"></div>
-      <div id="insEmpty" class="hidden mt-6 text-sm text-slate-500 text-center">Nic nenalezeno pro dané filtry.</div>
+      <p class="text-xs text-slate-500 mt-3">Tip: dlouhý popis a poznámky k symbolu najdeš v News a v Jarvisovi.</p>
+    </aside>
+
+    <!-- Workspace -->
+    <section class="col-span-12 md:col-span-9 space-y-5">
+      <!-- TOP summary -->
+      <div class="rounded-2xl border border-slate-200 bg-white p-4 flex flex-wrap items-center gap-3">
+        <div class="text-slate-700">
+          <div class="text-sm">Vybráno:</div>
+          <div class="text-xl font-semibold" id="pick">—</div>
+        </div>
+        <div class="ml-auto flex items-center gap-2">
+          <span class="pill text-sm" id="priceBadge">Cena: —</span>
+          <span class="pill text-sm" id="forecastBadge">1Y: min/avg/max —</span>
+          <span class="pill text-sm" id="confBadge">Conf: —</span>
+        </div>
+      </div>
+
+      <!-- NEWS -->
+      <article id="view-news" class="rounded-2xl border border-slate-200 bg-white p-4">
+        <div class="flex items-start justify-between gap-3">
+          <h2 class="text-lg font-semibold">📰 News rozbor (AI ekonom)</h2>
+          <div class="flex gap-2">
+            <button id="exportMD" class="pill bg-white hover:bg-slate-50 text-sm">Export MD</button>
+            <button id="exportJSON" class="pill bg-white hover:bg-slate-50 text-sm">Export JSON</button>
+          </div>
+        </div>
+        <p class="text-sm text-slate-600 mt-1">Kombinujeme makro + firemní zprávy do krátké investiční interpretace.</p>
+        <div id="newsBody" class="mt-3 prose prose-sm max-w-none"></div>
+      </article>
+
+      <!-- MARKET -->
+      <article id="view-market" class="rounded-2xl border border-slate-200 bg-white p-4 hidden">
+        <div class="flex items-center justify-between">
+          <h2 class="text-lg font-semibold">📈 Market graf + projekce</h2>
+          <div class="flex gap-2 text-sm">
+            <span class="pill">Optimistic</span>
+            <span class="pill">Base</span>
+            <span class="pill">Defensive</span>
+          </div>
+        </div>
+        <div class="mt-3">
+          <svg id="chart" class="chart w-full" viewBox="0 0 900 300" role="img" aria-label="Price with forecast">
+            <defs>
+              <marker id="arrow" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto" markerUnits="strokeWidth">
+                <path d="M0,0 L0,6 L6,3 z" fill="#334155"></path>
+              </marker>
+            </defs>
+            <!-- osy -->
+            <line class="axis" x1="50" y1="250" x2="850" y2="250"/>
+            <line class="axis" x1="50" y1="40" x2="50" y2="250"/>
+            <!-- dynamický obsah -->
+            <g id="chart-layer"></g>
+          </svg>
+        </div>
+        <div class="grid md:grid-cols-3 gap-3 mt-3" id="scenarios"></div>
+      </article>
+
+      <!-- AI (Jarvis) -->
+      <article id="view-ai" class="rounded-2xl border border-slate-200 bg-white p-4 hidden">
+        <div class="flex items-center justify-between">
+          <h2 class="text-lg font-semibold">🤖 Jarvis — osobní predikce</h2>
+          <button id="runJarvis" class="pill bg-brand-600 text-white hover:bg-brand-700 text-sm">Spustit analýzu</button>
+        </div>
+        <p class="text-sm text-slate-600 mt-1">Spojuje news + graf + risk. Výstup: směr, úrovně, důvody, invalidace.</p>
+        <div class="mt-3 grid gap-3">
+          <div class="rounded-xl border border-slate-200 p-3">
+            <h3 class="font-medium">Směr & úrovně</h3>
+            <div id="aiLevels" class="text-sm text-slate-700 mt-1">—</div>
+          </div>
+          <div class="rounded-xl border border-slate-200 p-3">
+            <h3 class="font-medium">Důvody (top-3)</h3>
+            <ul id="aiReasons" class="list-disc pl-5 text-sm text-slate-700 mt-1"></ul>
+          </div>
+          <div class="rounded-xl border border-slate-200 p-3">
+            <h3 class="font-medium">Podmínky neplatnosti</h3>
+            <ul id="aiInvalid" class="list-disc pl-5 text-sm text-slate-700 mt-1"></ul>
+          </div>
+        </div>
+      </article>
     </section>
-
-    <p class="mt-6 text-xs text-slate-500">* Demo data. V ostré verzi: AI teze + zprávy + živé ceny + alerty serverem.</p>
   </main>
 
-  <!-- ALERT MODAL -->
-  <div id="alertOverlay" class="hidden fixed inset-0 z-50 overlay"></div>
-  <section id="alertModal" class="hidden fixed inset-0 z-50 p-4 md:p-8 overflow-y-auto">
-    <div class="fade-enter max-w-lg mx-auto rounded-2xl border border-slate-200 bg-white shadow-lg overflow-hidden">
-      <div class="px-5 py-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
-        <h3 class="font-semibold">Vytvořit alert</h3>
-        <button id="alertClose" class="btn btn-ghost">Zavřít</button>
-      </div>
-      <div class="p-5 space-y-3">
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="text-sm text-slate-600">Symbol</label>
-            <input id="alertSymbol" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" readonly>
-          </div>
-          <div>
-            <label class="text-sm text-slate-600">Akt. cena (demo)</label>
-            <input id="alertPriceNow" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" readonly>
-          </div>
-        </div>
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="text-sm text-slate-600">Cílová cena</label>
-            <input id="alertTarget" type="number" step="0.01" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" placeholder="např. 250">
-          </div>
-          <div>
-            <label class="text-sm text-slate-600">Podmínka</label>
-            <select id="alertCond" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2">
-              <option value="above">Když cena > cílová</option>
-              <option value="below">Když cena &lt; cílová</option>
-            </select>
-          </div>
-        </div>
-        <div>
-          <label class="text-sm text-slate-600">Poznámka (volitelné)</label>
-          <input id="alertNote" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" placeholder="např. vstup/exit…">
-        </div>
-        <div class="flex justify-end gap-2 pt-2">
-          <button id="alertSave" class="btn btn-primary">Uložit alert</button>
-        </div>
-        <p class="text-xs text-slate-500">* Demo ukládá do localStorage. Pro napojení na TradingView/TV alerts použijeme jejich webhook/API.</p>
-      </div>
-    </div>
-  </section>
+  <script>
+  // ===== DEMO DATA ===========================================================
+  const DATA = [
+    {type:'stock',symbol:'AAPL',name:'Apple Inc.',price:219.85,d1:1.26,w1:2.10,
+      forecast:{min:165,avg:245,max:310,conf:72},
+      news:[
+        "CPI níž → pravděpodobnost dřívějšího uvolnění sazeb.",
+        "iPhone mix lepší než oček. v USA; Čína stabilizace.",
+        "Capex do AI/On-device ML – margin tailwind 2025."
+      ]
+    },
+    {type:'stock',symbol:'NVDA',name:'NVIDIA Corporation',price:241.8,d1:1.85,w1:4.10,
+      forecast:{min:128,avg:281,max:498,conf:72},
+      news:[
+        "Datacentra backlog > 2Q; ARMs server momentum.",
+        "Riziko exportních limitů je částečně zaceněné.",
+        "Konkurenční tlak – sleduj marže, supply cadence."
+      ]
+    },
+    {type:'crypto',symbol:'BTCUSD',name:'Bitcoin',price:67200,d1:2.30,w1:6.80,
+      forecast:{min:42000,avg:88000,max:120000,conf:58},
+      news:[
+        "ETF inflows drží poptávku.",
+        "Likvidita víkendů zvyšuje volatilitu.",
+        "Makro: slabší USD bývá pro krypto podpůrné."
+      ]
+    }
+  ];
 
-  <noscript><div class="max-w-6xl mx-auto px-4 py-6 text-rose-700">Pro zobrazení dat povol JavaScript.</div></noscript>
+  // ===== STATE + HELPERS =====================================================
+  const $ = q => document.querySelector(q);
+  const fmt = new Intl.NumberFormat('cs-CZ',{maximumFractionDigits:2});
+  const i18n = new Intl.NumberFormat('cs-CZ');
 
-  <!-- ===== Scripts (pořadí je důležité) ===== -->
-  <script src="/client/market/scripts/utils.js?v=1"></script>
-  <script src="/client/market/scripts/sparkline.js?v=1"></script>
-  <script src="/client/market/scripts/state.js?v=1"></script>
-  <script src="/client/market/scripts/ui.js?v=1"></script>
-  <script src="/client/market/scripts/alerts.js?v=1"></script>
-  <script src="/client/market/scripts/insights.js?v=1"></script>
-  <script src="/client/market/scripts/data.js?v=1"></script>
-  <!-- AI modul (globální window.AI) -->
-  <script src="/client/market/scripts/ai.js?v=1"></script>
-  <!-- Hlavní inicializace stránky -->
-  <script src="/client/market/scripts/market.js?v=1"></script>
+  let current = null;
+
+  function pickSymbol(sym){
+    current = DATA.find(x=>x.symbol===sym);
+    if(!current) return;
+    $('#pick').textContent = `${current.symbol} • ${current.name}`;
+    $('#priceBadge').textContent = `Cena: ${fmt.format(current.price)}`;
+    $('#forecastBadge').textContent = `1Y: ${i18n.format(current.forecast.min)} / ${i18n.format(current.forecast.avg)} / ${i18n.format(current.forecast.max)}`;
+    $('#confBadge').textContent = `Conf: ${current.forecast.conf}%`;
+    renderNews();
+    renderChart();
+    renderScenarios();
+  }
+
+  // ===== SIDEBAR =============================================================
+  const list = $('#tickerList');
+  function renderList(filter=''){
+    list.innerHTML='';
+    DATA.filter(x => (x.symbol+x.name).toLowerCase().includes(filter.toLowerCase()))
+      .forEach(r=>{
+        const b = document.createElement('button');
+        b.className = 'w-full text-left px-3 py-2 rounded-lg hover:bg-slate-100 border border-slate-200';
+        b.innerHTML = `<div class="font-medium">${r.symbol}</div><div class="text-xs text-slate-500 truncate">${r.name}</div>`;
+        b.onclick=()=>pickSymbol(r.symbol);
+        list.appendChild(b);
+      });
+  }
+  renderList(); $('#q').addEventListener('input', e=>renderList(e.target.value));
+  pickSymbol(DATA[0].symbol);
+
+  // ===== VIEW SWITCHER =======================================================
+  document.querySelectorAll('[data-view]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const target = btn.getAttribute('data-view');
+      ['news','market','ai'].forEach(v=>{
+        $('#view-'+v).classList.toggle('hidden', v!==target);
+      });
+    })
+  });
+
+  // ===== NEWS + EXPORT =======================================================
+  function renderNews(){
+    if(!current) return;
+    const html = `
+      <div class="text-sm text-slate-700">Ticker: <b>${current.symbol}</b> • ${current.name}</div>
+      <ul class="mt-2 list-disc pl-5 text-sm">
+        ${current.news.map(n=>`<li>${n}</li>`).join('')}
+      </ul>
+      <p class="mt-2 text-sm text-slate-700">
+        <b>Interpretace:</b> ${current.forecast.conf}% jistota; pásmo ${i18n.format(current.forecast.min)}–${i18n.format(current.forecast.max)}, střed ${i18n.format(current.forecast.avg)}.
+      </p>`;
+    $('#newsBody').innerHTML = html;
+  }
+
+  function exportJSON(){
+    const out = { symbol: current.symbol, name: current.name, news: current.news, forecast: current.forecast, price: current.price, exported_at: new Date().toISOString() };
+    download('news-'+current.symbol+'.json', JSON.stringify(out,null,2));
+  }
+  function exportMD(){
+    const md = `# ${current.symbol} — News rozbor\n\n**Firma:** ${current.name}\n\n**Teze (1Y):** min ${current.forecast.min} / avg ${current.forecast.avg} / max ${current.forecast.max} (conf ${current.forecast.conf}%)\n\n## Body\n${current.news.map(n=>'- '+n).join('\n')}\n`;
+    download('news-'+current.symbol+'.md', md);
+  }
+  function download(filename, content){
+    const a=document.createElement('a'); a.href='data:text/plain;charset=utf-8,'+encodeURIComponent(content); a.download=filename; a.click();
+  }
+  $('#exportJSON').onclick=exportJSON; $('#exportMD').onclick=exportMD;
+
+  // ===== MARKET CHART ========================================================
+  function renderChart(){
+    if(!current) return;
+    const g = $('#chart-layer'); g.innerHTML='';
+
+    // demo minulá trajektorie (lineární)
+    const pastX0=50, pastX1=500, futX0=pastX1, futX1=850;
+    const yMin=40, yMax=250;
+    const spanMin=current.forecast.min, spanAvg=current.forecast.avg, spanMax=current.forecast.max;
+    const scaleY = v => {
+      const lo = spanMin*0.9, hi = spanMax*1.1; // padding
+      const t = (v-lo)/(hi-lo); return yMax - t*(yMax-yMin);
+    };
+
+    // minulost – jednoduchá „klikatá“ čára
+    const past = [0,0.15,0.05,0.3,0.2,0.45,0.35,0.55,0.5,0.6].map((t,i)=>[
+      pastX0 + (pastX1-pastX0)*i/9,
+      scaleY(spanMin + t*(spanMax-spanMin))
+    ]);
+    g.appendChild(path('past', past));
+
+    // základní futura: current.price -> avg
+    const yNow = scaleY(current.price);
+    const yAvg = scaleY(spanAvg);
+    const yBull = scaleY(spanMax);
+    const yBear = scaleY(spanMin);
+
+    g.appendChild(line('base', futX0, yNow, futX1, yAvg));
+    g.appendChild(line('bull future', futX0, yNow, futX1, yBull));
+    g.appendChild(line('bear future', futX0, yNow, futX1, yBear));
+
+    // popisky
+    g.appendChild(text('label', futX1-40, yBull-6, 'Optimistic'));
+    g.appendChild(text('label', futX1-40, yAvg-6, 'Base'));
+    g.appendChild(text('label', futX1-40, yBear-6, 'Defensive'));
+  }
+
+  function path(cls, pts){
+    const p=document.createElementNS('http://www.w3.org/2000/svg','path');
+    p.setAttribute('class',cls);
+    p.setAttribute('d','M '+pts.map(xy=>xy.join(',')).join(' L '));
+    return p;
+  }
+  function line(cls,x1,y1,x2,y2){
+    const l=document.createElementNS('http://www.w3.org/2000/svg','line');
+    l.setAttribute('class',cls);
+    l.setAttribute('x1',x1); l.setAttribute('y1',y1);
+    l.setAttribute('x2',x2); l.setAttribute('y2',y2);
+    return l;
+  }
+  function text(cls,x,y,txt){
+    const t=document.createElementNS('http://www.w3.org/2000/svg','text');
+    t.setAttribute('class',cls); t.setAttribute('x',x); t.setAttribute('y',y); t.textContent=txt; return t;
+  }
+
+  // ===== SCÉNÁŘE KARTY =======================================================
+  function renderScenarios(){
+    const box = $('#scenarios'); box.innerHTML='';
+    const spans = [
+      {k:'Optimistic',v:current.forecast.max,desc:'Růstový scénář (momentum / příznivé makro).'},
+      {k:'Base',v:current.forecast.avg,desc:'Základ: konsensus / mean reversion.'},
+      {k:'Defensive',v:current.forecast.min,desc:'Riziko: utažené podmínky / šoky.'}
+    ];
+    spans.forEach(s=>{
+      const el=document.createElement('div');
+      el.className='rounded-xl border border-slate-200 p-3';
+      el.innerHTML=`<div class="text-sm text-slate-500">${s.k}</div>
+        <div class="text-2xl font-semibold">${i18n.format(s.v)}</div>
+        <p class="text-sm text-slate-600 mt-1">${s.desc}</p>`;
+      box.appendChild(el);
+    });
+  }
+
+  // ===== JARVIS (kombinace) ==================================================
+  $('#runJarvis').onclick = () => {
+    if(!current) return;
+    const reasons = [
+      current.news[0] || 'Makro tailwind',
+      current.news[1] || 'Fundamenty stabilní',
+      `Technika: pásmo ${i18n.format(current.forecast.min)}–${i18n.format(current.forecast.max)}`
+    ];
+    const levels = `Směr: ${(current.forecast.avg>=current.price)?'↑ býčí':'↔/↓ opatrně'} • Target (base): ${i18n.format(current.forecast.avg)} • Optimistic: ${i18n.format(current.forecast.max)} • Defensive: ${i18n.format(current.forecast.min)}`;
+    const invalid = [
+      `Break pod ${i18n.format(current.forecast.min)} (uzavření 2×D).`,
+      'Výrazně horší makro / guidance (earnings).'
+    ];
+    $('#aiLevels').textContent = levels;
+    $('#aiReasons').innerHTML = reasons.map(r=>`<li>${r}</li>`).join('');
+    $('#aiInvalid').innerHTML = invalid.map(r=>`<li>${r}</li>`).join('');
+  };
+  </script>
 </body>
 </html>
