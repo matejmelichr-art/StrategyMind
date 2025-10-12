@@ -291,16 +291,27 @@
     });
   }
 
-  // ====== 🔌 PROPOJENÍ NA BACKEND (Pages functions) =========================
+  /* ====== 🔌 PROPOJENÍ NA BACKEND (Cloudflare Worker) =======================
+     Nastavíme základní URL na Worker a všechny požadavky posíláme tam.
+  -------------------------------------------------------------------------- */
+  const API_BASE = "https://tight-field-436e.matejmelichr.workers.dev";
+
   const API = {
-    analyze: (payload) => fetch('/api/analyze', {
-      method:'POST', headers:{'content-type':'application/json'},
-      body: JSON.stringify(payload)
-    }).then(r=>r.ok?r.json():Promise.reject(r)),
-    news: (payload) => fetch('/api/news', {
-      method:'POST', headers:{'content-type':'application/json'},
-      body: JSON.stringify(payload)
-    }).then(r=>r.ok?r.json():Promise.reject(r))
+    analyze: (payload) =>
+      fetch(`${API_BASE}/api/analyze`, {
+        method: 'POST',
+        mode: 'cors',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(payload)
+      }).then(r => r.ok ? r.json() : Promise.reject(r)),
+
+    news: (payload) =>
+      fetch(`${API_BASE}/api/news`, {
+        method: 'POST',
+        mode: 'cors',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(payload)
+      }).then(r => r.ok ? r.json() : Promise.reject(r))
   };
 
   async function runAnalyze(){
@@ -322,7 +333,6 @@
         $('#confBadge').textContent = `Conf: ${res.confidence}%`;
       }
       if(res.reasons && res.reasons.length){
-        // vtiskneme je i do NEWS části, pokud nepřijde news zvlášť
         const ul = res.reasons.map(x=>`<li>${x}</li>`).join('');
         $('#newsBody').innerHTML = `<div class="text-sm text-slate-700">Ticker: <b>${current.symbol}</b> • ${current.name}</div><ul class="mt-2 list-disc pl-5 text-sm">${ul}</ul>`;
       }
