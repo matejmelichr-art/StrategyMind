@@ -133,5 +133,28 @@
     btn.addEventListener('click',()=>{const m=document.documentElement.classList.contains('dark')?'light':'dark';sessionStorage.setItem('sm-theme',m);apply(m)});
     document.querySelectorAll('a[href]').forEach(a=>a.setAttribute('role','link'));
   </script>
+
+  <!-- 🧠 TEST AI MODUL -->
+  <div style="margin-top:2rem;text-align:center;font-family:sans-serif;">
+    <button id="test-ai-btn" style="background:#007aff;color:white;padding:10px 20px;border:none;border-radius:8px;cursor:pointer;">
+      🧠 Otestovat AI modul
+    </button>
+    <pre id="test-ai-output" style="margin-top:1rem;text-align:left;white-space:pre-wrap;"></pre>
+  </div>
+
+  <script>
+    document.getElementById("test-ai-btn").addEventListener("click", () => {
+      const output = document.getElementById("test-ai-output");
+      if (typeof AI === "undefined") {
+        output.textContent = "❌ AI modul není načtený – zkontroluj cesty ke scriptům.";
+        return;
+      }
+      const ctx = AI.buildContext({ insights: [], now: new Date() });
+      const sample = { symbol: "AAPL", forecast: { min: 150, avg: 250, max: 310 } };
+      const result = AI.scoreSymbol(sample, ctx);
+      output.textContent = "✅ AI modul načtený!\n\n" + JSON.stringify(result, null, 2);
+    });
+  </script>
+
 </body>
 </html>
