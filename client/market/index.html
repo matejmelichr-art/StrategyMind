@@ -222,7 +222,17 @@
 
   <noscript><div class="max-w-6xl mx-auto px-4 py-6 text-rose-700">Pro zobrazení dat povol JavaScript.</div></noscript>
 
-  <!-- App Script -->
-  <script src="./market.js"></script>
+  <!-- ===== Scripts (pořadí je důležité) ===== -->
+  <script src="/client/market/scripts/utils.js?v=1"></script>
+  <script src="/client/market/scripts/sparkline.js?v=1"></script>
+  <script src="/client/market/scripts/state.js?v=1"></script>
+  <script src="/client/market/scripts/ui.js?v=1"></script>
+  <script src="/client/market/scripts/alerts.js?v=1"></script>
+  <script src="/client/market/scripts/insights.js?v=1"></script>
+  <script src="/client/market/scripts/data.js?v=1"></script>
+  <!-- AI modul (globální window.AI) -->
+  <script src="/client/market/scripts/ai.js?v=1"></script>
+  <!-- Hlavní inicializace stránky -->
+  <script src="/client/market/scripts/market.js?v=1"></script>
 </body>
 </html>
