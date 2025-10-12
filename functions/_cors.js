@@ -1,16 +1,32 @@
-export const corsHeaders = {
-  "access-control-allow-origin": "*",
-  "access-control-allow-methods": "GET,POST,OPTIONS",
-  "access-control-allow-headers": "content-type, authorization"
-};
-export function withCORS(handler) {
+// Jednoduchý CORS wrapper pro Pages Functions
+const ALLOWED = [
+  'https://strategymind.pages.dev',
+  'https://strategymind.app',
+  'http://localhost:8788'
+];
+
+export function withCORS(handler){
   return async (ctx) => {
-    if (ctx.request.method === "OPTIONS") {
-      return new Response(null, { headers: corsHeaders });
+    const { request } = ctx;
+    const origin = request.headers.get('Origin') || '';
+    const allow = ALLOWED.includes(origin) ? origin : ALLOWED[0];
+
+    // Preflight
+    if (request.method === 'OPTIONS') {
+      return new Response(null, {
+        status: 204,
+        headers: {
+          'Access-Control-Allow-Origin': allow,
+          'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type,Authorization'
+        }
+      });
     }
+
     const res = await handler(ctx);
-    const headers = new Headers(res.headers || {});
-    Object.entries(corsHeaders).forEach(([k, v]) => headers.set(k, v));
-    return new Response(res.body, { ...res, headers });
+    const hdrs = new Headers(res.headers || {});
+    hdrs.set('Access-Control-Allow-Origin', allow);
+    hdrs.set('Vary', 'Origin');
+    return new Response(res.body, { status: res.status || 200, headers: hdrs });
   };
 }
