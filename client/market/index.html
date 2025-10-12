@@ -68,6 +68,9 @@
           <span class="pill text-sm" id="priceBadge">Cena: —</span>
           <span class="pill text-sm" id="forecastBadge">1Y: min/avg/max —</span>
           <span class="pill text-sm" id="confBadge">Conf: —</span>
+          <!-- 🔌 tlačítka na server -->
+          <button id="btnAnalyze" class="pill bg-brand-600 text-white hover:bg-brand-700 text-sm">AI analyzovat</button>
+          <button id="btnNews" class="pill bg-white hover:bg-slate-50 text-sm">AI news</button>
         </div>
       </div>
 
@@ -287,6 +290,87 @@
       box.appendChild(el);
     });
   }
+
+  // ====== 🔌 PROPOJENÍ NA BACKEND (Pages functions) =========================
+  const API = {
+    analyze: (payload) => fetch('/api/analyze', {
+      method:'POST', headers:{'content-type':'application/json'},
+      body: JSON.stringify(payload)
+    }).then(r=>r.ok?r.json():Promise.reject(r)),
+    news: (payload) => fetch('/api/news', {
+      method:'POST', headers:{'content-type':'application/json'},
+      body: JSON.stringify(payload)
+    }).then(r=>r.ok?r.json():Promise.reject(r))
+  };
+
+  async function runAnalyze(){
+    if(!current) return;
+    setBusy('#btnAnalyze', true);
+    try{
+      const res = await API.analyze({
+        symbol: current.symbol,
+        price: current.price,
+        span: current.forecast,
+        context: { source: 'market-console' }
+      });
+      // očekáváme: {direction, confidence, span:{min,avg,max}, reasons:[...]}
+      if(res.span){
+        current.forecast = res.span;
+        $('#forecastBadge').textContent = `1Y: ${i18n.format(res.span.min)} / ${i18n.format(res.span.avg)} / ${i18n.format(res.span.max)}`;
+      }
+      if(typeof res.confidence==='number'){
+        $('#confBadge').textContent = `Conf: ${res.confidence}%`;
+      }
+      if(res.reasons && res.reasons.length){
+        // vtiskneme je i do NEWS části, pokud nepřijde news zvlášť
+        const ul = res.reasons.map(x=>`<li>${x}</li>`).join('');
+        $('#newsBody').innerHTML = `<div class="text-sm text-slate-700">Ticker: <b>${current.symbol}</b> • ${current.name}</div><ul class="mt-2 list-disc pl-5 text-sm">${ul}</ul>`;
+      }
+      renderChart(); renderScenarios();
+    }catch(e){
+      console.error(e);
+      alert('API /api/analyze: chyba požadavku');
+    }finally{
+      setBusy('#btnAnalyze', false);
+    }
+  }
+
+  async function runNews(){
+    if(!current) return;
+    setBusy('#btnNews', true);
+    try{
+      const res = await API.news({
+        symbol: current.symbol,
+        horizon: 'W',
+        locale: 'cs'
+      });
+      // očekáváme: { summary: string, bullets: string[] }
+      const bullets = (res.bullets||[]).map(b=>`<li>${b}</li>`).join('');
+      const html = `
+        <div class="text-sm text-slate-700">Ticker: <b>${current.symbol}</b> • ${current.name}</div>
+        ${res.summary ? `<p class="mt-2 text-sm text-slate-700">${res.summary}</p>` : ''}
+        ${bullets ? `<ul class="mt-2 list-disc pl-5 text-sm">${bullets}</ul>` : ''}
+      `;
+      $('#newsBody').innerHTML = html;
+    }catch(e){
+      console.error(e);
+      alert('API /api/news: chyba požadavku');
+    }finally{
+      setBusy('#btnNews', false);
+    }
+  }
+
+  function setBusy(sel, busy){
+    const el = document.querySelector(sel);
+    if(!el) return;
+    el.disabled = busy;
+    el.style.opacity = busy ? .6 : 1;
+    el.textContent = busy ? '⏳ Probíhá…' : (sel==='#btnAnalyze' ? 'AI analyzovat' : 'AI news');
+  }
+
+  // Handlery tlačítek
+  document.getElementById('btnAnalyze').addEventListener('click', runAnalyze);
+  document.getElementById('btnNews').addEventListener('click', runNews);
   </script>
 </body>
 </html>
