@@ -291,27 +291,25 @@
     });
   }
 
-  /* ====== 🔌 PROPOJENÍ NA BACKEND (Cloudflare Worker) =======================
-     Nastavíme základní URL na Worker a všechny požadavky posíláme tam.
+    /* ====== 🔌 PROPOJENÍ NA BACKEND (Cloudflare Worker) =======================
+     Napojení na Worker: /api/analyze (POST), /api/news (GET ?q=...)
   -------------------------------------------------------------------------- */
   const API_BASE = "https://tight-field-436e.matejmelichr.workers.dev";
 
   const API = {
+    // /api/analyze — POST { symbol, price, span }
     analyze: (payload) =>
       fetch(`${API_BASE}/api/analyze`, {
         method: 'POST',
-        mode: 'cors',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify(payload)
-      }).then(r => r.ok ? r.json() : Promise.reject(r)),
+      }).then(r => r.ok ? r.json() : r.text().then(t => Promise.reject(new Error(t)))),
 
-    news: (payload) =>
-      fetch(`${API_BASE}/api/news`, {
-        method: 'POST',
-        mode: 'cors',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify(payload)
-      }).then(r => r.ok ? r.json() : Promise.reject(r))
+    // /api/news — GET ?q=<symbol|markets>
+    news: (query = "markets") =>
+      fetch(`${API_BASE}/api/news?q=${encodeURIComponent(query)}`, {
+        method: 'GET'
+      }).then(r => r.ok ? r.json() : r.text().then(t => Promise.reject(new Error(t))))
   };
 
   async function runAnalyze(){
@@ -324,16 +322,21 @@
         span: current.forecast,
         context: { source: 'market-console' }
       });
+
+      // očekáváme: {direction, confidence, span:{min,avg,max}, reasons:[...]}
       if(res.span){
         current.forecast = res.span;
-        $('#forecastBadge').textContent = `1Y: ${i18n.format(res.span.min)} / ${i18n.format(res.span.avg)} / ${i18n.format(res.span.max)}`;
+        $('#forecastBadge').textContent =
+          `1Y: ${i18n.format(res.span.min)} / ${i18n.format(res.span.avg)} / ${i18n.format(res.span.max)}`;
       }
-      if(typeof res.confidence==='number'){
+      if(typeof res.confidence === 'number'){
         $('#confBadge').textContent = `Conf: ${res.confidence}%`;
       }
-      if(res.reasons && res.reasons.length){
+      if(Array.isArray(res.reasons) && res.reasons.length){
         const ul = res.reasons.map(x=>`<li>${x}</li>`).join('');
-        $('#newsBody').innerHTML = `<div class="text-sm text-slate-700">Ticker: <b>${current.symbol}</b> • ${current.name}</div><ul class="mt-2 list-disc pl-5 text-sm">${ul}</ul>`;
+        $('#newsBody').innerHTML =
+          `<div class="text-sm text-slate-700">Ticker: <b>${current.symbol}</b> • ${current.name}</div>
+           <ul class="mt-2 list-disc pl-5 text-sm">${ul}</ul>`;
       }
       renderChart(); renderScenarios();
     }catch(e){
@@ -348,16 +351,19 @@
     if(!current) return;
     setBusy('#btnNews', true);
     try{
-      const res = await API.news({
-        symbol: current.symbol,
-        horizon: 'W',
-        locale: 'cs'
-      });
-      const bullets = (res.bullets||[]).map(b=>`<li>${b}</li>`).join('');
+      // Worker vrací { items:[{title,url,snippet,source}], ts? }
+      const res = await API.news(current.symbol || "markets");
+      const items = Array.isArray(res.items) ? res.items : [];
+
+      const listHtml = items.slice(0,8).map(i => `
+        <li class="mb-2">
+          <a href="${i.url}" target="_blank" class="text-brand-700 hover:underline">${i.title}</a>
+          <div class="text-xs text-slate-500">${i.source || ''}${i.snippet ? ' — ' + i.snippet : ''}</div>
+        </li>`).join('');
+
       const html = `
         <div class="text-sm text-slate-700">Ticker: <b>${current.symbol}</b> • ${current.name}</div>
-        ${res.summary ? `<p class="mt-2 text-sm text-slate-700">${res.summary}</p>` : ''}
-        ${bullets ? `<ul class="mt-2 list-disc pl-5 text-sm">${bullets}</ul>` : ''}
+        <ul class="mt-2 list-disc pl-5 text-sm">${listHtml || '<li>Žádné položky</li>'}</ul>
       `;
       $('#newsBody').innerHTML = html;
     }catch(e){
