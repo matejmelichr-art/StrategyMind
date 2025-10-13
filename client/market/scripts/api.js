@@ -1,61 +1,116 @@
-<!-- /client/market/scripts/api.js -->
-<script>
-/** Central API adapter for StrategyMind (browser) */
-window.API_BASE = "https://tight-field-436e.matejmelichr.workers.dev";
+// =====================================
+// StrategyMind – API Connector (Frontend)
+// =====================================
+// Připojení na Cloudflare Worker API
+// Autor: Matej Melichr (v.2025-10)
+// -------------------------------------
 
-const req = async (path, init={}) => {
-  const url = `${window.API_BASE}${path}`;
-  const r = await fetch(url, {
-    ...init,
-    headers: { "Content-Type": "application/json", ...(init.headers||{}) }
+// 🔌 Backend (Cloudflare Worker)
+const API_BASE = "https://tight-field-436e.matejmelichr.workers.dev";
+
+// ==========================
+// Helper funkce pro API call
+// ==========================
+async function apiFetch(url, options = {}) {
+  const res = await fetch(url, {
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...(options.headers || {})
+    },
   });
-  if (!r.ok) throw new Error(await r.text());
-  return r.json();
-};
+  if (!res.ok) {
+    const err = await res.text().catch(() => res.statusText);
+    throw new Error(`API Error ${res.status}: ${err}`);
+  }
+  return res.json();
+}
 
-window.API = {
-  // --- Chat / Jarvis
-  chat: (topic, messages) =>
-    req(`/api/chat?topic=${encodeURIComponent(topic||"general")}`, {
-      method:"POST", body: JSON.stringify({ messages })
-    }),
-
-  // --- Finance
-  quotes: (symbols=[]) =>
-    req(`/api/finance/quotes?symbols=${encodeURIComponent(symbols.join(","))}`),
-
-  candles: ({symbol, resolution="D", from, to}) => {
-    const p = new URLSearchParams({ symbol, resolution });
-    if (from) p.set("from", from); if (to) p.set("to", to);
-    return req(`/api/finance/candles?${p}`);
+// ==========================
+// Hlavní API objekt
+// ==========================
+const API = {
+  // 🧠 Health check
+  async health() {
+    return apiFetch(`${API_BASE}/api/health`);
   },
 
-  indicators: ({symbol, resolution="D", sma="20,50,200", ema="12,26", rsi="14", bb="20"}) =>
-    req(`/api/finance/indicators?symbol=${encodeURIComponent(symbol)}&resolution=${resolution}&sma=${sma}&ema=${ema}&rsi=${rsi}&bb=${bb}`),
+  // 📊 Analyze – analyzuje cenu podle pásma
+  async analyze(symbol, price, span) {
+    const payload = { symbol, price, span };
+    return apiFetch(`${API_BASE}/api/analyze`, {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
+  },
 
-  correlation: ({symbols=[], period=120}) =>
-    req(`/api/finance/correlation?symbols=${encodeURIComponent(symbols.join(","))}&period=${period}`),
-
-  screener: ({symbols=[], filter="all"}) =>
-    req(`/api/finance/screener?symbols=${encodeURIComponent(symbols.join(","))}&filter=${filter}`),
-
-  backtest: ({symbol, resolution="D", fast=20, slow=50}) =>
-    req(`/api/finance/backtest?symbol=${encodeURIComponent(symbol)}&resolution=${resolution}&fast=${fast}&slow=${slow}`),
-
-  // --- News
-  news: (q="markets") => req(`/api/news?q=${encodeURIComponent(q)}`),
-  newsSentiment: (q="markets") => req(`/api/news/sentiment?q=${encodeURIComponent(q)}`),
-
-  // --- Real-estate
-  cadastre: (q) => req(`/api/cadastre/search?q=${encodeURIComponent(q)}`),
-  reScan: (q) => req(`/api/realestate/scan?q=${encodeURIComponent(q)}`),
-  reIdeas: (prompt) => req(`/api/realestate/ideas`, { method:"POST", body: JSON.stringify({ prompt }) }),
-  reComps: (q) => req(`/api/realestate/comps?q=${encodeURIComponent(q)}`),
-
-  // --- Money
-  moneyPlan: ({income=50000, risk="balanced"}) =>
-    req(`/api/money/plan?income=${income}&risk=${risk}`),
-  compound: ({principal=100000, monthly=2000, rate=8, years=10}) =>
-    req(`/api/money/compound?principal=${principal}&monthly=${monthly}&rate=${rate}&years=${years}`),
+  // 📰 News – získá nejnovější zprávy
+  async news(symbol = "markets") {
+    const q = encodeURIComponent(symbol);
+    return apiFetch(`${API_BASE}/api/news?q=${q}`);
+  },
 };
-</script>
+
+// ==========================
+// Ukázkové napojení na UI
+// ==========================
+
+// Zdraví API
+async function checkHealth() {
+  try {
+    const data = await API.health();
+    console.log("✅ API health:", data);
+    const el = document.getElementById("health-status");
+    if (el) el.textContent = `API: OK (${new Date(data.ts).toLocaleTimeString()})`;
+  } catch (err) {
+    console.error("❌ API health error:", err);
+    const el = document.getElementById("health-status");
+    if (el) el.textContent = "API: ERROR";
+  }
+}
+
+// Získání zpráv do sekce "AI News"
+async function loadNews(symbol = "markets") {
+  try {
+    const data = await API.news(symbol);
+    const list = document.getElementById("news-list");
+    if (!list) return;
+    list.innerHTML = "";
+    data.items.slice(0, 8).forEach((n) => {
+      const li = document.createElement("li");
+      li.innerHTML = `<a href="${n.url}" target="_blank">${n.title}</a><br>
+        <small>${n.source}</small>`;
+      list.appendChild(li);
+    });
+  } catch (err) {
+    console.error("News load error:", err);
+  }
+}
+
+// Spuštění analýzy ceny (např. tlačítko "Analyze")
+async function runAnalyze() {
+  const symbol = document.getElementById("symbol-input").value || "AAPL";
+  const price = parseFloat(document.getElementById("price-input").value) || 200;
+  const min = parseFloat(document.getElementById("min-input").value) || 150;
+  const avg = parseFloat(document.getElementById("avg-input").value) || 200;
+  const max = parseFloat(document.getElementById("max-input").value) || 250;
+
+  try {
+    const data = await API.analyze(symbol, price, { min, avg, max });
+    const out = document.getElementById("analyze-output");
+    out.innerHTML = `
+      <strong>${symbol}</strong> → ${data.direction.toUpperCase()} (${data.confidence}%)
+      <br><em>${data.reasons.join("<br>")}</em>
+    `;
+  } catch (err) {
+    console.error("Analyze error:", err);
+  }
+}
+
+// ==========================
+// Auto-run po načtení stránky
+// ==========================
+document.addEventListener("DOMContentLoaded", () => {
+  checkHealth();
+  loadNews();
+});
