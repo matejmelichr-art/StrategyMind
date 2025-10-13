@@ -1,82 +1,68 @@
-// functions/api/analyze.js
-// Jednoduchá heuristická analýza: cena + pásmo (min/avg/max) -> směr + confidence
-// Vrací: { direction, confidence, span:{min,avg,max}, reasons:[...], symbol }
+// Cloudflare Pages Function: POST /api/analyze
+// body: { symbol, price, span:{min,avg,max} }
+// out : { symbol, direction:'up'|'down'|'flat', confidence:Number, span, reasons: string[] }
 
-import { withCORS } from "../_cors";
+const CORS = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Requested-With",
+  "Content-Type": "application/json; charset=utf-8",
+};
 
-export const onRequest = withCORS(async ({ request }) => {
-  if (request.method !== "POST") {
-    return new Response(JSON.stringify({ error: "Use POST" }), {
-      status: 405,
-      headers: { "content-type": "application/json" },
-    });
-  }
+export async function onRequestOptions() {
+  return new Response(null, { status: 204, headers: CORS });
+}
 
-  // Bezpečné načtení těla
+export async function onRequestPost({ request }) {
   let body = {};
-  try { body = await request.json(); } catch (_) {}
+  try { body = await request.json(); } catch {}
+  const { symbol = "TICKER", price = null, span = {} } = body || {};
 
-  const {
-    symbol = "AAPL",
-    price  = null,
-    span   = {},
-  } = body || {};
+  const sMin = Number(span.min ?? NaN);
+  const sAvg = Number(span.avg ?? NaN);
+  const sMax = Number(span.max ?? NaN);
+  const p    = Number(price ?? NaN);
 
-  // Normalizace vstupů
-  const sMin = Number(span.min ?? 0);
-  const sAvg = Number(span.avg ?? 0);
-  const sMax = Number(span.max ?? 0);
-  const p = price != null ? Number(price)
-    : (sAvg || (sMin && sMax ? (sMin + sMax) / 2 : null));
+  const validSpan =
+    Number.isFinite(sMin) && Number.isFinite(sAvg) && Number.isFinite(sMax) &&
+    sMin <= sAvg && sAvg <= sMax;
 
-  // --- směr dle polohy ceny v pásmu
+  if (!validSpan) {
+    return new Response(
+      JSON.stringify({ error: "invalid span: expected {min<=avg<=max}" }),
+      { status: 400, headers: CORS }
+    );
+  }
+
+  // směr podle polohy ceny v pásmu
   let direction = "flat";
-  if (p != null && sMin && sMax) {
-    const midLower = (sMin + (sAvg || sMin)) / 2;
-    const midUpper = ((sAvg || sMax) + sMax) / 2;
-    if (p < midLower) direction = "down";
-    else if (p > midUpper) direction = "up";
+  if (Number.isFinite(p)) {
+    if (p < (sMin + sAvg) / 2) direction = "down";
+    if (p > (sAvg + sMax) / 2) direction = "up";
   }
 
-  // --- confidence: užší pásmo => vyšší jistota; odchylka od středu => mírný bonus
-  const width = sMax && sMin ? Math.max(1e-9, sMax - sMin) : 1;
-  const denom = Math.max(1e-9, sAvg || ((sMin + sMax) / 2) || 1);
-  const dist  = p != null && sAvg ? Math.abs(p - sAvg) : width / 2;
-
-  let confidence =
-    40 +                               // základ
-    (1 - Math.min(0.7, width / denom)) * 45 +   // užší pásmo -> vyšší jistota
-    Math.min(15, (dist / width) * 15);          // bonus za „vyhraněnost“
-  confidence = Math.max(0, Math.min(98, Math.round(confidence)));
-
-  // --- krátké důvody (CZ)
-  const reasons = [];
-  if (p != null && sMin && sMax && sAvg) {
-    reasons.push(`Cena ${p.toFixed(2)} vs. pásmo ${sMin}–${sMax} (střed ${sAvg}).`);
-  }
-  reasons.push(
-    direction === "up"
-      ? "Nad horním středem pásma — mírně býčí bias / momentum."
-      : direction === "down"
-      ? "Pod dolním středem pásma — defenzivní nastavení / slabší momentum."
-      : "V okolí středu pásma — spíše konsolidace / mean reversion."
+  // confidence: užší pásmo a blíže středu ⇒ vyšší
+  const width = Math.max(1, sMax - sMin);
+  const dist  = Number.isFinite(p) ? Math.abs(p - sAvg) : width / 3;
+  const confidence = Math.round(
+    Math.min(
+      92,
+      40 + (dist / width) * 45 + (1 - Math.min(0.7, width / Math.max(1, sAvg))) * 15
+    )
   );
-  if (width / denom > 0.35) {
-    reasons.push("Širší pásmo ⇒ vyšší nejistota, vyčkej na potvrzení.");
-  } else {
-    reasons.push("Užší pásmo ⇒ vyšší jistota krátkodobé projekce.");
-  }
 
-  const result = {
-    symbol,
-    direction,
-    confidence,
-    span: { min: sMin || null, avg: sAvg || null, max: sMax || null },
-    reasons,
-  };
+  const reasons = [
+    Number.isFinite(p)
+      ? `Cena ${p.toFixed(2)} vs. pásmo ${sMin}–${sMax} (střed ${sAvg}).`
+      : `Pásmo ${sMin}–${sMax} (střed ${sAvg}).`,
+    direction === "up"   ? "Nad středem pásma – mírně býčí bias."
+  : direction === "down" ? "Pod středem pásma – mírně medvědí bias."
+                          : "Kolem středu pásma – neutrální.",
+    `Šířka pásma ${width.toFixed(2)} ⇒ konfid. ~${confidence}%.`
+  ];
 
-  return new Response(JSON.stringify(result), {
-    status: 200,
-    headers: { "content-type": "application/json" },
-  });
-});
+  return new Response(
+    JSON.stringify({ symbol, direction, confidence, span: { min: sMin, avg: sAvg, max: sMax }, reasons }),
+    { headers: CORS }
+  );
+}
