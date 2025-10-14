@@ -1,0 +1,10 @@
+html,body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial}
+.glass{backdrop-filter:blur(10px);background:linear-gradient(180deg,rgba(255,255,255,.75),rgba(255,255,255,.55))}
+.pill{padding:.35rem .6rem;border:1px solid #e2e8f0;border-radius:9999px}
+.chart .axis{stroke:#CBD5E1}
+.chart .past{stroke:#0ea5e9;stroke-width:2.5;fill:none}
+.chart .base{stroke:#2563eb;stroke-width:2;stroke-dasharray:6 6;fill:none}
+.chart .bull{stroke:#22c55e;stroke-width:2;fill:none;opacity:.7}
+.chart .bear{stroke:#ef4444;stroke-width:2;fill:none;opacity:.7}
+.chart .future{marker-end:url(#arrow)}
+.chart .label{font-size:12px;fill:#334155}
